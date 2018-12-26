@@ -31,30 +31,9 @@ void ros::init(int argc,char *argv,std::string node_name){
 	syslog(LOG_NOTICE,"usr task ID [%d]",id);
 	node_nv.push_back(node_name);
 }
-/*
-template<class M,class T> ros::Subscriber ros::NodeHandle::subscriber(std::string topic,int queue_size,void (T::*fp)(M)){
-	Subscriber sub;
-	return sub;
-}
-template<class M> ros::Subscriber ros::NodeHandle::subscriber(std::string topic,int queue_size,void (*fp)(M)){
-	Subscriber sub;
-	return sub;
-}
-*/
-#if 0
-<<<<<<< HEAD
-ros::Subscriber ros::NodeHandle::subscriber(std::string topic,std::string type,int queue_size,void (*fp)(std::string)){
-	ID id;
-	get_tid(&id);
-	IDv.push_back(id);
-	syslog(LOG_NOTICE,"usr task ID [%d]",id);
-	while(ros_sem != 0){
-=======
->>>>>>> mori_ws
-#endif
 
 
-ros::Subscriber ros::NodeHandle::subscriber(std::string topic,int queue_size,void (*fp)()){
+ros::Subscriber ros::NodeHandle::subscriber(std::string topic,int queue_size,void (*fp)(std::string&)){
 	while(ros_sem != 0){
 	}
 	state = 1;

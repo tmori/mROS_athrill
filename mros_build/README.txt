@@ -1,0 +1,3 @@
+TODO
+ 1. how to get kernel_cfg.h without compiling app.cpp...
+
