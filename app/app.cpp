@@ -8,6 +8,8 @@
 #include <iostream>
 #include <sstream>
 
+unsigned int athrill_device_func_call __attribute__ ((section(".athrill_device_section")));
+
 /*****mROS user task code*******/
 void usr_task1(void)
 {

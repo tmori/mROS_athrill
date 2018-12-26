@@ -53,7 +53,7 @@ TARGET = v850_gcc
 #
 #  プログラミング言語の定義
 #
-SRCLANG = c
+SRCLANG = c,c++
 ifeq ($(SRCLANG),c++)
   USE_CXX = true
   CXXLIBS = -lstdc++ -lm -lc
@@ -176,7 +176,7 @@ APPL_CFLAGS += -I$(MBED_LIB_DIR)/EthernetInterface/lwip/include/ipv4
 APPL_CFLAGS += -I$(MBED_LIB_DIR)/EthernetInterface/lwip-athrill/include
 APPL_CFLAGS += -DTARGET_ATHRILL
 APPL_CFLAGS += -DLWIP_TRANSPORT_ETHERNET
-APPL_LIBS =
+APPL_LIBS = -L../mros_build -L../mbed_build -lmros -lmbed -lnosys
 ifdef APPLDIR
   INCLUDES := $(INCLUDES) $(foreach dir,$(APPLDIR),-I$(dir))
 endif
