@@ -23,6 +23,7 @@ CFLAGS	+= -gdwarf-2 -Wall -Wno-unused-label -Wpointer-arith  -mv850e2v3 -Wa,-mno
 IFLAGS	:= -I.
 IFLAGS	+= $(INCLUDE_PATHS)
 IFLAGS	+= -I$(PRJROOT_ETHERIF)/lwip-athrill/include
+IFLAGS	+= -I$(MBED_LIB_DIR)/mbed-src/api
 IFLAGS	+= -I$(PRJROOT_ASP)
 IFLAGS	+= -I$(PRJROOT_ASP)/include
 IFLAGS	+= -I$(PRJROOT_ASP)/target/v850_gcc

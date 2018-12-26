@@ -337,8 +337,7 @@ void ros::Publisher::publish_dummy(){
 }
 
 void ros::Rate::sleep(){
-	//wait_ms(1000/this->rate);
-	dly_tsk(1000/this->rate);
+	wait_ms(1000/this->rate);
 }
 
 void ros::spin(){
