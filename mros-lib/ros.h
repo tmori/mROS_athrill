@@ -111,15 +111,8 @@ class NodeHandle{
 	Subscriber sub;
 	Publisher pub;
 public:
-#if 0
-<<<<<<< HEAD
-	Subscriber subscriber(std::string topic,std::string type,int queue_size,void(*fp)(std::string));
-	Publisher advertise(std::string topic,std::string type,int queue_size);
-=======
-#endif
-	Subscriber subscriber(std::string topic,int queue_size,void(*fp)());
+	Subscriber subscriber(std::string topic,int queue_size,void(*fp)(std::string&));
 	Publisher advertise(std::string topic,int queue_size);
-//>>>>>>> mori_ws
 };
 
 class Rate{

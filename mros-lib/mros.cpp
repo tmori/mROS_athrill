@@ -249,18 +249,6 @@ syslog(LOG_NOTICE, "========Activate mROS PUBLISH========");
 							connect_status = false;
 							break;
 						default:
-#if 0
-<<<<<<< HEAD
-							int len;
-							//if(check_head(rbuf)){
-							if(node_lst[node_num].topic_type == "std_msgs/String"){
-								len = pub_gen_header(snd_buf,node_lst[node_num].callerid,node_lst[node_num].message_definition,node_lst[node_num].topic_name,node_lst[node_num].topic_type,"992ce8a1687cec8c8bd883ec73ca41d1");
-							}else if(node_lst[node_num].topic_type == "sensor_msgs/Image"){
-								len = pub_gen_header(snd_buf,node_lst[node_num].callerid,node_lst[node_num].message_definition,node_lst[node_num].topic_name,node_lst[node_num].topic_type,"060021388200f6f0f447d0fcd9c64743");
-							}
-							//syslog(LOG_NOTICE,"PUB_TASK: TCPROS connection header[%s]",snd_buf[8]);
-=======
-#endif
 							/** for image data **/
 							int len = pub_gen_header(snd_buf,node_lst[node_num].callerid,node_lst[node_num].message_definition,node_lst[node_num].topic_name,node_lst[node_num].topic_type,"060021388200f6f0f447d0fcd9c64743");	//test function
 							/**for string data**/
@@ -289,26 +277,6 @@ syslog(LOG_NOTICE, "========Activate mROS PUBLISH========");
 			lst.stat_vec[ii] = 0;
 			ROS_INFO("PUB_TASK:accept internal request [%d][%d]",i,ii);
 		}else{
-#if 0
-<<<<<<< HEAD
-		//publish phase
-		//ROS_INFO("data publish phase");
-		memcpy(rbuf,mem,size);
-		rbuf[size] = '\0';	//cutting data end
-		int l;
-		if(node_lst[node_num].topic_type == "std_msgs/String"){
-			l = pub_gen_msg(buf,rbuf);
-		}else if(node_lst[node_num].topic_type == "sensor_msgs/Image"){
-			//publish
-			l = pub_gen_img_msg(buf,rbuf,size);
-		}else{
-			syslog(LOG_NOTICE,"PUB_TASK: NOT SUPPORTED TOPIC TYPE");
-		}
-		//ROS_INFO("data publish");
-		int err = lst.sock_vec[num].send(buf,l);
-		 //ROS_INFO("error code [%d]",err);
-=======
-#endif
 			//publish phase
 			if(lst.stat_vec[num] == 0){
 			//	if(lst.sock_vec[num].is_connected()){
@@ -394,42 +362,6 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 				string str = rbuf;
 				funcp = (intptr_t)atoi(get_fptr(str).c_str());
 				lst.add(sock,sdq[0],funcp);
-#if 0
-<<<<<<< HEAD
-				//send requestTopic
-				str = "<methodCall>requestTopic</methodCall>";
-				size = str.size();
-				memcpy(&mem[XML_ADDR],str.c_str(),size);
-				char buf[3];
-				buf[0] = sdq[0];
-				buf[1] = size;
-				buf[2] = size/256;
-				buf[3] = size/65536;
-				snd_dqp = (intptr_t)buf;
-				snd_dtq(XML_DTQ,*snd_dqp);
-				rcv_dtq(SUB_DTQ,dqp);
-				sdq = (char *)dqp;
-				size = sdq[1];
-				size += sdq[2]*256;
-				size += sdq[3]*65536;
-				memcpy(&tmp,&mem[SUB_ADDR],size);				//get date
-				str = tmp;
-				port = atoi(get_port2(str).c_str());	//test function
-				ip = m_ip;
-				//send TCPROS connection header
-				//for image data
-				//size = sub_gen_header(tmp,node_lst[node_num].callerid,"0",node_lst[node_num].topic_name,node_lst[node_num].topic_type,"060021388200f6f0f447d0fcd9c64743");
-				//for string data
-				size = sub_gen_header(tmp,node_lst[node_num].callerid,"0",node_lst[node_num].topic_name,node_lst[node_num].topic_type,"992ce8a1687cec8c8bd883ec73ca41d1");
-				tmp[size]  = '0';
-				lst.sock_vec[idx].connect(ip,port);
-				lst.sock_vec[idx].send(tmp,size);
-				wait_ms(10);
-				lst.sock_vec[idx].receive(tmp,5000);
-				lst.set_stat(true,idx);
-				init = true;
-=======
-#endif
 				syslog(LOG_NOTICE,"SUB_TASK:IP [%s][%s]",node_lst[node_num].ip.c_str(),network.getIPAddress());
 				if(strcmp(node_lst[node_num].ip.c_str(),network.getIPAddress()) != 0){
 //				if(strcmp(node_lst[node_num].ip.c_str(),network.getIPAddress()) == 0){
@@ -509,52 +441,7 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 				fp(msg_buf);
 			}
 	    }else{
-#if 0
-<<<<<<< HEAD
-	    //subscribe and callback loop
-	    	if(init){
-	    		syslog(LOG_NOTICE,"SUB_TASK: subscribing");
-	    		for(unsigned int i=0;i < lst.id_vec.size();i++){
-					rptr = &rbuf[0];
-					if(lst.stat_vec[i]){
-						rcv_flag = true;
-						while(rcv_flag){
-							int n = lst.sock_vec[i].receive(rptr,512);
-							if(n < 0){
-								syslog(LOG_NOTICE,"SUB_TASK: No data");
-							}else{
-								if(init_flag){
-									msg_size = (int)rbuf[0] + (int)rbuf[1]*256;// + rbuf[2]*65536 + rbuf[3]*16777216;
-									data_size = (int)rbuf[4] + (int)rbuf[5]*256;// + rbuf[6]*65536 + rbuf[7]*16777216;
-									init_flag = false;
-								}
-								len += n;
-								///syslog(LOG_NOTICE,"SUB_TASK:data length [%d]",msg_size);
-								if(len == msg_size +4){
-									//correct data received
-									rbuf[len] = '\0';
-									//syslog(LOG_NOTICE,"SUB_TASK:data length [%d]",len);
-									void (*fp)(string);
-									fp = lst.func_vec[i];
-									fp(&rbuf[8]);
-									rptr = &rbuf[0];
-									rcv_flag = false;
-									init_flag = true;
-									len = 0;
-								}else if(len > msg_size + 4){
-									//data overflow
-									syslog(LOG_NOTICE,"invalid header[%d][%d] [%d]",msg_size,len,n);
-									rptr = &rbuf[0];
-									rcv_flag = false;
-									init_flag = true;
-									len = 0;
-								}else{
-									//syslog(LOG_NOTICE,"SUB_TASK: data long");
-									//data receiving
-									rptr = &rbuf[n];
-								}
-=======
-#endif
+
  //subscribe and callback loop
 			for(unsigned int i=0;i < lst.id_vec.size();i++){
 				rptr = &rbuf[0];
@@ -601,7 +488,6 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 								//ROS_INFO("SUB_TASK: left length [%d]",left);
 								evl_flag = 1;
 							}
-//>>>>>>> mori_ws
 						}
 					}
 				}else if(lst.stat_vec[i] == 2){
