@@ -176,7 +176,7 @@ APPL_CFLAGS += -I$(MBED_LIB_DIR)/EthernetInterface/lwip/include/ipv4
 APPL_CFLAGS += -I$(MBED_LIB_DIR)/EthernetInterface/lwip-athrill/include
 APPL_CFLAGS += -DTARGET_ATHRILL
 APPL_CFLAGS += -DLWIP_TRANSPORT_ETHERNET
-APPL_LIBS = -L../mros_build -L../mbed_build -lmros -lmbed -lnosys
+APPL_LIBS = -Wl,--gc-sections -nostartfiles -L../mros_build -L../mbed_build -lmros -lmbed -lnosys
 ifdef APPLDIR
   INCLUDES := $(INCLUDES) $(foreach dir,$(APPLDIR),-I$(dir))
 endif
