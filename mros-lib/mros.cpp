@@ -618,28 +618,33 @@ void xml_mas_task(){
 	intptr_t *dq,*sdata;
 	dq = (intptr_t *)malloc(sizeof(char)*4);
 	char data[3];
-	char *xdq;
+	unsigned char *xdq;
 	char rbuf[512];
 #endif
 	while(1){
 		syslog(LOG_NOTICE,"XML_MAS_TASK: enter loop");
 		TCPSocketConnection xml_mas_sock;
 		xml_mas_sock.set_blocking(true,1500);
-		rcv_dtq(XML_DTQ,dq);
-		syslog(LOG_NOTICE,"XML_MAS_TASK: receive dtq");
-		xdq = (char *)dq;
-		int size = xdq[1];
-		size += xdq[2]*256;
-		size += xdq[3]*65536;
+		rcv_dtq(XML_DTQ, dq);
+		//syslog(LOG_NOTICE,"XML_MAS_TASK: receive dq=%x", *dq);
+		xdq = (unsigned char *)dq;
+		unsigned int size = (unsigned int)xdq[1];
+		size += ((unsigned int)xdq[2])*256;
+		size += ((unsigned int)xdq[3])*65536;
+		//syslog(LOG_NOTICE,"XML_MAS_TASK: HERE1 %u : %u : %u", xdq[1], xdq[2], xdq[3]);
+		//syslog(LOG_NOTICE,"XML_MAS_TASK: HERE1 size=%u", size);
 		memcpy(&rbuf,&mem[XML_ADDR],size);
 		std::string str,meth;
 		str = rbuf;
 		int mh,mt;
+		//syslog(LOG_NOTICE,"XML_MAS_TASK: HERE2");
 		mh = (int)str.find("<methodCall>");
 		mt = (int)str.find("</methodCall>");
+		//syslog(LOG_NOTICE,"XML_MAS_TASK: HERE3");
 		for(int i = mh + sizeof("<methodCall>") -1;i < mt ; i++){
 			meth = meth + str[i];
 		}
+		//syslog(LOG_NOTICE,"XML_MAS_TASK: HERE4");
 //===registerSubscriber=========================================================================================================================
 		if(meth == "registerSubscriber"){
 			xml_mas_sock.connect(m_ip,m_port);

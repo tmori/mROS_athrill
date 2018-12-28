@@ -130,13 +130,15 @@ ros::Publisher ros::NodeHandle::advertise(string topic,int queue_size){
 	pstr += "<fptr>12345671</fptr>\n";
 	intptr_t *pdq;
 	memcpy(&mem[XML_ADDR],pstr.c_str(),pstr.size());
-	char pbuf[3];
+	unsigned char pbuf[4];
 	pbuf[0] = pub.ID;
 	int size = strlen(pstr.c_str());
 	pbuf[1] = size;
 	pbuf[2] = size/256;
 	pbuf[3] = size/65536;
 	pdq = (intptr_t*) &pbuf;
+	//syslog(LOG_NOTICE,"advertise: %u : %u : %u", pbuf[1], pbuf[2], pbuf[3]);
+	//syslog(LOG_NOTICE,"advertise: XML_DTQ: snd_dtq dq=%x size=%u", *pdq, size);
 	snd_dtq(XML_DTQ,*pdq);
 	slp_tsk();
 	return pub;
