@@ -14,7 +14,7 @@
 char evl_flag = 0;
 
 /***** congiuration ros master ******/
-const char *m_ip = "192.168.11.4";	//ros master IP
+const char *m_ip = "0.0.0.0";	//ros master IP
 const int m_port = 11311;	//ros master xmlrpc port
 
 /*********global variables***************/
@@ -138,9 +138,10 @@ void tcpros_decoder(char* buf,sensor_msgs::Image& msg_buf){
 /**********************************
 * Main Task						  *
 ***********************************/
+TCPSocketConnection *sock_conn;
 
 void main_task(){
-	
+
 	syslog(LOG_NOTICE, "**********mROS main task start**********");
 	syslog(LOG_NOTICE, "LOG_INFO: network initialize...");
 	network_init();
@@ -391,6 +392,7 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 				/**for string data**/
 					size = sub_gen_header(rbuf,node_lst[node_num].callerid,"0",node_lst[node_num].topic_name,node_lst[node_num].topic_type,"992ce8a1687cec8c8bd883ec73ca41d1");
 					rbuf[size]  = '0';
+					syslog(LOG_NOTICE, "connect:ip=%s port=%u", node_lst[node_num].ip.c_str(),port);
 					int err = lst.sock_vec[idx].connect(node_lst[node_num].ip.c_str(),port);
 					if(err != 0){
 					//if(lst.sock_vec[idx].connect(node_lst[node_num].ip.c_str(),port) != 0){
@@ -647,6 +649,7 @@ void xml_mas_task(){
 		//syslog(LOG_NOTICE,"XML_MAS_TASK: HERE4");
 //===registerSubscriber=========================================================================================================================
 		if(meth == "registerSubscriber"){
+			syslog(LOG_NOTICE, "sub connect ip=%s port=%u", m_ip, m_port);
 			xml_mas_sock.connect(m_ip,m_port);
 			sus_all();
 			node sub;
@@ -682,6 +685,7 @@ void xml_mas_task(){
 
 //===registerPublisher===========================================================================================================================
 		}else if(meth == "registerPublisher"){
+			syslog(LOG_NOTICE, "pub connect ip=%s port=%u", m_ip, m_port);
 			xml_mas_sock.connect(m_ip,m_port);
 			sus_tsk(SUB_TASK);
 			syslog(LOG_NOTICE,"XML_MAS_TASK: Sleep SUB_TASK");
