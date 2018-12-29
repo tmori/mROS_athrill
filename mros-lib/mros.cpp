@@ -658,11 +658,16 @@ void xml_mas_task(){
 			sub.ID = xdq[0];
 			get_node(&sub,&str,true);														
 			xml = registerSubscriber(sub.callerid,sub.topic_name,sub.topic_type,sub.uri);
+
 			xml_mas_sock.send((char*)xml.c_str(),xml.size());
 			xml_mas_sock.receive(rbuf,sizeof(char)*512);
 			xml = rbuf;
+			//syslog(LOG_NOTICE, "response xml=%s", xml.c_str());
 			//ROS_INFO("%s",xml.c_str());
 			//怪しい
+			//syslog(LOG_NOTICE, "get_ip=%s", get_ip(xml).c_str());
+			//syslog(LOG_NOTICE, "getIPAddress=%s", network.getIPAddress());
+			//syslog(LOG_NOTICE, "get_port=%u", get_port(xml));
 			if(strcmp(get_ip(xml).c_str(),network.getIPAddress()) != 0){
 				sub.set_ip(get_ip(xml));
 				//sub.set_ip(m_ip);
@@ -710,12 +715,12 @@ void xml_mas_task(){
 		}else if(meth == "requestTopic"){	
 			syslog(LOG_NOTICE,"XML_MAS_TASK: send request topic");
 				int num = find_id(node_lst,xdq[0]);
-				//syslog(LOG_NOTICE,"XML_MAS_TASK: node num [%d]",num);
+				syslog(LOG_NOTICE,"XML_MAS_TASK: node num [%d]",num);
 				if(num != -1){
 				syslog(LOG_NOTICE,"XML_MAS_TASK: request node [ID:%x, topic:%s]",node_lst[num].ID,node_lst[num].topic_name.c_str());
 				string body = requestTopic(node_lst[num].callerid,node_lst[num].topic_name);
 				syslog(LOG_NOTICE,"XML_MAS_TASK: ip[%s],port[%d]",node_lst[num].ip.c_str(),node_lst[num].port);
-				//syslog(LOG_NOTICE,"XML_MAS_TASK: %s",body.c_str());
+				syslog(LOG_NOTICE,"XML_MAS_TASK: %s",body.c_str());
 				int le = xml_mas_sock.connect(node_lst[num].ip.c_str(),node_lst[num].port);
 				if(le < 0){
 					syslog(LOG_NOTICE,"XML_MAS_TASK: ip[%s],port[%d]:: err [%d]",node_lst[num].ip.c_str(),node_lst[num].port,le);
