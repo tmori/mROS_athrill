@@ -59,9 +59,9 @@ std::vector<node> node_lst;
 
 
 /* Initialize Network Configuration */
-#define USE_DHCP (1)
+#define USE_DHCP (0)
 #if(USE_DHCP == 0)
-	#define IP_ADDRESS  	("192.168.11.1")	/*IP address */
+	#define IP_ADDRESS  	("127.0.0.1")	/*IP address */
 	#define SUBNET_MASK		("255.0.0.0")	/*Subset mask */
 	#define DEFAULT_GATEWAY	("")	/*Default gateway */
 #endif
@@ -156,7 +156,7 @@ void main_task(){
 	act_tsk(XML_MAS_TASK);
 
 	act_tsk(USR_TASK1);
-	//act_tsk(USR_TASK2);
+	act_tsk(USR_TASK2);
 	syslog(LOG_NOTICE,"**********mROS Main task finish**********");
 }
 
@@ -192,12 +192,11 @@ syslog(LOG_NOTICE, "========Activate mROS PUBLISH========");
 	srv.bind(11511);		//port binding
 	srv.listen();
 	pub_list lst;
-	char *pdqp,*rbuf;
+	char *pdqp;
 	intptr_t *dqp;
 	dqp = (intptr_t *)malloc(sizeof(char)*4);
 	char buf[1024*512];
 	char snd_buf[512];
-	rbuf = &buf[8];
 #endif 	//_PUB_
 	while(1){
 		//syslog(LOG_NOTICE,"PUB_TASK:enter loop");
@@ -217,7 +216,7 @@ syslog(LOG_NOTICE, "========Activate mROS PUBLISH========");
 		size += ((unsigned int)pdqp[2])*256;
 		size += ((unsigned int)pdqp[3])*65536;
 		//syslog(LOG_NOTICE, "size=%u", size);
-		//syslog(LOG_NOTICE, "%u %u %u %u", pdqp[0], pdqp[1], pdqp[2], pdqp[3]);
+		//syslog(LOG_NOTICE, "pub_task: num=%d %u %u %u %u", num, pdqp[0], pdqp[1], pdqp[2], pdqp[3]);
 		if(num == -1){ 									
 			//initialization
 			syslog(LOG_NOTICE,"PUB_TASK:publisher initialization Node ID[%d]",pdqp[0]);
@@ -283,19 +282,21 @@ syslog(LOG_NOTICE, "========Activate mROS PUBLISH========");
 			//publish phase
 			if(lst.stat_vec[num] == 0){
 				//if(lst.sock_vec[num].is_connected()){
-					//ROS_INFO("PUB_TASK: TOPIC send size[%d]",size);
-					memcpy(rbuf,&mem[PUB_ADDR],size);
+					//memcpy(rbuf,&mem[PUB_ADDR],size);
+					//syslog(LOG_NOTICE, "PUB_TASK: mem=%s", &mem[PUB_ADDR]);
+					//ROS_INFO("PUB_TASK: TOPIC send size[%d] rbuf=%s",size, rbuf);
 					//ROS_INFO("PUB_TASK: memcpy");
-					rbuf[size] = '\0';	//cutting data end
+					//rbuf[size] = '\0';	//cutting data end
 					/**for string data**/
 					//int l = pub_gen_msg(buf,rbuf);
 					/**for image data**/
-					int l = pub_gen_img_msg(buf,rbuf,size);
+					int l = pub_gen_img_msg(buf,&mem[PUB_ADDR],size);
+					//syslog(LOG_NOTICE, "pub_gen_img_msg l=%d buf=%s rbuf=%s", l, buf, rbuf);
 					//ROS_INFO("PUB_TASK: generate TCPROS[%d]",l);
 					//publish
 					int err = lst.sock_vec[num].send(buf,l);
 					//ROS_INFO("PUB_TASK: send[%d]",err);
-					//if(err < 0)  ROS_INFO("PUB_TASK: PUBLISHING ERROR ! [%d]",err);
+					if(err < 0)  ROS_INFO("PUB_TASK: PUBLISHING ERROR ! [%d]",err);
 				//}
 			}else if(lst.stat_vec[num] == 1){
 				syslog(LOG_NOTICE,"PUB_TASK: internal data publish");
@@ -400,6 +401,7 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 					size = sub_gen_header((char*)rbuf,node_lst[node_num].callerid,"0",node_lst[node_num].topic_name,node_lst[node_num].topic_type,"992ce8a1687cec8c8bd883ec73ca41d1");
 					rbuf[size]  = '0';
 					syslog(LOG_NOTICE, "connect:ip=%s port=%u", node_lst[node_num].ip.c_str(),port);
+					syslog(LOG_NOTICE, "sub_task: size=%d send_buf=%s", size, rbuf);
 					int err = lst.sock_vec[idx].connect(node_lst[node_num].ip.c_str(),port);
 					if(err != 0){
 					//if(lst.sock_vec[idx].connect(node_lst[node_num].ip.c_str(),port) != 0){
@@ -408,6 +410,7 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 						exit(1);
 					}
 					ROS_INFO("SUB_TASK: TCPROS HEADER CONNECT");
+					syslog(LOG_NOTICE, "sub_task: send_buf=%s", rbuf);
 					err =  lst.sock_vec[idx].send((char*)rbuf,size);
 					//if(lst.sock_vec[idx].send(tmp,size) < 0){
 					if(err < 0){
@@ -416,7 +419,7 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 					}
 					ROS_INFO("SUB_TASK: SEND TCPROS HEADER");
 					lst.sock_vec[idx].receive((char*)rbuf,1024);
-					syslog(LOG_INFO, "sub_task: rcv_buf=%s", rbuf);
+					syslog(LOG_NOTICE, "sub_task: rcv_buf=%s", rbuf);
 					lst.set_stat(1,idx);
 				} else {
 					//Internal request topic
@@ -558,6 +561,7 @@ void xml_slv_task(){
 						//get method
 						mh = (int)str.find("<methodName>");
 						mt = (int)str.find("</methodName>");
+						meth = "";
 						for(int i = mh + sizeof("<methodName>") -1;i < mt ; i++){
 							meth = meth + str[i];
 						}
@@ -584,6 +588,7 @@ void xml_slv_task(){
 								str = test_requestResponse(tmp);				//test function
 								xml_slv_sock.send((char*)str.c_str(),str.size());
 								connect_status = false;
+								//syslog(LOG_NOTICE, "num=%d dqp=%u response=%s", num, *dqp, str.c_str());
 								snd_dtq(PUB_DTQ,*dqp);
 							}
 							state = 4;
@@ -750,15 +755,15 @@ void xml_mas_task(){
 				xml_mas_sock.receive(rbuf,sizeof(char)*512);
 
 				int size = strlen(rbuf);
-				//syslog(LOG_NOTICE, "XML_MAS_TASK: %u response=%s", size, rbuf);
+				syslog(LOG_NOTICE, "XML_MAS_TASK: %u response=%s", size, rbuf);
 				memcpy(&mem[SUB_ADDR],&rbuf,size);
 				data[0] = node_lst[num].ID;
 				data[1] = size;
 				data[2] = size/256;
 				data[3] = size/65536;
 				sdata = (intptr_t*) &data;
-				//syslog(LOG_NOTICE, "%u %u %u %u", data[0], data[1], data[2], data[3]);
-				//syslog(LOG_NOTICE, "sdata=%d", *sdata);
+				syslog(LOG_NOTICE, "%u %u %u %u", data[0], data[1], data[2], data[3]);
+				syslog(LOG_NOTICE, "sdata=%d", *sdata);
 				snd_dtq(SUB_DTQ,*sdata);
 			}else{
 				syslog(LOG_NOTICE,"XML_MAS: Can't find node! [request topic]");

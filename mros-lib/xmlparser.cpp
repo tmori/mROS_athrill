@@ -378,13 +378,21 @@ string get_fptr(string xml){
 		return body;
 }
 
+#ifdef ROS_INDIGO
+#define TOPIC_INT_TAG_START "<value>"
+#define TOPIC_INT_TAG_END "</value>"
+#else
+#define TOPIC_INT_TAG_START "<value><string>"
+#define TOPIC_INT_TAG_END "</string></value>"
+#endif
+
 string req_topic_name(string xml){
 	int ini,head,tail;
 				string body;
-				ini = (int)xml.find("<value>");
-				head = (int)xml.find("<value>",ini + sizeof("<value>"));
-				tail = (int)xml.find("</value>",head);
-				for(int i = head + sizeof("<value>")-1;i < tail; i++){
+				ini = (int)xml.find(TOPIC_INT_TAG_START);
+				head = (int)xml.find(TOPIC_INT_TAG_START,ini + sizeof(TOPIC_INT_TAG_START));
+				tail = (int)xml.find(TOPIC_INT_TAG_END,head);
+				for(int i = head + sizeof(TOPIC_INT_TAG_START)-1;i < tail; i++){
 					body = body + xml[i];
 				}
 				return body;

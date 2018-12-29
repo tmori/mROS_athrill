@@ -156,14 +156,22 @@ string test_requestResponse(string ip){
     xml += "<methodResponse>\n";
     xml += "<params>\n";
     xml += "<param>\n";
+#ifdef ROS_INDIGO
     xml += "<value><array><data><value><i4>1</4></value>\n";
+#else
+    xml += "<value><array><data><value><int>1</int></value>\n";
+#endif
     xml += "<value></value>\n";
     xml += "<value><array>\n";
     xml += "<data><value>TCPROS</value>\n";
     xml += "<value>";
     xml += ip;
     xml += "</value>\n";
+#ifdef ROS_INDIGO
     xml += "<value><i4>11511</i4></value>\n</data>";
+#else
+    xml += "<value><int>11511</int></value>\n</data>";
+#endif
     xml += "</array></value>\n";
     xml += "</data></array></value>";
     xml += "</param>\n";

@@ -174,6 +174,10 @@ void ros::Publisher::publish(std_msgs::String& data){
 	pbuf[3] = size/65536;
 	pdq = (intptr_t*) &pbuf;
 	//syslog(LOG_NOTICE, "i=%d size=%u data=%s", i, size, data.data.c_str());
+
+	mem[PUB_ADDR + size] = '\0';
+	//syslog(LOG_NOTICE, "mem=%s", &mem[PUB_ADDR]);
+
 	snd_dtq(PUB_DTQ,*pdq);
 
 }

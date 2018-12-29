@@ -69,6 +69,7 @@ int sub_gen_header(char *buf,string id,string nodelay,string topic,string type,s
     add_len(&buf[it],strlen("tcp_nodely=1"));
     memcpy(&buf[it +4],"tcp_nodely=1",strlen("tcp_nodely=1"));
     it = it + 4 + strlen("tcp_nodely=1");
+    syslog(LOG_NOTICE, "sub_gen_header:len=%d", len);
     return len;
 }
 
@@ -84,37 +85,15 @@ int pub_gen_msg(char *buf,char *msg){
 
 
 int pub_gen_img_msg(char *buf,char *msg,int size){
+#ifdef ROS_INDIGO
     memcpy(&buf[4],msg,size);
     add_len(buf,size);
-    /*
-    //seq
-    memcpy(&buf[len],&buf[len+4],sizeof(unsigned int));
-    len += sizeof(unsigned int);
-    //sec
-    memcpy(&buf[len],&buf[len+4],sizeof(unsigned int));
-    len += sizeof(unsigned int)
-    //nsec
-    memcpy(&buf[len],&buf[len+4],sizeof(unsigned int));
-    len += sizeof(unsigned int);
-    //frame_id -> need branch
-    //length
-    memcpy(&buf[len],&buf[len+sizeof(unsigned int)],sizeof(unsigned int));
-    len += 4;
-    memcpy(&buf[len],&buf[len+strlen(&buf[len])],);
-    //height
-    len += 4;
-    memcpy(&buf[len],&buf[len+sizeof(unsigned int)],sizeof(unsigned int));//height
-    //width
-    len += 4;
-    memcpy(&buf[len],&buf[len+sizeof(unsigned int)],sizeof(unsigned int));
-    //encoding
-    len += 4;
-    add_len(&buf[len],strlen(&buf[len+4]));
-    len += 4;
-    memcpy(&buf[len],&buf[len+4],);
-    add_len(&buf[4],len);
-    add_len(buf,len+4);
-    */
     return size+4;
+#else
+    memcpy(&buf[8], msg, size);
+    add_len(&buf[0], size + 4);
+    add_len(&buf[4], size);
+    return size+8;
+#endif
 }
 
