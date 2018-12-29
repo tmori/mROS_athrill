@@ -36,8 +36,8 @@ void usr_task1(void)
 
 
 /*******  callback **********/
-void Callback(string &msg){	
-	syslog(LOG_NOTICE,"I heard [%s]",msg.c_str());
+void Callback(string *msg){	
+	syslog(LOG_NOTICE,"I heard [%s]",msg->c_str());
 }
 
 /*****mROS user task code*******/

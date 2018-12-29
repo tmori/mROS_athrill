@@ -99,7 +99,7 @@ void tcpros_decoder(char* buf,sensor_msgs::Image& msg_buf){
 		msg_buf.string.resize(l);
 	}else if(type == "sensor_msgs/Image"){
 	*/
-		int l,p;
+		unsigned int l,p;
 		p=0;
 		msg_buf.header.seq = buf[p];
 		p=p+4;
@@ -107,29 +107,29 @@ void tcpros_decoder(char* buf,sensor_msgs::Image& msg_buf){
 		p=p+4;
 		msg_buf.header.nsec = buf[p];
 		p=p+4;
-		l = buf[p];
-		l = l +buf[p+1]*256;
-		l = l + buf[p+2]*65536;
+		l = (unsigned int)buf[p];
+		l = l +  ((unsigned int)buf[p+1])*256;
+		l = l +  ((unsigned int)buf[p+2])*65536;
 		p=p+4;
 		msg_buf.header.frame_id = &buf[p];
 		msg_buf.header.frame_id.resize(l);
 		p=p+l;
-		msg_buf.height = buf[p] + buf[p+1]*256 + buf[p+2]*65536;
+		msg_buf.height =  ((unsigned int)buf[p]) +  ((unsigned int)buf[p+1])*256 +  ((unsigned int)buf[p+2])*65536;
 		p=p+4;
-		msg_buf.width = buf[p] + buf[p+1]*256 + buf[p+2]*65536;
+		msg_buf.width = (unsigned int)buf[p] + ((unsigned int)buf[p+1])*256 + ((unsigned int)buf[p+2])*65536;
 		p=p+4;
-		l = buf[p] + buf[p+1]*256 + buf[p+2]*65536;
+		l = (unsigned int)buf[p] + ((unsigned int)buf[p+1])*256 + ((unsigned int)buf[p+2])*65536;
 		p=p+4;
 		msg_buf.encoding = &buf[p];
 		msg_buf.encoding.resize(l);
 		p=p+l;
 		msg_buf.is_bigendian=buf[p];
 		p=p+1;
-		msg_buf.step = buf[p] + buf[p+1]*256 + buf[p+2]*65536;
+		msg_buf.step = (unsigned int)buf[p] + ((unsigned int)buf[p+1])*256 + ((unsigned int)buf[p+2])*65536;
 		p=p+4;
-		l = buf[p];
-		l= l+ buf[p+1]*256;
-		l= l+ buf[p+2]*65536;
+		l = (unsigned int)buf[p];
+		l= l+ ((unsigned int)buf[p+1])*256;
+		l= l+ ((unsigned int)buf[p+2])*65536;
 		p=p+4;
 		msg_buf.data = (unsigned char*)&buf[p];
 }
@@ -155,7 +155,7 @@ void main_task(){
 	act_tsk(XML_SLV_TASK);
 	act_tsk(XML_MAS_TASK);
 
-	act_tsk(USR_TASK1);
+	//act_tsk(USR_TASK1);
 	act_tsk(USR_TASK2);
 	syslog(LOG_NOTICE,"**********mROS Main task finish**********");
 }
@@ -212,10 +212,10 @@ syslog(LOG_NOTICE, "========Activate mROS PUBLISH========");
 		int num = lst.find(pdqp[0]);
 		//syslog(LOG_NOTICE,"PUB_TASK:operate node [%d]",pdqp[0]);
 		int node_num = find_id(node_lst,pdqp[0]);			
-		int size;
-		size = pdqp[1];
-		size += pdqp[2]*256;
-		size += pdqp[3]*65536;
+		unsigned int size;
+		size = (unsigned int)pdqp[1];
+		size += ((unsigned int)pdqp[2])*256;
+		size += ((unsigned int)pdqp[3])*65536;
 		if(num == -1){ 									
 			//initialization
 			syslog(LOG_NOTICE,"PUB_TASK:publisher initialization Node ID[%d]",pdqp[0]);
@@ -269,7 +269,7 @@ syslog(LOG_NOTICE, "========Activate mROS PUBLISH========");
 			//internal node request
 			ROS_INFO("PUB_TASK:Internal request size:[%d]",size);
 			string str;
-			for(int i=0;i<size;i++){
+			for(unsigned int i=0;i<size;i++){
 				str += mem[PUB_ADDR2+i];
 			}
 			//ROS_INFO("PUB_TASK: topic:[%s]",str.c_str());
@@ -330,8 +330,8 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 	sub_list lst;
 	intptr_t *dqp,*snd_dqp;
 	dqp = (intptr_t *)malloc(sizeof(char)*4);
-	char *sdq,*rptr; //data queue pointer,receive buffer,memory address
-	char rbuf[1024*350];
+	unsigned char *sdq,*rptr; //data queue pointer,receive buffer,memory address
+	unsigned char rbuf[1024*350];
 	int port;	//port number
 	int left;   //receive length
 	bool rcv_flag = true;
@@ -345,7 +345,7 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 		slp_tsk();
 		int t = trcv_dtq(SUB_DTQ,dqp,1);	//if queue is empty, go subscribe loop
 	    if(t == 0){
-	    	sdq = (char *)dqp;
+	    	sdq = (unsigned char *)dqp;
 			int num = lst.find(sdq[0]);
 			//syslog(LOG_NOTICE,"SUB_TASK: node id [%d]",sdq[0]);
 			if(num == -1){
@@ -355,12 +355,12 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 				syslog(LOG_NOTICE,"SUB_TASK: subscriber initialization　node ID:[%d] index:[%d]",sdq[0],idx);
 				static TCPSocketConnection sock;
 				static intptr_t funcp;
-				int size = sdq[1];
-				size += sdq[2]*256;
-				size += sdq[3]*65536;
+				unsigned int size = sdq[1];
+				size += ((unsigned int)sdq[2])*256;
+				size += ((unsigned int)sdq[3])*65536;
 				memcpy(rbuf,&mem[SUB_ADDR],size);
 				//get function pointer address
-				string str = rbuf;
+				string str = (const char*)rbuf;
 				funcp = (intptr_t)atoi(get_fptr(str).c_str());
 				lst.add(sock,sdq[0],funcp);
 				syslog(LOG_NOTICE,"SUB_TASK:IP [%s][%s]",node_lst[node_num].ip.c_str(),network.getIPAddress());
@@ -370,7 +370,7 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 					str = "<methodCall>requestTopic</methodCall>";
 					size = str.size();
 					memcpy(&mem[XML_ADDR],str.c_str(),size);
-					char buf[3];
+					char buf[4];
 					buf[0] = sdq[0];
 					buf[1] = size;
 					buf[2] = size/256;
@@ -378,19 +378,23 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 					snd_dqp = (intptr_t*)buf;
 					snd_dtq(XML_DTQ,*snd_dqp);
 					rcv_dtq(SUB_DTQ,dqp);
-					sdq = (char *)dqp;
-					size = sdq[1];
-					size += sdq[2]*256;
-					size += sdq[3]*65536;
+					sdq = (unsigned char *)dqp;
+					size = (unsigned int)sdq[1];
+					size += ((unsigned int)sdq[2])*256;
+					size += ((unsigned int)sdq[3])*65536;
+
+					//syslog(LOG_NOTICE, "sub_task: %u %u %u %u", sdq[0], sdq[1], sdq[2], sdq[3]);
+					//syslog(LOG_NOTICE, "sub_task: size=%u dqp=%d", size, *dqp);
 					memcpy(&rbuf,&mem[SUB_ADDR],size);				//get date
-					str = rbuf;
+					str = (const char*)rbuf;
+					//syslog(LOG_NOTICE, "sub_task: xml=%s", str.c_str());
 					port = atoi(get_port2(str).c_str());	//test function
 					syslog(LOG_NOTICE,"SUB_TASK:port [%d]",port);
 		//send TCPROS connection header
 				/**for image data**/
 					//size = sub_gen_header(tmp,node_lst[node_num].callerid,"0",node_lst[node_num].topic_name,node_lst[node_num].topic_type,"060021388200f6f0f447d0fcd9c64743");
 				/**for string data**/
-					size = sub_gen_header(rbuf,node_lst[node_num].callerid,"0",node_lst[node_num].topic_name,node_lst[node_num].topic_type,"992ce8a1687cec8c8bd883ec73ca41d1");
+					size = sub_gen_header((char*)rbuf,node_lst[node_num].callerid,"0",node_lst[node_num].topic_name,node_lst[node_num].topic_type,"992ce8a1687cec8c8bd883ec73ca41d1");
 					rbuf[size]  = '0';
 					syslog(LOG_NOTICE, "connect:ip=%s port=%u", node_lst[node_num].ip.c_str(),port);
 					int err = lst.sock_vec[idx].connect(node_lst[node_num].ip.c_str(),port);
@@ -401,29 +405,30 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 						exit(1);
 					}
 					ROS_INFO("SUB_TASK: TCPROS HEADER CONNECT");
-					err =  lst.sock_vec[idx].send(rbuf,size);
+					err =  lst.sock_vec[idx].send((char*)rbuf,size);
 					//if(lst.sock_vec[idx].send(tmp,size) < 0){
 					if(err < 0){
 						ROS_INFO("SUB_TASK: TCPROS HEADER SEND ERROR err[%d]",err);
 						exit(1);
 					}
 					ROS_INFO("SUB_TASK: SEND TCPROS HEADER");
-					lst.sock_vec[idx].receive(rbuf,1024);
+					lst.sock_vec[idx].receive((char*)rbuf,1024);
+					syslog(LOG_INFO, "sub_task: rcv_buf=%s", rbuf);
 					lst.set_stat(1,idx);
-				}else{
+				} else {
 					//Internal request topic
 					ROS_INFO("SUB_TASK: Internal request");
 					lst.set_stat(2,idx);
 					memcpy(&mem[PUB_ADDR2],node_lst[node_num].topic_name.c_str(),strlen(node_lst[node_num].topic_name.c_str()));
-					char buf[3];
+					char buf[4];
 					buf[0] = 0;
 					buf[1] = strlen(node_lst[node_num].topic_name.c_str());
 					buf[2] = 0;
 					buf[3] = 0;
 					snd_dqp = (intptr_t*)buf;
 					snd_dtq(PUB_DTQ,*snd_dqp);
-					}
-//>>>>>>> mori_ws
+				}
+
 				syslog(LOG_NOTICE,"SUB_TASK: subscriber connected");
 				//rcv_count = 1;
 				wup_all();
@@ -432,12 +437,12 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 			}else if(num != -1 && lst.stat_vec[num] == 2){
 				//方式3,4専用
 				//syslog(LOG_NOTICE,"SUB_TASK: subscribe internal topic data");
-				int size = sdq[1];
-				size += sdq[2]*256;
-				size += sdq[3]*65536;
+				unsigned int size = sdq[1];
+				size += ((unsigned int)sdq[2])*256;
+				size += ((unsigned int)sdq[3])*65536;
 				//ROS_INFO("SUB_TASK: data size[%d]",size);
 				memcpy(rbuf,&mem[PUB_ADDR2],size);
-				tcpros_decoder(rbuf,msg_buf);		//TCPROSからメッセージに戻す
+				tcpros_decoder((char*)rbuf,msg_buf);		//TCPROSからメッセージに戻す
 				void (*fp)(sensor_msgs::Image&);
 				fp = (void (*)(sensor_msgs::Image&))lst.func_vec[num];
 				fp(msg_buf);
@@ -453,10 +458,10 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 					while(rcv_flag){
 						int n=0;
 						if(init_flag){
-							n = lst.sock_vec[i].receive(rptr,1024*16);
+							n = lst.sock_vec[i].receive((char*)rptr,1024*16);
 							left = 0;
 						}else{
-							n = lst.sock_vec[i].receive(rptr,left);
+							n = lst.sock_vec[i].receive((char*)rptr,left);
 						}
 						if(n < 0){
 							//syslog(LOG_NOTICE,"SUB_TASK: No data");
@@ -473,10 +478,11 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 							if(len >= msg_size +4){
 				//data received
 								rbuf[msg_size + 4] = '\0';
-								//syslog(LOG_NOTICE,"SUB_TASK:data length [%d]",len);
+								syslog(LOG_NOTICE,"SUB_TASK:data length [%d]",len);
 								void (*fp)(intptr_t);		//stringのみ対応
 								fp = (void (*)(intptr_t))lst.func_vec[i];
-								fp((intptr_t)&rbuf[8]);
+								string msg((const char*)&rbuf[8]);
+								fp((intptr_t)&msg);
 								rptr = &rbuf[0];
 								rcv_flag = false;
 								init_flag = true;
@@ -520,7 +526,7 @@ void xml_slv_task(){
 	}
 	xml_slv_srv.set_blocking(true,1500);	//blockingじゃないと周期的に取れない
 	char rbuf[512];
-	char data[3];
+	char data[4];
 	string str,meth;
 	intptr_t *dqp;
 	bool connect_status = false;
@@ -619,9 +625,9 @@ void xml_mas_task(){
 	syslog(LOG_NOTICE,"========Activate mROS XML-RPC Master========");
 	intptr_t *dq,*sdata;
 	dq = (intptr_t *)malloc(sizeof(char)*4);
-	char data[3];
+	unsigned char data[4];
 	unsigned char *xdq;
-	char rbuf[512];
+	char rbuf[1024];
 #endif
 	while(1){
 		syslog(LOG_NOTICE,"XML_MAS_TASK: enter loop");
@@ -669,8 +675,8 @@ void xml_mas_task(){
 			//syslog(LOG_NOTICE, "getIPAddress=%s", network.getIPAddress());
 			//syslog(LOG_NOTICE, "get_port=%u", get_port(xml));
 			if(strcmp(get_ip(xml).c_str(),network.getIPAddress()) != 0){
-				sub.set_ip(get_ip(xml));
-				//sub.set_ip(m_ip);
+				//sub.set_ip(get_ip(xml));
+				sub.set_ip(m_ip);
 			}else{
 				sub.set_ip(get_ip(xml));
 			}
@@ -720,7 +726,7 @@ void xml_mas_task(){
 				syslog(LOG_NOTICE,"XML_MAS_TASK: request node [ID:%x, topic:%s]",node_lst[num].ID,node_lst[num].topic_name.c_str());
 				string body = requestTopic(node_lst[num].callerid,node_lst[num].topic_name);
 				syslog(LOG_NOTICE,"XML_MAS_TASK: ip[%s],port[%d]",node_lst[num].ip.c_str(),node_lst[num].port);
-				syslog(LOG_NOTICE,"XML_MAS_TASK: %s",body.c_str());
+				//syslog(LOG_NOTICE,"XML_MAS_TASK: %s",body.c_str());
 				int le = xml_mas_sock.connect(node_lst[num].ip.c_str(),node_lst[num].port);
 				if(le < 0){
 					syslog(LOG_NOTICE,"XML_MAS_TASK: ip[%s],port[%d]:: err [%d]",node_lst[num].ip.c_str(),node_lst[num].port,le);
@@ -738,13 +744,17 @@ void xml_mas_task(){
 				}
 				ROS_INFO("COMPLETE SEND REQUEST [%d]",le);
 				xml_mas_sock.receive(rbuf,sizeof(char)*512);
+
 				int size = strlen(rbuf);
+				//syslog(LOG_NOTICE, "XML_MAS_TASK: %u response=%s", size, rbuf);
 				memcpy(&mem[SUB_ADDR],&rbuf,size);
 				data[0] = node_lst[num].ID;
 				data[1] = size;
 				data[2] = size/256;
 				data[3] = size/65536;
 				sdata = (intptr_t*) &data;
+				//syslog(LOG_NOTICE, "%u %u %u %u", data[0], data[1], data[2], data[3]);
+				//syslog(LOG_NOTICE, "sdata=%d", *sdata);
 				snd_dtq(SUB_DTQ,*sdata);
 			}else{
 				syslog(LOG_NOTICE,"XML_MAS: Can't find node! [request topic]");

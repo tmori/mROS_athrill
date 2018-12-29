@@ -1,4 +1,9 @@
 #include "mros.h"
+#include <kernel.h>
+#include <t_syslog.h>
+#include <t_stdlib.h>
+#include "syssvc/serial.h"
+#include "syssvc/syslog.h"
 
 /* XMLパーサ 使ってないので作ってください
 #define SUCCESS_PARSING 1
@@ -286,11 +291,20 @@ int get_port(string http){
     return atoi(val.c_str());
 }
 
+#ifdef ROS_INDIGO
+#define INT_TAG_START "<i4>"
+#define INT_TAG_END "</i4>"
+#else
+#define INT_TAG_START "<int>"
+#define INT_TAG_END "</int>"
+#endif
+
 string get_port2(string http){
 	string val;
-	int head = (int)http.find("<i4>",http.find("TCPROS"));
-	int tail = (int)http.find("</i4>",head + sizeof("<i4>") -1);
-    for(int i = head + sizeof("<i4>") -1 ; i < tail ; i++){
+	int head = (int)http.find(INT_TAG_START, http.find("TCPROS"));
+	int tail = (int)http.find(INT_TAG_END, head + sizeof(INT_TAG_START) -1);
+
+    for(int i = head + sizeof(INT_TAG_START) -1 ; i < tail ; i++){
         val = val + http[i];
     }
 

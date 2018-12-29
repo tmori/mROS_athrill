@@ -111,7 +111,7 @@ class NodeHandle{
 	Subscriber sub;
 	Publisher pub;
 public:
-	Subscriber subscriber(std::string topic,int queue_size,void(*fp)(std::string&));
+	Subscriber subscriber(std::string topic,int queue_size,void(*fp)(std::string*));
 	Publisher advertise(std::string topic,int queue_size);
 };
 

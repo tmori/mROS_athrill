@@ -33,7 +33,7 @@ void ros::init(int argc,char *argv,std::string node_name){
 }
 
 
-ros::Subscriber ros::NodeHandle::subscriber(std::string topic,int queue_size,void (*fp)(std::string&)){
+ros::Subscriber ros::NodeHandle::subscriber(std::string topic,int queue_size,void (*fp)(std::string*)){
 	while(ros_sem != 0){
 	}
 	state = 1;
