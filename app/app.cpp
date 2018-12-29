@@ -16,19 +16,20 @@ void usr_task1(void)
 	syslog(LOG_NOTICE,"========Activate user task1========");
 	int argc = 0;
 	char *argv = NULL;
+	int i = 0;
 	ros::init(argc,argv,"mros_node");
 	ros::NodeHandle n;
 	ros::Publisher chatter_pub = n.advertise("mros_msg", 1);
 	ros::Rate loop_rate(5);
+	char buf[128];
 
-	std::ostringstream oss;
 	std_msgs::String str;
 
 	syslog(LOG_NOTICE,"Data Publish Start");
 	while(1){
 		wait_ms(1000);
-		oss << "Distance[" << 10 << "]cm" << endl;
-		str.data = oss.str();
+		sprintf(buf, "publish test data(%u)", i++);
+		str.data = string(buf);
 		chatter_pub.publish(str);
 		loop_rate.sleep();
 	}

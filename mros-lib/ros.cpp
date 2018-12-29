@@ -145,7 +145,7 @@ ros::Publisher ros::NodeHandle::advertise(string topic,int queue_size){
 }
 
 void ros::Publisher::publish(std_msgs::String& data){
-	ROS_INFO("PUBLISH STRING");
+	//ROS_INFO("PUBLISH STRING");
 	while(ros_sem != 0){
 
 	}
@@ -161,6 +161,7 @@ void ros::Publisher::publish(std_msgs::String& data){
 		sbuf[2] = size/256;
 		sbuf[3] = size/65536;
 		pdq = (intptr_t*) &sbuf;
+		syslog(LOG_NOTICE, "i=%d data=%s", i, data.data.c_str());
 		snd_dtq(SUB_DTQ,*pdq);
 	}
 
@@ -172,6 +173,7 @@ void ros::Publisher::publish(std_msgs::String& data){
 	pbuf[2] = size/256;
 	pbuf[3] = size/65536;
 	pdq = (intptr_t*) &pbuf;
+	//syslog(LOG_NOTICE, "i=%d size=%u data=%s", i, size, data.data.c_str());
 	snd_dtq(PUB_DTQ,*pdq);
 
 }

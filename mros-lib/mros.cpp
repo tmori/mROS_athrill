@@ -155,8 +155,8 @@ void main_task(){
 	act_tsk(XML_SLV_TASK);
 	act_tsk(XML_MAS_TASK);
 
-	//act_tsk(USR_TASK1);
-	act_tsk(USR_TASK2);
+	act_tsk(USR_TASK1);
+	//act_tsk(USR_TASK2);
 	syslog(LOG_NOTICE,"**********mROS Main task finish**********");
 }
 
@@ -216,6 +216,8 @@ syslog(LOG_NOTICE, "========Activate mROS PUBLISH========");
 		size = (unsigned int)pdqp[1];
 		size += ((unsigned int)pdqp[2])*256;
 		size += ((unsigned int)pdqp[3])*65536;
+		//syslog(LOG_NOTICE, "size=%u", size);
+		//syslog(LOG_NOTICE, "%u %u %u %u", pdqp[0], pdqp[1], pdqp[2], pdqp[3]);
 		if(num == -1){ 									
 			//initialization
 			syslog(LOG_NOTICE,"PUB_TASK:publisher initialization Node ID[%d]",pdqp[0]);
@@ -280,20 +282,21 @@ syslog(LOG_NOTICE, "========Activate mROS PUBLISH========");
 		}else{
 			//publish phase
 			if(lst.stat_vec[num] == 0){
-			//	if(lst.sock_vec[num].is_connected()){
-				//ROS_INFO("PUB_TASK: TOPIC send size[%d]",size);
-				memcpy(rbuf,&mem[PUB_ADDR],size);
-				//ROS_INFO("PUB_TASK: memcpy");
-				rbuf[size] = '\0';	//cutting data end
-				/**for string data**/
-				//int l = pub_gen_msg(buf,rbuf);
-				/**for image data**/
-				int l = pub_gen_img_msg(buf,rbuf,size);
-				//ROS_INFO("PUB_TASK: generate TCPROS[%d]",l);
-				//publish
-				int err = lst.sock_vec[num].send(buf,l);
-				//ROS_INFO("PUB_TASK: send[%d]",err);
-				if(err < 0)  ROS_INFO("PUB_TASK: PUBLISHING ERROR ! [%d]",err);
+				//if(lst.sock_vec[num].is_connected()){
+					//ROS_INFO("PUB_TASK: TOPIC send size[%d]",size);
+					memcpy(rbuf,&mem[PUB_ADDR],size);
+					//ROS_INFO("PUB_TASK: memcpy");
+					rbuf[size] = '\0';	//cutting data end
+					/**for string data**/
+					//int l = pub_gen_msg(buf,rbuf);
+					/**for image data**/
+					int l = pub_gen_img_msg(buf,rbuf,size);
+					//ROS_INFO("PUB_TASK: generate TCPROS[%d]",l);
+					//publish
+					int err = lst.sock_vec[num].send(buf,l);
+					//ROS_INFO("PUB_TASK: send[%d]",err);
+					//if(err < 0)  ROS_INFO("PUB_TASK: PUBLISHING ERROR ! [%d]",err);
+				//}
 			}else if(lst.stat_vec[num] == 1){
 				syslog(LOG_NOTICE,"PUB_TASK: internal data publish");
 			}
@@ -536,7 +539,7 @@ void xml_slv_task(){
 		slp_tsk();
 		ROS_INFO("XML_SLV_TASK: Listen");
 		int err = xml_slv_srv.accept(xml_slv_sock);
-		//ROS_INFO("XML_SLV_TASK: ACCEPT err [%d]",err);
+		ROS_INFO("XML_SLV_TASK: ACCEPT err [%d]",err);
 		if(err == 0){
 			connect_status = true;
 			syslog(LOG_NOTICE,"XML_SLV_TASK: Connected");
@@ -708,9 +711,10 @@ void xml_mas_task(){
 			get_node(&pub,&str,false);														
 			node_lst.push_back(pub);
 			xml = registerPublisher(pub.callerid,pub.topic_name,pub.topic_type,pub.uri);
-			//ROS_INFO("%s",xml.c_str());
+			ROS_INFO("%s",xml.c_str());
 			xml_mas_sock.send((char*)xml.c_str(),xml.size());
 			xml_mas_sock.receive(rbuf,sizeof(char)*512);
+			ROS_INFO("response = %s",rbuf);
 			data[0] = pub.ID;
 			data[1] = 0;
 			data[2] = 0;
