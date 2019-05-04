@@ -53,6 +53,7 @@ public:
 
 
 private:
+	mros_uint32 usecount;
 	mros_uint32	array_size;
 	T 			*array;
 };

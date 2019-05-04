@@ -18,5 +18,6 @@ PrimitiveContainer<T>::~PrimitiveContainer()
 		free(this->array);
 		this->array = NULL;
 	}
+	this->usecount = 0;
 	this->array_size = 0;
 }

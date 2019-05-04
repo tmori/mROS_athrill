@@ -5,26 +5,26 @@
 #include "mros_topic.h"
 
 namespace mros {
+namespace topic {
 namespace topology {
+
+
 
 class RosTopicConnector {
 public:
-	static mRosReturnType get_publish_topics(PrimitiveContainer<RosTopicConnectorIdType> &container);
-	static mRosReturnType get_subscribe_topics(PrimitiveContainer<RosTopicConnectorIdType> &container);
+	static mRosReturnType init(mRosSizeType max_connector);
+	static mRosReturnType get_topics(PrimitiveContainer<RosTopicConnectorIdType> &container);
+	static mRosReturnType put_topics(PrimitiveContainer<RosTopicConnectorIdType> &container);
 
-	static mRosReturnType put_publish_topic(const char* topic_name, RosNodeIdType src, RosNodeIdType dst);
-	static mRosReturnType put_subscribe_topic(const char* topic_name, RosNodeIdType src, RosNodeIdType dst);
+	static mRosReturnType add_pubnode_topic(const char* topic_name, RosNodeIdType src);
+	static mRosReturnType add_subnode_topic(const char* topic_name, RosNodeIdType dst);
 
 private:
-	RosTopicConnector(RosTopicIdType topic, RosNodeIdType src, RosNodeIdType dst);
+	RosTopicConnector();
 	~RosTopicConnector();
-
-	RosTopicConnectorIdType		connector_id;
-	RosTopicIdType				topic_id;
-	RosNodeIdType				src_id;
-	RosNodeIdType				dst_id;
 };
 
+}
 }
 }
 
