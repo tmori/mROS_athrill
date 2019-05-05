@@ -14,6 +14,8 @@ public:
 	static mRosReturnType create(const char *topic_name);
 	static mRosReturnType remove(const char *topic_name);
 	static mRosReturnType remove(RosTopicIdType id);
+	static mRosReturnType set_quesize(const char *topic_name, mRosSizeType size);
+	static mRosReturnType set_quesize(RosTopicIdType id, mRosSizeType size);
 
 private:
 	RosTopic();

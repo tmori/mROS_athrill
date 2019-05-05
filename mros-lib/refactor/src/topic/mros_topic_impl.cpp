@@ -34,7 +34,7 @@ do {	\
 	(entryp)->data.topic_id = MROS_ID_NONE;	\
 	(entryp)->data.topic_name = NULL;	\
 	(entryp)->data.namelen = 0;	\
-	(entryp)->data.queue_maxsize = 0; \
+	(entryp)->data.queue_maxsize = 1; \
 } while (0)
 
 typedef struct {
@@ -114,6 +114,29 @@ mRosReturnType RosTopic::create(const char *topic_name)
 	RosTopicIdType id;
 	return RosTopic::create(topic_name, id);
 }
+mRosReturnType RosTopic::set_quesize(const char *topic_name, mRosSizeType size)
+{
+	RosTopicIdType id;
+
+	mRosReturnType ret = RosTopic::get(topic_name, id);
+	if (ret != MROS_E_OK) {
+		return ret;
+	}
+	TOPIC_OBJ(id).data.queue_maxsize = size;
+	return MROS_E_OK;
+}
+mRosReturnType RosTopic::set_quesize(RosTopicIdType id, mRosSizeType size)
+{
+	if (id > topic_manager.max_topic) {
+		return MROS_E_RANGE;
+	}
+	if (TOPIC_OBJ(id).data.counter == 0) {
+		return MROS_E_INVAL;
+	}
+	TOPIC_OBJ(id).data.queue_maxsize = size;
+	return MROS_E_OK;
+}
+
 mRosReturnType RosTopic::remove(const char *topic_name)
 {
 	RosTopicIdType id;
