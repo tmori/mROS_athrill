@@ -101,6 +101,7 @@ mRosReturnType RosTopic::create(const char *topic_name, RosTopicIdType &id)
 	if (p == NULL) {
 		return MROS_E_NOMEM;
 	}
+	id = p->data.topic_id;
 	p->data.counter = 1U;
 	p->data.namelen = len;
 	p->data.topic_name = topic_name;

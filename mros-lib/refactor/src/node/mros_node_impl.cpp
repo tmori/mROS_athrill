@@ -2,6 +2,7 @@
 #include "mros_memory.h"
 #include <stdlib.h>
 #include <string.h>
+#include "test_serial.h"
 
 using namespace mros::node;
 using namespace mros::memory;
@@ -38,36 +39,31 @@ static RosNodeManagerType node_manager[ROS_NODE_TYPE_NUM];
 #define NODE_OBJ(type, id)		node_manager[(type)].node_entries[NODE_INDEX((id))]
 #define NODE_TYPE(id)	( (id <= node_manager[ROS_NODE_TYPE_INNER].max_node) ? ROS_NODE_TYPE_INNER : ROS_NODE_TYPE_OUTER )
 
-mRosReturnType RosNode::init(mRosSizeType max_node)
+static mRosReturnType init_node_manager(RosNodeType type, mRosSizeType max_node)
 {
-	for (RosNodeType type = ROS_NODE_TYPE_INNER; type < ROS_NODE_TYPE_NUM; type++) {
-		node_manager[type].node_entries = (RosNodeListEntryType *)malloc(max_node * sizeof(RosNodeListEntryType));
-		//TODO ASSERT
-		for (mros_uint32 i = 0; i < max_node; i++) {
-			RosNodeListEntryType *entry = &(node_manager[type].node_entries[i]);
-			ROS_NODE_ENTRY_INIT(entry);
-			entry->data.node_id = NODE_ID(i) + (((RosNodeIdType)type) * max_node);
-		}
-		List_Init(&node_manager[type].head, RosNodeListEntryType, max_node, node_manager[type].node_entries);
-		node_manager[type].max_node = max_node;
+	node_manager[type].node_entries = (RosNodeListEntryType *)malloc(max_node * sizeof(RosNodeListEntryType));
+	//TODO ASSERT
+	for (mros_uint32 i = 0; i < max_node; i++) {
+		RosNodeListEntryType *entry = &(node_manager[type].node_entries[i]);
+		ROS_NODE_ENTRY_INIT(entry);
+		entry->data.node_id = NODE_ID(i) + (((RosNodeIdType)type) * max_node);
 	}
+	List_Init(&node_manager[type].head, RosNodeListEntryType, max_node, node_manager[type].node_entries);
+	node_manager[type].max_node = max_node;
+
 	return MROS_E_OK;
 }
-mRosReturnType RosNode::get(const char *node_name, RosNodeIdType &id)
+static mRosReturnType get_node(const char *node_name, mros_uint32 len, RosNodeType type, RosNodeIdType &id)
 {
 	RosNodeListEntryType *p;
-	mros_uint32 len = strlen(node_name);
-
 	id = MROS_ID_NONE;
-	for (RosNodeType type = ROS_NODE_TYPE_INNER; type < ROS_NODE_TYPE_NUM; type++) {
-		ListEntry_Foreach(&node_manager[type].head, p) {
-			if (len != p->data.namelen) {
-				continue;
-			}
-			if (!strcmp(p->data.node_name, node_name)) {
-				id = p->data.node_id;
-				break;
-			}
+	ListEntry_Foreach(&node_manager[type].head, p) {
+		if (len != p->data.namelen) {
+			continue;
+		}
+		if (!strcmp(p->data.node_name, node_name)) {
+			id = p->data.node_id;
+			break;
 		}
 	}
 	if (id == MROS_ID_NONE) {
@@ -75,6 +71,28 @@ mRosReturnType RosNode::get(const char *node_name, RosNodeIdType &id)
 	}
 	return MROS_E_OK;
 }
+
+mRosReturnType RosNode::init(mRosSizeType max_node)
+{
+	mRosReturnType ret = init_node_manager(ROS_NODE_TYPE_INNER, max_node);
+	if (ret != MROS_E_OK) {
+		return ret;
+	}
+	ret = init_node_manager(ROS_NODE_TYPE_OUTER, max_node);
+	return ret;
+}
+mRosReturnType RosNode::get(const char *node_name, RosNodeIdType &id)
+{
+	mros_uint32 len = strlen(node_name);
+
+	mRosReturnType ret = get_node(node_name, len, ROS_NODE_TYPE_INNER, id);
+	if (ret != MROS_E_OK) {
+		ret = get_node(node_name, len, ROS_NODE_TYPE_OUTER, id);
+	}
+
+	return ret;
+}
+
 mRosReturnType RosNode::create(const char *node_name, RosNodeType type, RosNodeIdType &id)
 {
 	RosNodeListEntryType *p;
@@ -92,6 +110,7 @@ mRosReturnType RosNode::create(const char *node_name, RosNodeType type, RosNodeI
 	if (p == NULL) {
 		return MROS_E_NOMEM;
 	}
+	id = p->data.node_id;
 	p->data.namelen = len;
 	p->data.node_name = node_name;
 	ListEntry_AddEntry(&node_manager[type].head, p);

@@ -49,6 +49,7 @@ IFLAGS	+= -I$(ROOT_PATH)/src/transfer
 VPATH	:= $(ROOT_PATH)/baremetal
 VPATH	+= $(ROOT_PATH)/src/lib
 VPATH	+= $(ROOT_PATH)/src/topic
+VPATH	+= $(ROOT_PATH)/src/node
 VPATH	+= $(TEST_PATH)
 
 LIBS := -lsupc++  -lstdc++  -lm -lc -lgcc  libathrillc.o
