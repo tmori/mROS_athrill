@@ -13,11 +13,11 @@ namespace topology {
 class RosTopicConnector {
 public:
 	static mRosReturnType init(mRosSizeType max_connector);
-	static mRosReturnType get_topics(PrimitiveContainer<RosTopicConnectorIdType> &container);
-	static mRosReturnType put_topics(PrimitiveContainer<RosTopicConnectorIdType> &container);
+	static mRosReturnType get_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container);
+	static mRosReturnType rel_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container);
 
 	static mRosReturnType add_pubnode_topic(const char* topic_name, RosNodeIdType src);
-	static mRosReturnType add_subnode_topic(const char* topic_name, RosNodeIdType dst);
+	static mRosReturnType add_subnode_topic(const char* topic_name, RosNodeIdType dst, RosFuncIdType func);
 
 private:
 	RosTopicConnector();

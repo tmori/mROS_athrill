@@ -19,6 +19,8 @@ OBJS	+= interrupt_table.o
 OBJS	+= timer.o
 OBJS	+= interrupt_asm.o
 OBJS	+= software_init.o
+OBJS	+= mros_topic_connector_impl.o
+OBJS	+= mros_topic_impl.o
 OBJS	+= main.o
 
 CXXFLAGS := -fno-use-cxa-atexit -fno-exceptions -fno-rtti 
@@ -37,12 +39,14 @@ IFLAGS	+= -I$(CPU_CONFIG_PATH)
 IFLAGS	+= -I$(APL_DIR)/include
 
 IFLAGS	+= -I$(ROOT_PATH)/src/lib
+IFLAGS	+= -I$(ROOT_PATH)/src/inc
 IFLAGS	+= -I$(ROOT_PATH)/src/node
 IFLAGS	+= -I$(ROOT_PATH)/src/topic
 IFLAGS	+= -I$(ROOT_PATH)/src/transfer
 
 VPATH	:= $(ROOT_PATH)/baremetal
 VPATH	+= $(ROOT_PATH)/src/lib
+VPATH	+= $(ROOT_PATH)/src/topic
 VPATH	+= $(TEST_PATH)
 
 LIBS := -lsupc++  -lstdc++  -lm -lc -lgcc  libathrillc.o

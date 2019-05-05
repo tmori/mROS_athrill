@@ -8,22 +8,16 @@ namespace topic {
 
 class RosTopic {
 public:
+	static mRosReturnType init(mRosSizeType max_topic);
 	static mRosReturnType get(const char *topic_name, RosTopicIdType &id);
 	static mRosReturnType create(const char *topic_name, RosTopicIdType &id);
 	static mRosReturnType create(const char *topic_name);
 	static mRosReturnType remove(const char *topic_name);
 	static mRosReturnType remove(RosTopicIdType id);
-	RosTopicIdType id()
-	{
-		return topic_id;
-	}
 
 private:
-	RosTopic(const char *name);
+	RosTopic();
 	~RosTopic();
-	RosTopicIdType		topic_id;
-	const char			*topic_name;
-
 };
 }
 }

@@ -10,6 +10,7 @@ typedef struct {
 	RosTopicIdType				topic_id;
 	RosNodeIdType				src_id;
 	RosNodeIdType				dst_id;
+	RosFuncIdType				func_id;
 } RosConnectorEntryType;
 
 typedef ListEntryType(RosConnectorEntryListType, RosConnectorEntryType) RosConnectorEntryListType;
@@ -21,6 +22,7 @@ do {	\
 	(entryp)->data.src_id = MROS_ID_NONE;		\
 	(entryp)->data.dst_id = MROS_ID_NONE;		\
 	(entryp)->data.topic_id = MROS_ID_NONE;	\
+	(entryp)->data.func_id = MROS_ID_NONE;	\
 } while (0)
 
 typedef struct {
@@ -31,8 +33,7 @@ typedef struct {
 #define CONNECTOR_ID(index)		((index) + 1U)
 #define CONNECTOR_INDEX(id)		((id) - 1U)
 
-
-RosConnectorManagerType conn_manager;
+static RosConnectorManagerType conn_manager;
 
 #define CONNECTOR_OBJ(id)		conn_manager.connector_entries[CONNECTOR_INDEX((id))]
 
@@ -40,7 +41,7 @@ mRosReturnType topology::RosTopicConnector::init(mRosSizeType max_connector)
 {
 	conn_manager.connector_entries = (RosConnectorEntryListType *)malloc(max_connector * sizeof(RosConnectorEntryListType));
 	//TODO ASSERT
-	for (int i = 0; i < max_connector; i++) {
+	for (mros_uint32 i = 0; i < max_connector; i++) {
 		RosConnectorEntryListType *entry = &(conn_manager.connector_entries[i]);
 		entry->data.connector_id = CONNECTOR_ID(i);
 		ROS_CONNECTOR_ENTRY_INIT(entry);
@@ -50,14 +51,14 @@ mRosReturnType topology::RosTopicConnector::init(mRosSizeType max_connector)
 	return MROS_E_OK;
 }
 
-mRosReturnType topology::RosTopicConnector::get_topics(PrimitiveContainer<RosTopicConnectorIdType> &container)
+mRosReturnType topology::RosTopicConnector::get_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container)
 {
 	RosConnectorEntryListType *p;
 	container.usecount = 0;
 	int i = 0;
 
 	ListEntry_Foreach(&conn_manager.head, p) {
-		if (container.usecount >= container.array_size) {
+		if (container.usecount >= container.size()) {
 			break;
 		}
 		if ((p->data.src_id != MROS_ID_NONE) && (p->data.dst_id != MROS_ID_NONE)) {
@@ -71,25 +72,30 @@ mRosReturnType topology::RosTopicConnector::get_topics(PrimitiveContainer<RosTop
 	return MROS_E_OK;
 }
 
-mRosReturnType topology::RosTopicConnector::put_topics(PrimitiveContainer<RosTopicConnectorIdType> &container)
+mRosReturnType topology::RosTopicConnector::rel_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container)
 {
-	for (int i = 0; i < container.usecount; i++) {
+	for (mros_uint32 i = 0; i < container.usecount; i++) {
 		CONNECTOR_OBJ(container[i]).data.counter--;
 	}
 	container.usecount = 0;
 	return MROS_E_OK;
 }
 
-static mRosReturnType topology::RosTopicConnector::add_pubnode_topic(const char* topic_name, RosNodeIdType src)
+mRosReturnType topology::RosTopicConnector::add_pubnode_topic(const char* topic_name, RosNodeIdType src)
 {
 	RosTopicIdType topic_id;
 	mRosReturnType ret;
 	RosConnectorEntryListType *entry = NULL;
 	RosConnectorEntryListType *p;
 	bool isTopicFound = false;
+	bool isTopicCreated = false;
 
+	/* TODO LOCK */
 	ret = RosTopic::create(topic_name, topic_id);
-	if (ret != MROS_E_OK) {
+	if (ret == MROS_E_OK) {
+		isTopicCreated = true;
+	}
+	else if (ret != MROS_E_EXIST) {
 		goto errdone;
 	}
 
@@ -136,20 +142,27 @@ errdone:
 	if (entry != NULL) {
 		ListEntry_Free(&conn_manager.head, entry);
 	}
+	if (isTopicCreated) {
+		(void)RosTopic::remove(topic_name);
+	}
 	return ret;
 }
 
-static mRosReturnType topology::RosTopicConnector::add_subnode_topic(const char* topic_name, RosNodeIdType dst)
+mRosReturnType topology::RosTopicConnector::add_subnode_topic(const char* topic_name, RosNodeIdType dst, RosFuncIdType func)
 {
 	RosTopicIdType topic_id;
 	mRosReturnType ret;
 	RosConnectorEntryListType *entry = NULL;
 	RosConnectorEntryListType *p;
 	RosNodeIdType src_id = MROS_ID_NONE;
+	bool isTopicCreated = false;
 
 	/* TODO LOCK */
 	ret = RosTopic::create(topic_name, topic_id);
-	if (ret != MROS_E_OK) {
+	if (ret == MROS_E_OK) {
+		isTopicCreated = true;
+	}
+	else if (ret != MROS_E_EXIST) {
 		goto errdone;
 	}
 
@@ -185,12 +198,16 @@ static mRosReturnType topology::RosTopicConnector::add_subnode_topic(const char*
 	entry->data.topic_id = topic_id;
 	entry->data.src_id = src_id;
 	entry->data.dst_id = dst;
+	entry->data.func_id = func;
 	/* TODO UNLOCK */
 	return MROS_E_OK;
 
 errdone:
 	if (entry != NULL) {
 		ListEntry_Free(&conn_manager.head, entry);
+	}
+	if (isTopicCreated) {
+		(void)RosTopic::remove(topic_name);
 	}
 	/* TODO UNLOCK */
 	return ret;

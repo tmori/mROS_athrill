@@ -9,6 +9,7 @@ namespace lib {
 template <typename T>
 class PrimitiveContainer {
 public:
+	mros_uint32 usecount;
 	PrimitiveContainer(mros_uint32 size);
 	~PrimitiveContainer();
 
@@ -51,11 +52,9 @@ public:
 		}
 	}
 
-
 private:
-	mros_uint32 usecount;
-	mros_uint32	array_size;
-	T 			*array;
+	mRosSizeType	array_size;
+	T 				*array;
 };
 
 }

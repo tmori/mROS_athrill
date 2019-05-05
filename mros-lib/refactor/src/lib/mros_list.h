@@ -65,13 +65,12 @@ struct {	\
 
 #define List_Init(headp, entry_type, prealloc_size, memp)	\
 do {	\
-	int _i;	\
 	(headp)->entry_size = sizeof(entry_type);	\
 	(headp)->entry_num = 0;	\
 	(headp)->entries = NULL;	\
 	(headp)->free = NULL;	\
 	(headp)->free_num = (prealloc_size);	\
-	for (_i = 0; _i < (prealloc_size); _i++) { \
+	for (mros_uint32 _i = 0; _i < (prealloc_size); _i++) { \
 		entry_type *_tmp = &(((entry_type*)(memp))[_i]); \
 		ListEntry_Init(_tmp);	\
 		ListEntry_InsertHead((headp)->free, _tmp);	\
@@ -122,8 +121,8 @@ do { \
 } while (0)
 
 #define ListEntry_Foreach(headp, var)	\
-	int _i = 0;	\
-	for ((var) = (headp)->entries; \
+	(var) = (headp)->entries;	\
+	for (mros_uint32 _i = 0; \
 		_i < (headp)->entry_num; \
 		(var) = (var)->next, _i++)
 
