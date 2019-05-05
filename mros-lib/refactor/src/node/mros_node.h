@@ -6,19 +6,25 @@
 namespace mros {
 namespace node {
 
+typedef enum {
+	ROS_NODE_INNER = 0,
+	ROS_NODE_OUTER
+} RosNodeType;
+
 class RosNode {
 public:
-	RosNode(const char *name);
-	RosNodeIdType id()
-	{
-		return node_id;
-	}
-	~RosNode();
+	static mRosReturnType init(mRosSizeType max_node);
+	static mRosReturnType get(const char *node_name, RosNodeIdType &id);
+	static mRosReturnType create_node(const char *node_name, RosNodeType type, RosNodeIdType &id);
+	static mRosReturnType create_node(const char *node_name, RosNodeType type);
+	static mRosReturnType remove(const char *node_name);
+	static mRosReturnType remove(RosNodeIdType id);
+
+	static mRosReturnType send(RosNodeIdType id, char *data, mRosSizeType datalen, mRosSizeType &rlen);
 
 private:
-	RosNodeIdType	node_id;
-	const char		*node_name;
-
+	RosNode();
+	~RosNode();
 };
 
 }
