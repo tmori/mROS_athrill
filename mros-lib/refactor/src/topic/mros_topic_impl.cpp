@@ -25,21 +25,20 @@ typedef struct {
 	mRosMemoryListHeadType 		queue_head;
 } RosTopicEntryType;
 
-typedef ListEntryType(RosTopicEntryListType, RosTopicEntryType) RosTopicEntryListType;
-typedef ListHeadType(RosTopicEntryListType) RosTopicEntryListHeadType;
+typedef ListEntryType(RosTopicListEntryType, RosTopicEntryType) RosTopicListEntryType;
+typedef ListHeadType(RosTopicListEntryType) RosTopicEntryHeadType;
 
 #define ROS_TOPIC_ENTRY_INIT(entryp)	\
 do {	\
 	(entryp)->data.counter = 0;		\
-	(entryp)->data.topic_id = MROS_ID_NONE;	\
 	(entryp)->data.topic_name = NULL;	\
 	(entryp)->data.namelen = 0;	\
 	(entryp)->data.queue_maxsize = 1; \
 } while (0)
 
 typedef struct {
-	RosTopicEntryListHeadType 	head;
-	RosTopicEntryListType 		*topic_entries;
+	RosTopicEntryHeadType	 	head;
+	RosTopicListEntryType 		*topic_entries;
 	RosTopicIdType				max_topic;
 } RosTopicManagerType;
 
@@ -53,15 +52,15 @@ static RosTopicManagerType topic_manager;
 
 mRosReturnType RosTopic::init(mRosSizeType max_topic)
 {
-	topic_manager.topic_entries = (RosTopicEntryListType *)malloc(max_topic * sizeof(RosTopicEntryListType));
+	topic_manager.topic_entries = (RosTopicListEntryType *)malloc(max_topic * sizeof(RosTopicListEntryType));
 	//TODO ASSERT
 	for (mros_uint32 i = 0; i < max_topic; i++) {
-		RosTopicEntryListType *entry = &(topic_manager.topic_entries[i]);
-		entry->data.topic_id = TOPIC_ID(i);
+		RosTopicListEntryType *entry = &(topic_manager.topic_entries[i]);
 		ROS_TOPIC_ENTRY_INIT(entry);
+		entry->data.topic_id = TOPIC_ID(i);
 		List_Init(&(entry->data.queue_head), mRosMemoryListEntryType, 0, NULL);
 	}
-	List_Init(&topic_manager.head, RosTopicEntryListType, max_topic, topic_manager.topic_entries);
+	List_Init(&topic_manager.head, RosTopicListEntryType, max_topic, topic_manager.topic_entries);
 	topic_manager.max_topic = max_topic;
 
 	return MROS_E_OK;
@@ -69,7 +68,7 @@ mRosReturnType RosTopic::init(mRosSizeType max_topic)
 
 mRosReturnType RosTopic::get(const char *topic_name, RosTopicIdType &id)
 {
-	RosTopicEntryListType *p;
+	RosTopicListEntryType *p;
 	mros_uint32 len = strlen(topic_name);
 
 	id = MROS_ID_NONE;
@@ -90,7 +89,7 @@ mRosReturnType RosTopic::get(const char *topic_name, RosTopicIdType &id)
 
 mRosReturnType RosTopic::create(const char *topic_name, RosTopicIdType &id)
 {
-	RosTopicEntryListType *p;
+	RosTopicListEntryType *p;
 	mros_uint32 len = strlen(topic_name);
 
 	mRosReturnType ret = RosTopic::get(topic_name, id);
@@ -98,7 +97,7 @@ mRosReturnType RosTopic::create(const char *topic_name, RosTopicIdType &id)
 		return MROS_E_EXIST;
 	}
 
-	ListEntry_Alloc(&topic_manager.head, RosTopicEntryListType, &p);
+	ListEntry_Alloc(&topic_manager.head, RosTopicListEntryType, &p);
 	if (p == NULL) {
 		return MROS_E_NOMEM;
 	}

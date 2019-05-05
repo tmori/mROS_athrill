@@ -43,8 +43,8 @@ mRosReturnType topology::RosTopicConnector::init(mRosSizeType max_connector)
 	//TODO ASSERT
 	for (mros_uint32 i = 0; i < max_connector; i++) {
 		RosConnectorListEntryType *entry = &(conn_manager.connector_entries[i]);
-		entry->data.connector_id = CONNECTOR_ID(i);
 		ROS_CONNECTOR_ENTRY_INIT(entry);
+		entry->data.connector_id = CONNECTOR_ID(i);
 	}
 	List_Init(&conn_manager.head, RosConnectorListEntryType, max_connector, conn_manager.connector_entries);
 
