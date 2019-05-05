@@ -13,8 +13,8 @@ typedef struct {
 	RosFuncIdType				func_id;
 } RosConnectorEntryType;
 
-typedef ListEntryType(RosConnectorEntryListType, RosConnectorEntryType) RosConnectorEntryListType;
-typedef ListHeadType(RosConnectorEntryListType) RosConnectorEntryListHeadType;
+typedef ListEntryType(RosConnectorListEntryType, RosConnectorEntryType) RosConnectorListEntryType;
+typedef ListHeadType(RosConnectorListEntryType) RosConnectorListHeadType;
 
 #define ROS_CONNECTOR_ENTRY_INIT(entryp)	\
 do {	\
@@ -26,8 +26,8 @@ do {	\
 } while (0)
 
 typedef struct {
-	RosConnectorEntryListHeadType head;
-	RosConnectorEntryListType *connector_entries;
+	RosConnectorListHeadType head;
+	RosConnectorListEntryType *connector_entries;
 } RosConnectorManagerType;
 
 #define CONNECTOR_ID(index)		((index) + 1U)
@@ -39,21 +39,21 @@ static RosConnectorManagerType conn_manager;
 
 mRosReturnType topology::RosTopicConnector::init(mRosSizeType max_connector)
 {
-	conn_manager.connector_entries = (RosConnectorEntryListType *)malloc(max_connector * sizeof(RosConnectorEntryListType));
+	conn_manager.connector_entries = (RosConnectorListEntryType *)malloc(max_connector * sizeof(RosConnectorListEntryType));
 	//TODO ASSERT
 	for (mros_uint32 i = 0; i < max_connector; i++) {
-		RosConnectorEntryListType *entry = &(conn_manager.connector_entries[i]);
+		RosConnectorListEntryType *entry = &(conn_manager.connector_entries[i]);
 		entry->data.connector_id = CONNECTOR_ID(i);
 		ROS_CONNECTOR_ENTRY_INIT(entry);
 	}
-	List_Init(&conn_manager.head, RosConnectorEntryListType, max_connector, conn_manager.connector_entries);
+	List_Init(&conn_manager.head, RosConnectorListEntryType, max_connector, conn_manager.connector_entries);
 
 	return MROS_E_OK;
 }
 
 mRosReturnType topology::RosTopicConnector::get_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container)
 {
-	RosConnectorEntryListType *p;
+	RosConnectorListEntryType *p;
 	container.usecount = 0;
 	int i = 0;
 
@@ -85,8 +85,8 @@ mRosReturnType topology::RosTopicConnector::add_pubnode_topic(const char* topic_
 {
 	RosTopicIdType topic_id;
 	mRosReturnType ret;
-	RosConnectorEntryListType *entry = NULL;
-	RosConnectorEntryListType *p;
+	RosConnectorListEntryType *entry = NULL;
+	RosConnectorListEntryType *p;
 	bool isTopicFound = false;
 	bool isTopicCreated = false;
 
@@ -125,7 +125,7 @@ mRosReturnType topology::RosTopicConnector::add_pubnode_topic(const char* topic_
 		}
 	}
 	else {
-		ListEntry_Alloc(&conn_manager.head, RosConnectorEntryListType, &entry);
+		ListEntry_Alloc(&conn_manager.head, RosConnectorListEntryType, &entry);
 		if (entry == NULL) {
 			ret = MROS_E_NOMEM;
 			goto errdone;
@@ -152,8 +152,8 @@ mRosReturnType topology::RosTopicConnector::add_subnode_topic(const char* topic_
 {
 	RosTopicIdType topic_id;
 	mRosReturnType ret;
-	RosConnectorEntryListType *entry = NULL;
-	RosConnectorEntryListType *p;
+	RosConnectorListEntryType *entry = NULL;
+	RosConnectorListEntryType *p;
 	RosNodeIdType src_id = MROS_ID_NONE;
 	bool isTopicCreated = false;
 
@@ -187,7 +187,7 @@ mRosReturnType topology::RosTopicConnector::add_subnode_topic(const char* topic_
 		}
 	}
 	if (entry == NULL) {
-		ListEntry_Alloc(&conn_manager.head, RosConnectorEntryListType, &entry);
+		ListEntry_Alloc(&conn_manager.head, RosConnectorListEntryType, &entry);
 		if (entry == NULL) {
 			ret = MROS_E_NOMEM;
 			goto errdone;

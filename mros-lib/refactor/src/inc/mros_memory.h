@@ -28,8 +28,8 @@ typedef struct {
 	char 					*memp;
 } mRosMemoryEntryType;
 
-typedef ListEntryType(mRosMemoryEntryListType, mRosMemoryEntryType) mRosMemoryEntryListType;
-typedef ListHeadType(mRosMemoryEntryListType) mRosMemoryEntryListHeadType;
+typedef ListEntryType(mRosMemoryListEntryType, mRosMemoryEntryType) mRosMemoryListEntryType;
+typedef ListHeadType(mRosMemoryListEntryType) mRosMemoryListHeadType;
 
 class mRosMemory {
 public:

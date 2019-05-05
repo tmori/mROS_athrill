@@ -22,7 +22,7 @@ typedef struct {
 	 * トピックデータ格納用キュー
 	 */
 	mRosSizeType				queue_maxsize;
-	mRosMemoryEntryListHeadType queue_head;
+	mRosMemoryListHeadType 		queue_head;
 } RosTopicEntryType;
 
 typedef ListEntryType(RosTopicEntryListType, RosTopicEntryType) RosTopicEntryListType;
@@ -59,7 +59,7 @@ mRosReturnType RosTopic::init(mRosSizeType max_topic)
 		RosTopicEntryListType *entry = &(topic_manager.topic_entries[i]);
 		entry->data.topic_id = TOPIC_ID(i);
 		ROS_TOPIC_ENTRY_INIT(entry);
-		List_Init(&(entry->data.queue_head), mRosMemoryEntryListType, 0, NULL);
+		List_Init(&(entry->data.queue_head), mRosMemoryListEntryType, 0, NULL);
 	}
 	List_Init(&topic_manager.head, RosTopicEntryListType, max_topic, topic_manager.topic_entries);
 	topic_manager.max_topic = max_topic;
@@ -162,7 +162,7 @@ mRosReturnType RosTopic::remove(RosTopicIdType id)
 	return MROS_E_OK;
 }
 
-mRosReturnType RosTopic::add_data(RosTopicIdType id, memory::mRosMemoryEntryListType &data)
+mRosReturnType RosTopic::add_data(RosTopicIdType id, memory::mRosMemoryListEntryType &data)
 {
 	if (id > topic_manager.max_topic) {
 		return MROS_E_RANGE;
@@ -177,9 +177,9 @@ mRosReturnType RosTopic::add_data(RosTopicIdType id, memory::mRosMemoryEntryList
 	return MROS_E_OK;
 }
 
-mRosReturnType RosTopic::get_data(RosTopicIdType id, memory::mRosMemoryEntryListType **data)
+mRosReturnType RosTopic::get_data(RosTopicIdType id, memory::mRosMemoryListEntryType **data)
 {
-	memory::mRosMemoryEntryListType *datap;
+	memory::mRosMemoryListEntryType *datap;
 	if (id > topic_manager.max_topic) {
 		return MROS_E_RANGE;
 	}
