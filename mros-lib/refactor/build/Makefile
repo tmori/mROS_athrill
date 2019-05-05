@@ -21,6 +21,7 @@ OBJS	+= interrupt_asm.o
 OBJS	+= software_init.o
 OBJS	+= mros_topic_connector_impl.o
 OBJS	+= mros_topic_impl.o
+OBJS	+= mros_memory_impl.o
 OBJS	+= main.o
 
 CXXFLAGS := -fno-use-cxa-atexit -fno-exceptions -fno-rtti 

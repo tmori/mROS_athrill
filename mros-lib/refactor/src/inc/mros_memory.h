@@ -34,13 +34,10 @@ typedef ListHeadType(mRosMemoryListEntryType) mRosMemoryListHeadType;
 class mRosMemory {
 public:
 	static mRosReturnType init(mRosSizeType preallocation_count[MROS_MEMSIZE_NUM]);
-	static mRosReturnType memory_alloc(mRosSizeType size, mRosMemoryEntryType &memory);
-	static mRosReturnType memory_free(mRosMemoryEntryType &memory);
+	static mRosReturnType memory_alloc(mRosSizeType size, mRosMemoryListEntryType **memory);
+	static mRosReturnType memory_free(mRosMemoryListEntryType &memory);
 
 private:
-	static mRosSizeType max_memory_num[MROS_MEMSIZE_NUM];
-	static mRosSizeType unit_memory_size[MROS_MEMSIZE_NUM];
-
 	mRosMemory();
 	~mRosMemory();
 };
