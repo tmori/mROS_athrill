@@ -161,6 +161,40 @@ mRosReturnType RosTopic::remove(RosTopicIdType id)
 	ListEntry_Free(&topic_manager.head, &TOPIC_OBJ(id));
 	return MROS_E_OK;
 }
+
+mRosReturnType RosTopic::add_data(RosTopicIdType id, memory::mRosMemoryEntryListType &data)
+{
+	if (id > topic_manager.max_topic) {
+		return MROS_E_RANGE;
+	}
+	if (TOPIC_OBJ(id).data.counter == 0) {
+		return MROS_E_INVAL;
+	}
+	if (TOPIC_OBJ(id).data.queue_head.entry_num >= TOPIC_OBJ(id).data.queue_maxsize) {
+		return MROS_E_LIMIT;
+	}
+	ListEntry_AddEntry(&TOPIC_OBJ(id).data.queue_head, &data);
+	return MROS_E_OK;
+}
+
+mRosReturnType RosTopic::get_data(RosTopicIdType id, memory::mRosMemoryEntryListType **data)
+{
+	memory::mRosMemoryEntryListType *datap;
+	if (id > topic_manager.max_topic) {
+		return MROS_E_RANGE;
+	}
+	if (TOPIC_OBJ(id).data.counter == 0) {
+		return MROS_E_INVAL;
+	}
+	if (TOPIC_OBJ(id).data.queue_head.entry_num <= 0) {
+		return MROS_E_NOENT;
+	}
+	datap = ListEntry_First(TOPIC_OBJ(id).data.queue_head.entries);
+	ListEntry_RemoveEntry(&TOPIC_OBJ(id).data.queue_head, datap);
+	*data = datap;
+	return MROS_E_OK;
+}
+
 RosTopic::RosTopic()
 {
 	//TODO

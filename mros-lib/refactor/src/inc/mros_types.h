@@ -19,6 +19,7 @@ typedef mros_uint32 mRosSizeType;
 #define MROS_E_EXIST		17
 #define MROS_E_INVAL		22
 #define MROS_E_RANGE		34
+#define MROS_E_LIMIT		111
 typedef mros_int32 mRosReturnType;
 
 #endif /* _MROS_TYPES_H_ */

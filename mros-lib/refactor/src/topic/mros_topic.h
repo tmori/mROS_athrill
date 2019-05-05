@@ -2,6 +2,7 @@
 #define _MROS_TOPIC_H_
 
 #include "mros_types.h"
+#include "mros_memory.h"
 
 namespace mros {
 namespace topic {
@@ -16,6 +17,8 @@ public:
 	static mRosReturnType remove(RosTopicIdType id);
 	static mRosReturnType set_quesize(const char *topic_name, mRosSizeType size);
 	static mRosReturnType set_quesize(RosTopicIdType id, mRosSizeType size);
+	static mRosReturnType add_data(RosTopicIdType id, memory::mRosMemoryEntryListType &data);
+	static mRosReturnType get_data(RosTopicIdType id, memory::mRosMemoryEntryListType **data);
 
 private:
 	RosTopic();
