@@ -1,9 +1,11 @@
 #include "mros_topic.h"
+#include "mros_memory.h"
 #include "mros_list.h"
 #include <stdlib.h>
 #include <string.h>
 
 using namespace mros::topic;
+using namespace mros::memory;
 
 typedef struct {
 	mros_uint32					counter;
@@ -15,6 +17,12 @@ typedef struct {
 	 */
 	const char					*topic_name;
 	mros_uint32					namelen;
+
+	/*
+	 * トピックデータ格納用キュー
+	 */
+	mRosSizeType				queue_maxsize;
+	mRosMemoryEntryListHeadType queue_head;
 } RosTopicEntryType;
 
 typedef ListEntryType(RosTopicEntryListType, RosTopicEntryType) RosTopicEntryListType;
@@ -26,6 +34,7 @@ do {	\
 	(entryp)->data.topic_id = MROS_ID_NONE;	\
 	(entryp)->data.topic_name = NULL;	\
 	(entryp)->data.namelen = 0;	\
+	(entryp)->data.queue_maxsize = 0; \
 } while (0)
 
 typedef struct {
@@ -50,6 +59,7 @@ mRosReturnType RosTopic::init(mRosSizeType max_topic)
 		RosTopicEntryListType *entry = &(topic_manager.topic_entries[i]);
 		entry->data.topic_id = TOPIC_ID(i);
 		ROS_TOPIC_ENTRY_INIT(entry);
+		List_Init(&(entry->data.queue_head), mRosMemoryEntryListType, 0, NULL);
 	}
 	List_Init(&topic_manager.head, RosTopicEntryListType, max_topic, topic_manager.topic_entries);
 	topic_manager.max_topic = max_topic;
