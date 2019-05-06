@@ -5,12 +5,9 @@
 using namespace mros::topic;
 
 typedef struct {
-	mros_uint32					counter;
-	RosTopicConnectorIdType		connector_id;
-	RosTopicIdType				topic_id;
-	RosNodeIdType				src_id;
-	RosNodeIdType				dst_id;
-	RosFuncIdType				func_id;
+	mros_uint32							counter;
+	RosTopicConnectorIdType				connector_id;
+	topology::RosTopicConnectorType		value;
 } RosConnectorEntryType;
 
 typedef ListEntryType(RosConnectorListEntryType, RosConnectorEntryType) RosConnectorListEntryType;
@@ -19,14 +16,15 @@ typedef ListHeadType(RosConnectorListEntryType) RosConnectorListHeadType;
 #define ROS_CONNECTOR_ENTRY_INIT(entryp)	\
 do {	\
 	(entryp)->data.counter = 0;		\
-	(entryp)->data.src_id = MROS_ID_NONE;		\
-	(entryp)->data.dst_id = MROS_ID_NONE;		\
-	(entryp)->data.topic_id = MROS_ID_NONE;	\
-	(entryp)->data.func_id = MROS_ID_NONE;	\
+	(entryp)->data.value.src_id = MROS_ID_NONE;		\
+	(entryp)->data.value.dst_id = MROS_ID_NONE;		\
+	(entryp)->data.value.topic_id = MROS_ID_NONE;	\
+	(entryp)->data.value.func_id = MROS_ID_NONE;	\
 } while (0)
 
 typedef struct {
-	RosConnectorListHeadType head;
+	RosConnectorListHeadType 	head;
+	mRosSizeType				max_connector;
 	RosConnectorListEntryType *connector_entries;
 } RosConnectorManagerType;
 
@@ -46,6 +44,7 @@ mRosReturnType topology::RosTopicConnector::init(mRosSizeType max_connector)
 		ROS_CONNECTOR_ENTRY_INIT(entry);
 		entry->data.connector_id = CONNECTOR_ID(i);
 	}
+	conn_manager.max_connector = max_connector;
 	List_Init(&conn_manager.head, RosConnectorListEntryType, max_connector, conn_manager.connector_entries);
 
 	return MROS_E_OK;
@@ -61,7 +60,7 @@ mRosReturnType topology::RosTopicConnector::get_connectors(PrimitiveContainer<Ro
 		if (container.usecount >= container.size()) {
 			break;
 		}
-		if ((p->data.src_id != MROS_ID_NONE) && (p->data.dst_id != MROS_ID_NONE)) {
+		if ((p->data.value.src_id != MROS_ID_NONE) && (p->data.value.dst_id != MROS_ID_NONE)) {
 			container[i] = p->data.connector_id;
 			container.usecount++;
 			p->data.counter++;
@@ -78,6 +77,15 @@ mRosReturnType topology::RosTopicConnector::rel_connectors(PrimitiveContainer<Ro
 		CONNECTOR_OBJ(container[i]).data.counter--;
 	}
 	container.usecount = 0;
+	return MROS_E_OK;
+}
+
+mRosReturnType topology::RosTopicConnector::get(RosTopicConnectorIdType id, RosTopicConnectorType &connector)
+{
+	if (id > conn_manager.max_connector) {
+		return MROS_E_RANGE;
+	}
+	connector = CONNECTOR_OBJ(id).data.value;
 	return MROS_E_OK;
 }
 
@@ -109,9 +117,9 @@ mRosReturnType topology::RosTopicConnector::add_pubnode_topic(const char* topic_
 	 * 7) entry: topicあり, src:違う, dst:あり　：EEXIST
 	 */
 	ListEntry_Foreach(&conn_manager.head, p) {
-		if (p->data.topic_id == topic_id) {
+		if (p->data.value.topic_id == topic_id) {
 			isTopicFound = true;
-			if ((p->data.src_id != MROS_ID_NONE) && (p->data.src_id != src)) {
+			if ((p->data.value.src_id != MROS_ID_NONE) && (p->data.value.src_id != src)) {
 				ret = MROS_E_EXIST;
 				goto errdone;
 			}
@@ -119,8 +127,8 @@ mRosReturnType topology::RosTopicConnector::add_pubnode_topic(const char* topic_
 	}
 	if (isTopicFound) {
 		ListEntry_Foreach(&conn_manager.head, p) {
-			if (p->data.topic_id == topic_id) {
-				p->data.src_id = src;
+			if (p->data.value.topic_id == topic_id) {
+				p->data.value.src_id = src;
 			}
 		}
 	}
@@ -131,8 +139,8 @@ mRosReturnType topology::RosTopicConnector::add_pubnode_topic(const char* topic_
 			goto errdone;
 		}
 		entry->data.counter = 1U;
-		entry->data.topic_id = topic_id;
-		entry->data.src_id = src;
+		entry->data.value.topic_id = topic_id;
+		entry->data.value.src_id = src;
 		ListEntry_AddEntry(&conn_manager.head, entry);
 	}
 
@@ -174,13 +182,13 @@ mRosReturnType topology::RosTopicConnector::add_subnode_topic(const char* topic_
 	 * 5) entry: topicあり, src:あり, dst:同じ　：EEXIST
 	 */
 	ListEntry_Foreach(&conn_manager.head, p) {
-		if (p->data.topic_id == topic_id) {
-			src_id = p->data.src_id;
-			if (p->data.dst_id == dst) {
+		if (p->data.value.topic_id == topic_id) {
+			src_id = p->data.value.src_id;
+			if (p->data.value.dst_id == dst) {
 				ret = MROS_E_EXIST;
 				goto errdone;
 			}
-			else if (p->data.dst_id == MROS_ID_NONE) {
+			else if (p->data.value.dst_id == MROS_ID_NONE) {
 				entry = p;
 				break;
 			}
@@ -195,10 +203,10 @@ mRosReturnType topology::RosTopicConnector::add_subnode_topic(const char* topic_
 		entry->data.counter = 1U;
 		ListEntry_AddEntry(&conn_manager.head, entry);
 	}
-	entry->data.topic_id = topic_id;
-	entry->data.src_id = src_id;
-	entry->data.dst_id = dst;
-	entry->data.func_id = func;
+	entry->data.value.topic_id = topic_id;
+	entry->data.value.src_id = src_id;
+	entry->data.value.dst_id = dst;
+	entry->data.value.func_id = func;
 	/* TODO UNLOCK */
 	return MROS_E_OK;
 

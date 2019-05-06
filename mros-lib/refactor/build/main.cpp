@@ -15,6 +15,7 @@
 using namespace mros::lib;
 using namespace mros::node;
 using namespace mros::topic;
+using namespace mros::topic::topology;
 using namespace mros::memory;
 
 unsigned char stack_data[STACK_SIZE] __attribute__ ((section(".bss_noclr")));
@@ -164,6 +165,74 @@ static void ros_topic_memory_test(void)
 	test_print_line("get_data=", ret);
 }
 
+static void ros_topic_connector_test(void)
+{
+	RosNodeIdType src;
+	RosNodeIdType dst;
+	RosFuncIdType func;
+	RosTopicIdType id;
+	PrimitiveContainer<RosTopicConnectorIdType> container = PrimitiveContainer<RosTopicConnectorIdType>(10);
+
+	mRosReturnType ret = RosTopicConnector::init(2);
+	test_print_line("RosTopicConnector::init(2)=", ret);
+
+	ret = RosTopicConnector::get_connectors(container);
+	test_print_line("get_connectors()=", ret);
+	test_print_line("container.usecount=", container.usecount);
+
+	ret = RosTopic::init(2);
+	test_print_line("RosTopic::init(2)=", ret);
+
+	ret = RosNode::init(2);
+	test_print_line("RosNode::init(2)=", ret);
+
+	ret = RosNode::create("Mori", ROS_NODE_TYPE_INNER, src);
+	test_print_line("RosNode::create(Mori)=", ret);
+	test_print_line("RosNode::create(id)=", src);
+
+	ret = RosNode::create("Takashi", ROS_NODE_TYPE_OUTER, dst);
+	test_print_line("RosNode::create(Takashi)=", ret);
+	test_print_line("RosNode::create(id)=", dst);
+
+	ret = RosTopicConnector::add_pubnode_topic("topic_A", src);
+	test_print_line("add_pubnode_topic()=", ret);
+
+	ret = RosTopicConnector::add_pubnode_topic("topic_B", src);
+	test_print_line("add_pubnode_topic()=", ret);
+
+	ret = RosTopicConnector::add_pubnode_topic("topic_C", src);
+	test_print_line("add_pubnode_topic()=", ret);
+
+	func = (RosFuncIdType)ros_topic_connector_test;
+	ret = RosTopicConnector::add_subnode_topic("topic_A", dst, func);
+	test_print_line("add_subnode_topic()=", ret);
+
+	ret = RosTopicConnector::get_connectors(container);
+	test_print_line("get_connectors()=", ret);
+	test_print_line("container.usecount=", container.usecount);
+
+	RosTopicConnectorType connector;
+
+	ret = RosTopicConnector::get(container[0], connector);
+	test_print_line("RosTopicConnector::get()=", ret);
+	test_print_line("connector.topic_id=", connector.topic_id);
+	test_print_line("connector.src_id=", connector.src_id);
+	test_print_line("connector.dst_id=", connector.dst_id);
+	test_print_line("connector.func_id=", connector.func_id);
+
+	RosNodeType type;
+	ret = RosNode::type(connector.src_id, type);
+	test_print_line("RosNode::type()=", ret);
+	test_print_line("src_type=", type);
+
+	ret = RosNode::type(connector.dst_id, type);
+	test_print_line("RosNode::type()=", ret);
+	test_print_line("dst_type=", type);
+
+	ret = RosTopicConnector::rel_connectors(container);
+	test_print_line("rel_connectors()=", ret);
+}
+
 int main(void)
 {
 #if 0
@@ -177,7 +246,7 @@ int main(void)
 	}
 #endif
 
-	ros_topic_memory_test();
+	ros_topic_connector_test();
 
 	while (1) {
 		;

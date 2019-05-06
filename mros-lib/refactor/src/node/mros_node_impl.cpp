@@ -38,6 +38,12 @@ static RosNodeManagerType node_manager[ROS_NODE_TYPE_NUM];
 #define NODE_OBJ(type, id)		node_manager[(type)].node_entries[NODE_INDEX((id))]
 #define NODE_TYPE(id)	( (id <= node_manager[ROS_NODE_TYPE_INNER].max_node) ? ROS_NODE_TYPE_INNER : ROS_NODE_TYPE_OUTER )
 
+#define NODE_MAX_ID(type)	( \
+	(type == ROS_NODE_TYPE_INNER) ? \
+			node_manager[ROS_NODE_TYPE_INNER].max_node :  \
+			(node_manager[ROS_NODE_TYPE_INNER].max_node + node_manager[ROS_NODE_TYPE_OUTER].max_node) \
+	)
+
 static mRosReturnType init_node_manager(RosNodeType type, mRosSizeType max_node)
 {
 	node_manager[type].node_entries = (RosNodeListEntryType *)malloc(max_node * sizeof(RosNodeListEntryType));
@@ -138,7 +144,7 @@ mRosReturnType RosNode::remove(const char *node_name)
 mRosReturnType RosNode::remove(RosNodeIdType id)
 {
 	RosNodeType type = NODE_TYPE(id);
-	if (id > node_manager[type].max_node) {
+	if (id > NODE_MAX_ID(type)) {
 		return MROS_E_RANGE;
 	}
 
@@ -146,10 +152,19 @@ mRosReturnType RosNode::remove(RosNodeIdType id)
 	return MROS_E_OK;
 }
 
+mRosReturnType RosNode::type(RosNodeIdType id, RosNodeType &type)
+{
+	type = NODE_TYPE(id);
+	if (id > NODE_MAX_ID(type)) {
+		return MROS_E_RANGE;
+	}
+	return MROS_E_OK;
+}
+
 mRosReturnType send(RosNodeIdType id, char *data, mRosSizeType datalen, mRosSizeType &rlen)
 {
 	RosNodeType type = NODE_TYPE(id);
-	if (id > node_manager[type].max_node) {
+	if (id > NODE_MAX_ID(type)) {
 		return MROS_E_RANGE;
 	}
 	//TODO

@@ -16,6 +16,7 @@ class RosNode {
 public:
 	static mRosReturnType init(mRosSizeType max_node);
 	static mRosReturnType get(const char *node_name, RosNodeIdType &id);
+	static mRosReturnType type(RosNodeIdType id, RosNodeType &type);
 	static mRosReturnType create(const char *node_name, RosNodeType type, RosNodeIdType &id);
 	static mRosReturnType create(const char *node_name, RosNodeType type);
 	static mRosReturnType remove(const char *node_name);
