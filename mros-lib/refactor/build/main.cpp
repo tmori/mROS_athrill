@@ -110,8 +110,9 @@ static void ros_topic_memory_test(void)
 	for (int i = 0; i < (int)MROS_MEMSIZE_NUM; i++) {
 		preallocation_count[i] = 2;
 	}
+	mRosMemory mem_manager;
 
-	ret = mRosMemory::init(preallocation_count);
+	ret = mem_manager.init(preallocation_count);
 	test_print_line("mRosMemory::init(2)=", ret);
 
 	ret = RosTopic::create("tmori", tid);
@@ -119,22 +120,22 @@ static void ros_topic_memory_test(void)
 	test_print_line("RosTopic::create(id)=", tid);
 
 	mRosMemoryListEntryType *memory = NULL;
-	ret = mRosMemory::memory_alloc(17,  &memory);
+	ret = mem_manager.memory_alloc(17,  &memory);
 	test_print_line("memory_alloc(17)=", ret);
 	test_print_line("memory.memory_id=", memory->data.memory_id);
 	test_print_line("memory.memsize_id=", memory->data.memsize_id);
 	test_print_line("memory.memsize=", memory->data.memsize);
 
-	ret = mRosMemory::memory_free(*memory);
+	ret = mem_manager.memory_free(*memory);
 	test_print_line("memory_free(17)=", ret);
 
-	ret = mRosMemory::memory_alloc(17,  &memory);
+	ret = mem_manager.memory_alloc(17,  &memory);
 	test_print_line("memory_alloc(17)=", ret);
 	test_print_line("memory.memory_id=", memory->data.memory_id);
 	test_print_line("memory.memsize_id=", memory->data.memsize_id);
 	test_print_line("memory.memsize=", memory->data.memsize);
 
-	ret = mRosMemory::memory_free(*memory);
+	ret = mem_manager.memory_free(*memory);
 	test_print_line("memory_free(17)=", ret);
 
 	memory->data.memp[0] = 't';
@@ -158,7 +159,7 @@ static void ros_topic_memory_test(void)
 	test_print_line("memory.memsize=", ret_memory->data.memsize);
 	test_print_line(ret_memory->data.memp, ret);
 
-	ret = mRosMemory::memory_free(*ret_memory);
+	ret = mem_manager.memory_free(*ret_memory);
 	test_print_line("memory_free(17)=", ret);
 
 	ret = RosTopic::get_data(tid, &ret_memory);
@@ -247,7 +248,8 @@ int main(void)
 	}
 #endif
 
-	ros_topic_connector_test();
+	//ros_topic_connector_test();
+	ros_topic_memory_test();
 
 	while (1) {
 		;

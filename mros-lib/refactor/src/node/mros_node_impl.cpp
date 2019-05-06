@@ -1,10 +1,9 @@
 #include "mros_node.h"
-#include "mros_memory.h"
+#include "mros_list.h"
 #include <stdlib.h>
 #include <string.h>
 
 using namespace mros::node;
-using namespace mros::memory;
 
 typedef struct {
 	RosNodeIdType				node_id;

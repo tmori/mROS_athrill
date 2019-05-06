@@ -14,19 +14,11 @@ static const mRosSizeType memory_size[MROS_MEMSIZE_NUM] = {
 	4096,
 	8192,
 };
-typedef struct {
-	mRosMemoryListHeadType head;
-	mRosSizeType max_memory_num;
-	mRosMemoryListEntryType *memory_entries;
-	char					*memory;
-} mRosMemoryManagerType;
 
 #define MEMORY_ID(index)		((index) + 1U)
 #define MEMORY_INDEX(id)		((id) - 1U)
 
-static mRosMemoryManagerType memory_manager[MROS_MEMSIZE_NUM];
 #define MEMORY_OBJ(mid, id)		memory_manager[(mid)].memory_entries[MEMORY_INDEX((id))]
-
 
 mRosReturnType mRosMemory::init(mRosSizeType preallocation_count[MROS_MEMSIZE_NUM])
 {
@@ -86,5 +78,15 @@ mRosMemory::mRosMemory()
 
 mRosMemory::~mRosMemory()
 {
+	for (mros_uint32 i = 0; i < MROS_MEMSIZE_NUM; i++) {
+		if (memory_manager[i].memory_entries != NULL) {
+			free(memory_manager[i].memory_entries);
+			memory_manager[i].memory_entries = NULL;
+		}
+		if (memory_manager[i].memory != NULL) {
+			free(memory_manager[i].memory);
+			memory_manager[i].memory = NULL;
+		}
+	}
 }
 

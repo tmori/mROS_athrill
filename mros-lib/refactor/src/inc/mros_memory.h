@@ -31,15 +31,24 @@ typedef struct {
 typedef ListEntryType(mRosMemoryListEntryType, mRosMemoryEntryType) mRosMemoryListEntryType;
 typedef ListHeadType(mRosMemoryListEntryType) mRosMemoryListHeadType;
 
+typedef struct {
+	mRosMemoryListHeadType head;
+	mRosSizeType max_memory_num;
+	mRosMemoryListEntryType *memory_entries;
+	char					*memory;
+} mRosMemoryManagerType;
+
 class mRosMemory {
 public:
-	static mRosReturnType init(mRosSizeType preallocation_count[MROS_MEMSIZE_NUM]);
-	static mRosReturnType memory_alloc(mRosSizeType size, mRosMemoryListEntryType **memory);
-	static mRosReturnType memory_free(mRosMemoryListEntryType &memory);
-
-private:
 	mRosMemory();
 	~mRosMemory();
+
+	mRosReturnType init(mRosSizeType preallocation_count[MROS_MEMSIZE_NUM]);
+	mRosReturnType memory_alloc(mRosSizeType size, mRosMemoryListEntryType **memory);
+	mRosReturnType memory_free(mRosMemoryListEntryType &memory);
+
+private:
+	mRosMemoryManagerType memory_manager[MROS_MEMSIZE_NUM];
 };
 
 }

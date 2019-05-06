@@ -22,6 +22,7 @@ typedef struct {
 
 class mRosPacket {
 public:
+	static mRosReturnType init(memory::mRosMemory &memory_manager);
 	static mRosReturnType get(mRosPacketType &packet, mRosSizeType size);
 	static mRosReturnType put(mRosPacketType &packet);
 

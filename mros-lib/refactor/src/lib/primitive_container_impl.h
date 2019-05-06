@@ -7,6 +7,7 @@ template <typename T>
 PrimitiveContainer<T>::PrimitiveContainer(mros_uint32 size)
 {
 	this->array_size = size;
+	this->usecount = 0;
 	this->array = (T *)malloc(size * sizeof(T));
 	//TODO ASSERT
 }
