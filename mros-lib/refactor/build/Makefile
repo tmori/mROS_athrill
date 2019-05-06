@@ -23,6 +23,8 @@ OBJS	+= mros_topic_connector_impl.o
 OBJS	+= mros_topic_impl.o
 OBJS	+= mros_node_impl.o
 OBJS	+= mros_memory_impl.o
+OBJS	+= mros_packet_impl.o
+OBJS	+= mros_packet_encoder_impl.o
 OBJS	+= main.o
 
 CXXFLAGS := -fno-use-cxa-atexit -fno-exceptions -fno-rtti 
@@ -45,11 +47,14 @@ IFLAGS	+= -I$(ROOT_PATH)/src/inc
 IFLAGS	+= -I$(ROOT_PATH)/src/node
 IFLAGS	+= -I$(ROOT_PATH)/src/topic
 IFLAGS	+= -I$(ROOT_PATH)/src/transfer
+IFLAGS	+= -I$(ROOT_PATH)/src/packet
+IFLAGS	+= -I$(ROOT_PATH)/src/packet/template
 
 VPATH	:= $(ROOT_PATH)/baremetal
 VPATH	+= $(ROOT_PATH)/src/lib
 VPATH	+= $(ROOT_PATH)/src/topic
 VPATH	+= $(ROOT_PATH)/src/node
+VPATH	+= $(ROOT_PATH)/src/packet
 VPATH	+= $(TEST_PATH)
 
 LIBS := -lsupc++  -lstdc++  -lm -lc -lgcc  libathrillc.o

@@ -11,26 +11,23 @@ typedef enum {
 	MROS_PACKET_DATA_REGISTER_PUBLISHER = 0,
 	MROS_PACKET_DATA_REGISTER_SUBSCRIBER,
 	MROS_PACKET_DATA_REQUEST_TOPIC,
-	MROS_PACKET_ENCTYPE_NUM,
+	MROS_PACKET_DATA_NUM,
 } mRosPacketDataType;
 
 typedef struct {
-	RosPacketIdType				packet_id;
-	mRosSizeType				header_size;
-	mRosSizeType				body_size;
-	memory::mRosMemoryEntryType header;
-	memory::mRosMemoryEntryType body;
+	mRosSizeType						total_size;
+	mRosSizeType						data_size;
+	memory::mRosMemoryListEntryType 	*data;
 } mRosPacketType;
 
 class mRosPacket {
 public:
-	static mRosReturnType init(mRosSizeType max_packet);
-	static mRosReturnType get(mRosPacketType &packet);
+	static mRosReturnType get(mRosPacketType &packet, mRosSizeType size);
 	static mRosReturnType put(mRosPacketType &packet);
 
 private:
-	mRosPacket();
-	~mRosPacket();
+	mRosPacket() {}
+	~mRosPacket() {}
 };
 
 
@@ -38,4 +35,4 @@ private:
 }
 
 
-#endif /+ _MROS_PACKET_H_ */
+#endif /* _MROS_PACKET_H_ */

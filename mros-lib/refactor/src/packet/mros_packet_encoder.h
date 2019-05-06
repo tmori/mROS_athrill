@@ -15,11 +15,12 @@ typedef struct {
 
 class mRosPacketEncoder {
 public:
+	static mRosReturnType init();
 	static mRosReturnType encode(mRosEncodeArgType &arg, mRosPacketType &packet);
 
 private:
-	mRosPacketEncoder();
-	~mRosPacketEncoder();
+	mRosPacketEncoder() {}
+	~mRosPacketEncoder() {}
 };
 
 
