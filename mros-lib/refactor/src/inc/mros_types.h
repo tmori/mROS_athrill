@@ -8,6 +8,7 @@ typedef unsigned int mros_uint32;
 typedef mros_uint32 RosNodeIdType;
 typedef mros_uint32 RosTopicIdType;
 typedef mros_uint32 RosTopicConnectorIdType;
+typedef mros_uint32 RosPacketIdType;
 typedef mros_uint32 RosFuncIdType;
 typedef mros_uint32 mRosIdType;
 

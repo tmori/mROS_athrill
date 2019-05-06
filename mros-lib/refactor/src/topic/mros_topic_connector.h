@@ -18,7 +18,7 @@ typedef struct {
 class RosTopicConnector {
 public:
 	static mRosReturnType init(mRosSizeType max_connector);
-	static mRosReturnType get_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container);
+	static mRosReturnType get_connectors(RosTopicIdType topic_id, PrimitiveContainer<RosTopicConnectorIdType> &container);
 	static mRosReturnType rel_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container);
 	static mRosReturnType get(RosTopicConnectorIdType id, RosTopicConnectorType &connector);
 

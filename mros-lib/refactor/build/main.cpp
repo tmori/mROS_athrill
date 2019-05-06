@@ -176,7 +176,7 @@ static void ros_topic_connector_test(void)
 	mRosReturnType ret = RosTopicConnector::init(2);
 	test_print_line("RosTopicConnector::init(2)=", ret);
 
-	ret = RosTopicConnector::get_connectors(container);
+	ret = RosTopicConnector::get_connectors(1, container);
 	test_print_line("get_connectors()=", ret);
 	test_print_line("container.usecount=", container.usecount);
 
@@ -207,7 +207,8 @@ static void ros_topic_connector_test(void)
 	ret = RosTopicConnector::add_subnode_topic("topic_A", dst, func);
 	test_print_line("add_subnode_topic()=", ret);
 
-	ret = RosTopicConnector::get_connectors(container);
+	ret = RosTopic::get("topic_A", id);
+	ret = RosTopicConnector::get_connectors(id, container);
 	test_print_line("get_connectors()=", ret);
 	test_print_line("container.usecount=", container.usecount);
 

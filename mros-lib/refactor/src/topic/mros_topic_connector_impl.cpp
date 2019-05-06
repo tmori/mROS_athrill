@@ -50,7 +50,7 @@ mRosReturnType topology::RosTopicConnector::init(mRosSizeType max_connector)
 	return MROS_E_OK;
 }
 
-mRosReturnType topology::RosTopicConnector::get_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container)
+mRosReturnType topology::RosTopicConnector::get_connectors(RosTopicIdType topic_id, PrimitiveContainer<RosTopicConnectorIdType> &container)
 {
 	RosConnectorListEntryType *p;
 	container.usecount = 0;
@@ -59,6 +59,9 @@ mRosReturnType topology::RosTopicConnector::get_connectors(PrimitiveContainer<Ro
 	ListEntry_Foreach(&conn_manager.head, p) {
 		if (container.usecount >= container.size()) {
 			break;
+		}
+		if (p->data.value.topic_id != topic_id) {
+			continue;
 		}
 		if ((p->data.value.src_id != MROS_ID_NONE) && (p->data.value.dst_id != MROS_ID_NONE)) {
 			container[i] = p->data.connector_id;
