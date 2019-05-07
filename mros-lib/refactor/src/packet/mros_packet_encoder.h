@@ -9,8 +9,10 @@ namespace packet {
 #define MROS_ENCODE_ARGS_MAX	5
 typedef struct {
 	mRosPacketDataType type;
-	mRosSizeType	args;
+	mRosSizeType	args_char;
 	const char* 	argv[MROS_ENCODE_ARGS_MAX];
+	mRosSizeType	args_int;
+	mros_uint32		argi[MROS_ENCODE_ARGS_MAX];
 } mRosEncodeArgType;
 
 class mRosPacketEncoder {
