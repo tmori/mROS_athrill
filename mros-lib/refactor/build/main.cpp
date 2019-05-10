@@ -11,12 +11,15 @@
 #include "mros_node.h"
 #include "mros_topic.h"
 #include "mros_topic_connector.h"
+#include "mros_packet_decoder.h"
+#include "mros_packet.h"
 
 using namespace mros::lib;
 using namespace mros::node;
 using namespace mros::topic;
 using namespace mros::topic::topology;
 using namespace mros::memory;
+using namespace mros::packet;
 
 unsigned char stack_data[STACK_SIZE] __attribute__ ((section(".bss_noclr")));
 
@@ -235,6 +238,41 @@ static void ros_topic_connector_test(void)
 	test_print_line("rel_connectors()=", ret);
 }
 
+static void ros_decoder(void)
+{
+	mRosReturnType ret;
+	mros_uint32 port;
+	mRosSizeType preallocation_count[MROS_MEMSIZE_NUM];
+	for (int i = 0; i < (int)MROS_MEMSIZE_NUM; i++) {
+		preallocation_count[i] = 2;
+	}
+	mRosMemory mem_manager;
+
+	ret = mem_manager.init(preallocation_count);
+	test_print_line("mRosMemory::init(2)=", ret);
+
+	ret = mRosPacket::init(mem_manager);
+	test_print_line("mRosPacket::init(2)=", ret);
+
+	const char* test_string = "http://xxx.xxx.xx:8080/";
+	mRosSizeType len = strlen(test_string) + 1U;
+	mRosPacketType packet;
+
+	ret = mRosPacket::get(packet, len);
+	test_print_line("mRosPacket::get=", ret);
+
+	memcpy(packet.data->data.memp, test_string, len - 1);
+	packet.data->data.memp[len -1] = '\0';
+
+	ret = mRosPacketDecoder::decode_port(port, packet);
+	test_print_line("mRosPacketDecoder::decode_port=", ret);
+
+	test_print_line("port=", port);
+
+
+
+}
+
 int main(void)
 {
 #if 0
@@ -249,7 +287,8 @@ int main(void)
 #endif
 
 	//ros_topic_connector_test();
-	ros_topic_memory_test();
+	//ros_topic_memory_test();
+	ros_decoder();
 
 	while (1) {
 		;

@@ -6,7 +6,7 @@ using namespace mros::memory;
 
 static mRosMemory *packet_memory_manager = NULL;
 
-mRosReturnType init(mRosMemory &memory_manager)
+mRosReturnType mRosPacket::init(mRosMemory &memory_manager)
 {
 	if (packet_memory_manager != NULL) {
 		return MROS_E_INVAL;

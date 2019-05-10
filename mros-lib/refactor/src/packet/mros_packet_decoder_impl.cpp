@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 using namespace mros::packet;
-
 static const char *find_string_after(const char* string1, const char* string2)
 {
 	const char* str = strstr(string1, string2);
@@ -13,9 +12,12 @@ static const char *find_string_after(const char* string1, const char* string2)
 	str += strlen(string2);
 	return str;
 }
+#define PORT_MAX_STR_LEN	6U /* 65536 */
 
 mRosReturnType mRosPacketDecoder::decode_port(mros_uint32 &port, mRosPacketType &packet)
 {
+	char val[PORT_MAX_STR_LEN];
+
 	//search HERE
 	//        |
 	//        V
@@ -24,6 +26,7 @@ mRosReturnType mRosPacketDecoder::decode_port(mros_uint32 &port, mRosPacketType 
 	if (head == NULL) {
 		return MROS_E_INVAL;
 	}
+
 	//           search HERE
 	//                   |
 	//                   V
@@ -39,14 +42,17 @@ mRosReturnType mRosPacketDecoder::decode_port(mros_uint32 &port, mRosPacketType 
 	//"http://xxx.xxx.xx:8080/"
 	const char* tail = strstr(head, "/");
 	mros_uint32 len = (tail - head) + 1;
-	char val[len];
-	
+	if (len > PORT_MAX_STR_LEN) {
+		return MROS_E_INVAL;
+	}
+
 	memcpy(&val[0], head, (len - 1));
 	val[len - 1] = '\0';
 
-    port = strtol(val, NULL, 10);
+	port = strtol(val, NULL, 10);
 	return MROS_E_OK;
 }
+#if 0
 
 mRosReturnType mRosPacketDecoder::decode_port(std::string &port, mRosPacketType &packet)
 {
@@ -85,3 +91,4 @@ mRosReturnType mRosPacketDecoder::decode_req_topic_name(std::string &topic_name,
 {
 	return MROS_E_OK;
 }
+#endif

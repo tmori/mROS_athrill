@@ -55,7 +55,7 @@ SECTIONS
 	___dtors_end = .;
 
 	.rodata : { *(.rodata) } > INTROM
-	.rosdata : { *(.rosdata) } > INTRAM
+	.rosdata : { *(.rosdata) } > INTROM
 	__gp = .;
 	. = ALIGN(4);
 	__idata_start = . ;
@@ -67,6 +67,14 @@ SECTIONS
 		*(.data)
 		. = ALIGN(4);
 		_edata	=  . ;
+	} > INTRAM
+
+	.sdata	:
+	{
+		. = ALIGN(4);
+		__gp = .  + 0x8000;
+		*(.sdata)
+		. = ALIGN(4);
 	} > INTRAM
 
 	__idata_end = __idata_start + SIZEOF(.data);
