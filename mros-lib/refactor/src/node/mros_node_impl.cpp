@@ -160,7 +160,7 @@ mRosReturnType RosNode::type(RosNodeIdType id, RosNodeType &type)
 	return MROS_E_OK;
 }
 
-mRosReturnType send(RosNodeIdType id, char *data, mRosSizeType datalen, mRosSizeType &rlen)
+mRosReturnType RosNode::send(RosNodeIdType id, char *data, mRosSizeType datalen, mRosSizeType &rlen)
 {
 	RosNodeType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {

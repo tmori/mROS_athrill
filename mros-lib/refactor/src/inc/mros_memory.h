@@ -25,6 +25,7 @@ typedef struct {
 	mRosMemorySizeIdType	memsize_id;
 	mRosIdType				memory_id;
 	mRosSizeType			memsize;
+	mRosSizeType			size;
 	char 					*memp;
 } mRosMemoryEntryType;
 

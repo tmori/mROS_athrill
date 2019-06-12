@@ -9,13 +9,15 @@ namespace transfer {
 
 class RosTopicDataPublisher {
 public:
+	static mRosReturnType init(void);
 	static void publish(void);
 private:
 	RosTopicDataPublisher();
+	~RosTopicDataPublisher();
 };
 
 }
 }
 
-#endif _MROS_TOPIC_DATA_PUBLISHER_H_
+#endif /* _MROS_TOPIC_DATA_PUBLISHER_H_ */
 

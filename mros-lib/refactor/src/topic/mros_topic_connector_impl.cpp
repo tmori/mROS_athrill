@@ -1,8 +1,10 @@
 #include "mros_topic_connector.h"
+#include "mros_node.h"
 #include "mros_list.h"
 #include <stdlib.h>
 
 using namespace mros::topic;
+using namespace mros::node;
 
 typedef struct {
 	mros_uint32							counter;
@@ -73,6 +75,65 @@ mRosReturnType topology::RosTopicConnector::get_connectors(RosTopicIdType topic_
 
 	return MROS_E_OK;
 }
+
+mRosReturnType topology::RosTopicConnector::get_pub_connectors(RosTopicIdType topic_id, PrimitiveContainer<RosTopicConnectorIdType> &container)
+{
+	RosConnectorListEntryType *p;
+	container.usecount = 0;
+	int i = 0;
+
+	ListEntry_Foreach(&conn_manager.head, p) {
+		if (container.usecount >= container.size()) {
+			break;
+		}
+		if (p->data.value.topic_id != topic_id) {
+			continue;
+		}
+		if ((p->data.value.src_id != MROS_ID_NONE) || (p->data.value.dst_id != MROS_ID_NONE)) {
+			continue;
+		}
+		RosNodeType type;
+		mRosReturnType ret = RosNode::type(p->data.value.src_id,  type);
+		if ((ret == MROS_E_OK) && (type == ROS_NODE_TYPE_INNER)) {
+			container[i] = p->data.connector_id;
+			container.usecount++;
+			p->data.counter++;
+			i++;
+		}
+	}
+
+	return MROS_E_OK;
+}
+
+mRosReturnType topology::RosTopicConnector::get_sub_connectors(RosTopicIdType topic_id, PrimitiveContainer<RosTopicConnectorIdType> &container)
+{
+	RosConnectorListEntryType *p;
+	container.usecount = 0;
+	int i = 0;
+
+	ListEntry_Foreach(&conn_manager.head, p) {
+		if (container.usecount >= container.size()) {
+			break;
+		}
+		if (p->data.value.topic_id != topic_id) {
+			continue;
+		}
+		if ((p->data.value.src_id != MROS_ID_NONE) || (p->data.value.dst_id != MROS_ID_NONE)) {
+			continue;
+		}
+		RosNodeType type;
+		mRosReturnType ret = RosNode::type(p->data.value.dst_id,  type);
+		if ((ret == MROS_E_OK) && (type == ROS_NODE_TYPE_INNER)) {
+			container[i] = p->data.connector_id;
+			container.usecount++;
+			p->data.counter++;
+			i++;
+		}
+	}
+
+	return MROS_E_OK;
+}
+
 
 mRosReturnType topology::RosTopicConnector::rel_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container)
 {

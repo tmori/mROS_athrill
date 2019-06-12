@@ -66,6 +66,31 @@ mRosReturnType RosTopic::init(mRosSizeType max_topic)
 	return MROS_E_OK;
 }
 
+mRosReturnType RosTopic::get_topics(PrimitiveContainer<RosTopicIdType> &container)
+{
+	RosTopicListEntryType *p;
+	mros_uint32 i = 0;
+
+	ListEntry_Foreach(&topic_manager.head, p) {
+		if (container.usecount >= container.size()) {
+			break;
+		}
+		container[i] = p->data.topic_id;
+		container.usecount++;
+		p->data.counter++;
+		i++;
+	}
+	return MROS_E_OK;
+}
+mRosReturnType RosTopic::rel_topics(PrimitiveContainer<RosTopicIdType> &container)
+{
+	for (mros_uint32 i = 0; i < container.usecount; i++) {
+		TOPIC_OBJ(container[i]).data.counter--;
+	}
+	container.usecount = 0;
+	return MROS_E_OK;
+}
+
 mRosReturnType RosTopic::get(const char *topic_name, RosTopicIdType &id)
 {
 	RosTopicListEntryType *p;

@@ -26,6 +26,7 @@ OBJS	+= mros_memory_impl.o
 OBJS	+= mros_packet_impl.o
 OBJS	+= mros_packet_encoder_impl.o
 OBJS	+= mros_packet_decoder_impl.o
+OBJS	+= mros_topic_data_publisher_impl.o
 OBJS	+= main.o
 
 CXXFLAGS := -fno-use-cxa-atexit -fno-exceptions -fno-rtti 
@@ -56,6 +57,7 @@ VPATH	+= $(ROOT_PATH)/src/lib
 VPATH	+= $(ROOT_PATH)/src/topic
 VPATH	+= $(ROOT_PATH)/src/node
 VPATH	+= $(ROOT_PATH)/src/packet
+VPATH	+= $(ROOT_PATH)/src/transfer
 VPATH	+= $(TEST_PATH)
 
 LIBS := -lsupc++  -lstdc++  -lm -lc -lgcc  libathrillc.o

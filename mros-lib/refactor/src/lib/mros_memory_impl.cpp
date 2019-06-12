@@ -39,6 +39,7 @@ mRosReturnType mRosMemory::init(mRosSizeType preallocation_count[MROS_MEMSIZE_NU
 			entry->data.memsize_id = (mRosMemorySizeIdType)i;
 			entry->data.memory_id = MEMORY_ID(j);
 			entry->data.memsize = memory_size[i];
+			entry->data.size = 0;
 			entry->data.memp = &(memory_manager[i].memory[(memory_size[i] * j)]);
 		}
 		List_Init(&memory_manager[i].head, mRosMemoryListEntryType, memory_manager[i].max_memory_num, memory_manager[i].memory_entries);
@@ -55,6 +56,7 @@ mRosReturnType mRosMemory::memory_alloc(mRosSizeType size, mRosMemoryListEntryTy
 			continue;
 		}
 		ListEntry_Alloc(&memory_manager[i].head, mRosMemoryListEntryType, memory);
+		(*memory)->data.size = size;
 		return MROS_E_OK;
 	}
 	return MROS_E_NOMEM;
@@ -68,6 +70,7 @@ mRosReturnType mRosMemory::memory_free(mRosMemoryListEntryType &memory)
 	if (memory.data.memory_id > memory_manager[memory.data.memsize_id].max_memory_num) {
 		return MROS_E_RANGE;
 	}
+	memory.data.size = 0;
 	ListEntry_Free(&memory_manager[memory.data.memsize_id].head, &memory);
 	return MROS_E_OK;
 }
