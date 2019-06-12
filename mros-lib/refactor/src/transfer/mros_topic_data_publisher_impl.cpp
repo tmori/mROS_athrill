@@ -31,13 +31,14 @@ static void ros_topic_publish(RosTopicIdType topic_id)
 		return;
 	}
 
+	ret = RosTopic::get_data(topic_id, &topic_data);
+	if (ret != MROS_E_OK) {
+		(void)RosTopicConnector::rel_connectors(*connector_container);
+		return;
+	}
+
 	for (mros_uint32 i = 0; i < connector_container->size(); i++) {
 		ret = RosTopicConnector::get(connector_container->get(i), connector);
-		if (ret != MROS_E_OK) {
-			//TOODO ERROR LOG
-			continue;
-		}
-		ret = RosTopic::get_data(topic_id, &topic_data);
 		if (ret != MROS_E_OK) {
 			//TOODO ERROR LOG
 			continue;
@@ -48,11 +49,10 @@ static void ros_topic_publish(RosTopicIdType topic_id)
 			//TOODO ERROR LOG
 			continue;
 		}
-		//TODO free topic_data
 	}
 
-
 	(void)RosTopicConnector::rel_connectors(*connector_container);
+	//TODO free topic_data
 	return;
 }
 
