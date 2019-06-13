@@ -1,14 +1,20 @@
 #include "mros_node.h"
 #include "mros_list.h"
+#include "mros_memory.h"
 #include <stdlib.h>
 #include <string.h>
 
 using namespace mros::node;
+using namespace mros::memory;
 
 typedef struct {
 	RosNodeIdType				node_id;
 	const char					*node_name;
 	mros_uint32					namelen;
+	struct {
+		mRosMemoryListHeadType	pub;
+		mRosMemoryListHeadType	sub;
+	} topic_data_queue;
 } RosNodeEntryType;
 
 typedef ListEntryType(RosNodeListEntryType, RosNodeEntryType) RosNodeListEntryType;
@@ -118,6 +124,8 @@ mRosReturnType RosNode::create(const char *node_name, RosNodeType type, RosNodeI
 	p->data.namelen = len;
 	p->data.node_name = node_name;
 	ListEntry_AddEntry(&node_manager[type].head, p);
+	List_InitEmpty(&p->data.topic_data_queue.pub, mRosMemoryListEntryType);
+	List_InitEmpty(&p->data.topic_data_queue.sub, mRosMemoryListEntryType);
 	return MROS_E_OK;
 }
 
@@ -160,24 +168,66 @@ mRosReturnType RosNode::type(RosNodeIdType id, RosNodeType &type)
 	return MROS_E_OK;
 }
 
-mRosReturnType RosNode::get_topic(RosNodeIdType id, memory::mRosMemoryListEntryType **data)
+mRosReturnType RosNode::put_pub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType &topic_data)
 {
 	RosNodeType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
 		return MROS_E_RANGE;
 	}
-	//TODO
+	RosNodeListEntryType &node = NODE_OBJ(type, id);
+	ListEntry_AddEntry(&node.data.topic_data_queue.pub, &topic_data);
+
 	return MROS_E_OK;
 }
-mRosReturnType RosNode::put_topic(RosNodeIdType id, memory::mRosMemoryListEntryType &topic_data)
+mRosReturnType RosNode::get_pub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType **data)
 {
 	RosNodeType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
 		return MROS_E_RANGE;
 	}
-	//TODO
+	memory::mRosMemoryListEntryType *entry;
+	RosNodeListEntryType &node = NODE_OBJ(type, id);
+	if (node.data.topic_data_queue.pub.entry_num == 0) {
+		return MROS_E_NOENT;
+	}
+	ListEntry_GetFirst(&node.data.topic_data_queue.pub, data);
+	ListEntry_RemoveEntry(&node.data.topic_data_queue.pub, *data);
 	return MROS_E_OK;
 }
+mRosReturnType RosNode::put_sub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType &topic_data, RosFuncIdType func_id)
+{
+	RosNodeType type = NODE_TYPE(id);
+	if (id > NODE_MAX_ID(type)) {
+		return MROS_E_RANGE;
+	}
+
+	if (type == ROS_NODE_TYPE_INNER) {
+		//TODO inner node callback
+		//TODO free topic_data
+	}
+	else {
+		RosNodeListEntryType &node = NODE_OBJ(type, id);
+		ListEntry_AddEntry(&node.data.topic_data_queue.sub, &topic_data);
+	}
+
+	return MROS_E_OK;
+}
+mRosReturnType RosNode::get_sub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType **data)
+{
+	RosNodeType type = NODE_TYPE(id);
+	if (id > NODE_MAX_ID(type)) {
+		return MROS_E_RANGE;
+	}
+	memory::mRosMemoryListEntryType *entry;
+	RosNodeListEntryType &node = NODE_OBJ(type, id);
+	if (node.data.topic_data_queue.sub.entry_num == 0) {
+		return MROS_E_NOENT;
+	}
+	ListEntry_GetFirst(&node.data.topic_data_queue.sub, data);
+	ListEntry_RemoveEntry(&node.data.topic_data_queue.sub, *data);
+	return MROS_E_OK;
+}
+
 
 
 RosNode::RosNode()

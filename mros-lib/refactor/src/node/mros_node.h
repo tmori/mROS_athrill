@@ -23,8 +23,11 @@ public:
 	static mRosReturnType remove(const char *node_name);
 	static mRosReturnType remove(RosNodeIdType id);
 
-	static mRosReturnType get_topic(RosNodeIdType id, memory::mRosMemoryListEntryType **topic_data);
-	static mRosReturnType put_topic(RosNodeIdType id, memory::mRosMemoryListEntryType &topic_data);
+	static mRosReturnType put_pub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType &topic_data);
+	static mRosReturnType get_pub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType **topic_data);
+
+	static mRosReturnType put_sub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType &topic_data, RosFuncIdType func_id);
+	static mRosReturnType get_sub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType **topic_data);
 
 private:
 	RosNode();

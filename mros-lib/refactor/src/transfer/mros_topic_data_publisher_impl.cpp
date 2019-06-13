@@ -38,7 +38,7 @@ static void ros_topic_publish(RosTopicIdType topic_id)
 			continue;
 		}
 
-		ret = RosNode::get_topic(connector.node_id, &topic_data);
+		ret = RosNode::get_pub_topic(connector.node_id, &topic_data);
 		if (ret != MROS_E_OK) {
 			//TOODO ERROR LOG
 			continue;

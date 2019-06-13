@@ -45,7 +45,7 @@ static void ros_topic_subscribe(RosTopicIdType topic_id)
 			continue;
 		}
 
-		ret = RosNode::put_topic(connector.node_id, *topic_data);
+		ret = RosNode::put_sub_topic(connector.node_id, *topic_data, connector.func_id);
 		if (ret != MROS_E_OK) {
 			//TOODO ERROR LOG
 			continue;

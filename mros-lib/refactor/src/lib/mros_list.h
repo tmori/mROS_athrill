@@ -117,6 +117,12 @@ do { \
 	(headp)->entry_num--;	\
 } while (0)
 
+#define ListEntry_GetFirst(headp, entrypp)	\
+do { \
+	*(entrypp) = (headp)->entries;	\
+} while (0)
+
+
 #define ListEntry_RemoveAll(headp, entry_type) \
 do { \
 	while ((headp)->entry_num > 0) {	\
