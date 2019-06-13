@@ -2,6 +2,7 @@
 #define _MROS_NODE_H_
 
 #include "mros_types.h"
+#include "mros_memory.h"
 
 namespace mros {
 namespace node {
@@ -22,7 +23,8 @@ public:
 	static mRosReturnType remove(const char *node_name);
 	static mRosReturnType remove(RosNodeIdType id);
 
-	static mRosReturnType send(RosNodeIdType id, char *data, mRosSizeType datalen, mRosSizeType &rlen);
+	static mRosReturnType get_topic(RosNodeIdType id, memory::mRosMemoryListEntryType **topic_data);
+	static mRosReturnType put_topic(RosNodeIdType id, memory::mRosMemoryListEntryType &topic_data);
 
 private:
 	RosNode();

@@ -14,7 +14,7 @@ static PrimitiveContainer<RosTopicIdType> 			*topic_container;
 
 mRosReturnType RosTopicDataSubscriber::init(void)
 {
-	topic_container = new PrimitiveContainer<RosTopicConnectorIdType>(10); //TODO;
+	topic_container = new PrimitiveContainer<RosTopicIdType>(10); //TODO;
 	connector_container = new PrimitiveContainer<RosTopicConnectorIdType>(10); //TODO;
 
 	return MROS_E_OK;
@@ -26,7 +26,6 @@ static void ros_topic_subscribe(RosTopicIdType topic_id)
 	mRosReturnType ret;
 	RosTopicConnectorType connector;
 	mRosMemoryListEntryType *topic_data;
-	mRosSizeType rlen;
 
 	ret = RosTopicConnector::get_sub_connectors(topic_id, *connector_container);
 	if (ret != MROS_E_OK) {
@@ -46,7 +45,7 @@ static void ros_topic_subscribe(RosTopicIdType topic_id)
 			continue;
 		}
 
-		ret = RosNode::send(connector.node_id, topic_data->data.memp, topic_data->data.size, rlen);
+		ret = RosNode::put_topic(connector.node_id, *topic_data);
 		if (ret != MROS_E_OK) {
 			//TOODO ERROR LOG
 			continue;

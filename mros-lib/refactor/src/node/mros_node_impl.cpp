@@ -160,7 +160,16 @@ mRosReturnType RosNode::type(RosNodeIdType id, RosNodeType &type)
 	return MROS_E_OK;
 }
 
-mRosReturnType RosNode::send(RosNodeIdType id, char *data, mRosSizeType datalen, mRosSizeType &rlen)
+mRosReturnType RosNode::get_topic(RosNodeIdType id, memory::mRosMemoryListEntryType **data)
+{
+	RosNodeType type = NODE_TYPE(id);
+	if (id > NODE_MAX_ID(type)) {
+		return MROS_E_RANGE;
+	}
+	//TODO
+	return MROS_E_OK;
+}
+mRosReturnType RosNode::put_topic(RosNodeIdType id, memory::mRosMemoryListEntryType &topic_data)
 {
 	RosNodeType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
