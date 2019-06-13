@@ -27,6 +27,7 @@ OBJS	+= mros_packet_impl.o
 OBJS	+= mros_packet_encoder_impl.o
 OBJS	+= mros_packet_decoder_impl.o
 OBJS	+= mros_topic_data_publisher_impl.o
+OBJS	+= mros_topic_data_subscriber_impl.o
 OBJS	+= main.o
 
 CXXFLAGS := -fno-use-cxa-atexit -fno-exceptions -fno-rtti 

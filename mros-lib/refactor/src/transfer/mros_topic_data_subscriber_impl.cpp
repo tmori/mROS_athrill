@@ -1,4 +1,4 @@
-#include "mros_topic_data_publisher.h"
+#include "mros_topic_data_subscriber.h"
 #include "mros_topic_connector.h"
 #include "mros_node.h"
 
@@ -8,10 +8,11 @@ using namespace mros::topic::topology;
 using namespace mros::memory;
 using namespace mros::node;
 
+
 static PrimitiveContainer<RosTopicConnectorIdType> *connector_container;
 static PrimitiveContainer<RosTopicIdType> 			*topic_container;
 
-mRosReturnType RosTopicDataPublisher::init(void)
+mRosReturnType RosTopicDataSubscriber::init(void)
 {
 	topic_container = new PrimitiveContainer<RosTopicConnectorIdType>(10); //TODO;
 	connector_container = new PrimitiveContainer<RosTopicConnectorIdType>(10); //TODO;
@@ -19,26 +20,27 @@ mRosReturnType RosTopicDataPublisher::init(void)
 	return MROS_E_OK;
 }
 
-static void ros_topic_publish(RosTopicIdType topic_id)
+
+static void ros_topic_subscribe(RosTopicIdType topic_id)
 {
 	mRosReturnType ret;
 	RosTopicConnectorType connector;
 	mRosMemoryListEntryType *topic_data;
 	mRosSizeType rlen;
 
-	ret = RosTopicConnector::get_pub_connectors(topic_id, *connector_container);
+	ret = RosTopicConnector::get_sub_connectors(topic_id, *connector_container);
 	if (ret != MROS_E_OK) {
 		return;
 	}
 
 	ret = RosTopic::get_data(topic_id, &topic_data);
 	if (ret != MROS_E_OK) {
-		(void)RosTopicConnector::rel_pub_connectors(*connector_container);
+		(void)RosTopicConnector::rel_sub_connectors(*connector_container);
 		return;
 	}
 
 	for (mros_uint32 i = 0; i < connector_container->size(); i++) {
-		ret = RosTopicConnector::get_pub(connector_container->get(i), connector);
+		ret = RosTopicConnector::get_sub(connector_container->get(i), connector);
 		if (ret != MROS_E_OK) {
 			//TOODO ERROR LOG
 			continue;
@@ -51,33 +53,32 @@ static void ros_topic_publish(RosTopicIdType topic_id)
 		}
 	}
 
-	(void)RosTopicConnector::rel_pub_connectors(*connector_container);
+	(void)RosTopicConnector::rel_sub_connectors(*connector_container);
 	//TODO free topic_data
 	return;
 }
 
-void RosTopicDataPublisher::publish(void)
+void RosTopicDataSubscriber::subscribe(void)
 {
 	mRosReturnType ret;
 
-	ret = RosTopic::get_topics(*topic_container);
+	ret = RosTopicConnector::get_sub_topics(*topic_container);
 	if (ret != MROS_E_OK) {
 		return;
 	}
 	for (mros_uint32 i = 0; i < topic_container->size(); i++) {
-		ros_topic_publish(topic_container->get(i));
+		ros_topic_subscribe(topic_container->get(i));
 	}
-	(void)RosTopic::rel_topics(*topic_container);
 
 	return;
 }
 
-RosTopicDataPublisher::RosTopicDataPublisher()
+RosTopicDataSubscriber::RosTopicDataSubscriber()
 {
 	//TODO
 }
 
-RosTopicDataPublisher::~RosTopicDataPublisher()
+RosTopicDataSubscriber::~RosTopicDataSubscriber()
 {
 	//TODO
 }

@@ -77,6 +77,11 @@ do {	\
 	} \
 } while (0)
 
+#define List_InitEmpty(headp, entry_type)	\
+do { 	\
+	List_Init(headp, entry_type, 0, NULL);	\
+} while (0)
+
 #define ListEntry_Alloc(headp, entry_type, new_entrypp) \
 do { \
 	entry_type *_tmp;	\

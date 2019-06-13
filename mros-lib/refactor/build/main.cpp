@@ -175,14 +175,15 @@ static void ros_topic_connector_test(void)
 	RosNodeIdType dst;
 	RosFuncIdType func;
 	RosTopicIdType id;
-	PrimitiveContainer<RosTopicConnectorIdType> container = PrimitiveContainer<RosTopicConnectorIdType>(10);
+	PrimitiveContainer<RosTopicConnectorIdType> pub_container = PrimitiveContainer<RosTopicConnectorIdType>(10);
+	PrimitiveContainer<RosTopicConnectorIdType> sub_container = PrimitiveContainer<RosTopicConnectorIdType>(10);
 
-	mRosReturnType ret = RosTopicConnector::init(2);
+	mRosReturnType ret = RosTopicConnector::init(2, 2);
 	test_print_line("RosTopicConnector::init(2)=", ret);
 
-	ret = RosTopicConnector::get_connectors(1, container);
+	ret = RosTopicConnector::get_pub_connectors(1, pub_container);
 	test_print_line("get_connectors()=", ret);
-	test_print_line("container.usecount=", container.usecount);
+	test_print_line("container.usecount=", pub_container.usecount);
 
 	ret = RosTopic::init(2);
 	test_print_line("RosTopic::init(2)=", ret);
@@ -198,44 +199,56 @@ static void ros_topic_connector_test(void)
 	test_print_line("RosNode::create(Takashi)=", ret);
 	test_print_line("RosNode::create(id)=", dst);
 
-	ret = RosTopicConnector::add_pubnode_topic("topic_A", src);
+	ret = RosTopicConnector::add_pub("topic_A", src);
 	test_print_line("add_pubnode_topic()=", ret);
 
-	ret = RosTopicConnector::add_pubnode_topic("topic_B", src);
+	ret = RosTopicConnector::add_pub("topic_B", src);
 	test_print_line("add_pubnode_topic()=", ret);
 
-	ret = RosTopicConnector::add_pubnode_topic("topic_C", src);
+	ret = RosTopicConnector::add_pub("topic_C", src);
 	test_print_line("add_pubnode_topic()=", ret);
 
 	func = (RosFuncIdType)ros_topic_connector_test;
-	ret = RosTopicConnector::add_subnode_topic("topic_A", dst, func);
+	ret = RosTopicConnector::add_sub("topic_A", dst, func);
 	test_print_line("add_subnode_topic()=", ret);
 
 	ret = RosTopic::get("topic_A", id);
-	ret = RosTopicConnector::get_connectors(id, container);
-	test_print_line("get_connectors()=", ret);
-	test_print_line("container.usecount=", container.usecount);
+	ret = RosTopicConnector::get_pub_connectors(id, pub_container);
+	test_print_line("get_pub_connectors()=", ret);
+	test_print_line("pub_container.usecount=", pub_container.usecount);
+
+	ret = RosTopicConnector::get_sub_connectors(id, sub_container);
+	test_print_line("get_sub_connectors()=", ret);
+	test_print_line("sub_container.usecount=", sub_container.usecount);
 
 	RosTopicConnectorType connector;
 
-	ret = RosTopicConnector::get(container[0], connector);
-	test_print_line("RosTopicConnector::get()=", ret);
+	ret = RosTopicConnector::get_pub(pub_container[0], connector);
+	test_print_line("RosTopicConnector::get_pub()=", ret);
 	test_print_line("connector.topic_id=", connector.topic_id);
-	test_print_line("connector.src_id=", connector.src_id);
-	test_print_line("connector.dst_id=", connector.dst_id);
+	test_print_line("connector.node_id=", connector.node_id);
 	test_print_line("connector.func_id=", connector.func_id);
 
 	RosNodeType type;
-	ret = RosNode::type(connector.src_id, type);
+	ret = RosNode::type(connector.node_id, type);
 	test_print_line("RosNode::type()=", ret);
 	test_print_line("src_type=", type);
 
-	ret = RosNode::type(connector.dst_id, type);
+	ret = RosTopicConnector::get_sub(pub_container[0], connector);
+	test_print_line("RosTopicConnector::get_sub()=", ret);
+	test_print_line("connector.topic_id=", connector.topic_id);
+	test_print_line("connector.node_id=", connector.node_id);
+	test_print_line("connector.func_id=", connector.func_id);
+
+	ret = RosNode::type(connector.node_id, type);
 	test_print_line("RosNode::type()=", ret);
 	test_print_line("dst_type=", type);
 
-	ret = RosTopicConnector::rel_connectors(container);
-	test_print_line("rel_connectors()=", ret);
+	ret = RosTopicConnector::rel_pub_connectors(pub_container);
+	test_print_line("rel_pub_connectors()=", ret);
+
+	ret = RosTopicConnector::rel_sub_connectors(sub_container);
+	test_print_line("rel_sub_connectors()=", ret);
 }
 
 static void ros_decoder(void)
