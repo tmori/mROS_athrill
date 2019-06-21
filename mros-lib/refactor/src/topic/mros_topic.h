@@ -12,19 +12,19 @@ class RosTopic {
 public:
 	static mRosReturnType init(mRosSizeType max_topic);
 
-	static mRosReturnType get_topics(PrimitiveContainer<RosTopicIdType> &container);
-	static mRosReturnType rel_topics(PrimitiveContainer<RosTopicIdType> &container);
+	static mRosReturnType get_topics(PrimitiveContainer<mRosTopicIdType> &container);
+	static mRosReturnType rel_topics(PrimitiveContainer<mRosTopicIdType> &container);
 
 
-	static mRosReturnType get(const char *topic_name, RosTopicIdType &id);
-	static mRosReturnType create(const char *topic_name, RosTopicIdType &id);
+	static mRosReturnType get(const char *topic_name, mRosTopicIdType &id);
+	static mRosReturnType create(const char *topic_name, mRosTopicIdType &id);
 	static mRosReturnType create(const char *topic_name);
 	static mRosReturnType remove(const char *topic_name);
-	static mRosReturnType remove(RosTopicIdType id);
+	static mRosReturnType remove(mRosTopicIdType id);
 	static mRosReturnType set_quesize(const char *topic_name, mRosSizeType size);
-	static mRosReturnType set_quesize(RosTopicIdType id, mRosSizeType size);
-	static mRosReturnType add_data(RosTopicIdType id, memory::mRosMemoryListEntryType &data);
-	static mRosReturnType get_data(RosTopicIdType id, memory::mRosMemoryListEntryType **data);
+	static mRosReturnType set_quesize(mRosTopicIdType id, mRosSizeType size);
+	static mRosReturnType add_data(mRosTopicIdType id, memory::mRosMemoryListEntryType &data);
+	static mRosReturnType get_data(mRosTopicIdType id, memory::mRosMemoryListEntryType **data);
 
 private:
 	RosTopic();

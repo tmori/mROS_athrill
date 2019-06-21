@@ -29,7 +29,7 @@ sys_addr athrill_device_func_call __attribute__ ((section(".athrill_device_secti
 static void ros_node_test(void)
 {
 	mRosReturnType ret;
-	RosNodeIdType id;
+	mRosNodeIdType id;
 
 	ret = RosNode::init(2);
 	test_print_line("RosNode::init(10)=", ret);
@@ -65,7 +65,7 @@ static void ros_node_test(void)
 static void ros_topic_test(void)
 {
 	mRosReturnType ret;
-	RosTopicIdType id;
+	mRosTopicIdType id;
 
 	ret = RosTopic::init(2);
 	test_print_line("RosTopic::init(2)=", ret);
@@ -105,7 +105,7 @@ static void ros_topic_test(void)
 static void ros_topic_memory_test(void)
 {
 	mRosReturnType ret;
-	RosTopicIdType tid;
+	mRosTopicIdType tid;
 	mRosSizeType preallocation_count[MROS_MEMSIZE_NUM];
 
 	ret = RosTopic::init(2);
@@ -171,12 +171,12 @@ static void ros_topic_memory_test(void)
 
 static void ros_topic_connector_test(void)
 {
-	RosNodeIdType src;
-	RosNodeIdType dst;
-	RosFuncIdType func;
-	RosTopicIdType id;
-	PrimitiveContainer<RosTopicConnectorIdType> pub_container = PrimitiveContainer<RosTopicConnectorIdType>(10);
-	PrimitiveContainer<RosTopicConnectorIdType> sub_container = PrimitiveContainer<RosTopicConnectorIdType>(10);
+	mRosNodeIdType src;
+	mRosNodeIdType dst;
+	mRosFuncIdType func;
+	mRosTopicIdType id;
+	PrimitiveContainer<mRosTopicConnectorIdType> pub_container = PrimitiveContainer<mRosTopicConnectorIdType>(10);
+	PrimitiveContainer<mRosTopicConnectorIdType> sub_container = PrimitiveContainer<mRosTopicConnectorIdType>(10);
 
 	mRosReturnType ret = RosTopicConnector::init(2, 2);
 	test_print_line("RosTopicConnector::init(2)=", ret);
@@ -208,7 +208,7 @@ static void ros_topic_connector_test(void)
 	ret = RosTopicConnector::add_pub("topic_C", src);
 	test_print_line("add_pubnode_topic()=", ret);
 
-	func = (RosFuncIdType)ros_topic_connector_test;
+	func = (mRosFuncIdType)ros_topic_connector_test;
 	ret = RosTopicConnector::add_sub("topic_A", dst, func);
 	test_print_line("add_subnode_topic()=", ret);
 
@@ -289,8 +289,8 @@ static void ros_decoder(void)
 int main(void)
 {
 #if 0
-	PrimitiveContainer<RosTopicConnectorIdType> container = PrimitiveContainer<RosTopicConnectorIdType>(10);
-	RosTopicConnectorIdType i;
+	PrimitiveContainer<mRosTopicConnectorIdType> container = PrimitiveContainer<mRosTopicConnectorIdType>(10);
+	mRosTopicConnectorIdType i;
 
 	for (i = 0; i < container.size(); i++) {
 		container[i] = i;

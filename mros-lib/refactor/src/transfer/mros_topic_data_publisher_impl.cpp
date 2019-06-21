@@ -8,18 +8,18 @@ using namespace mros::topic::topology;
 using namespace mros::memory;
 using namespace mros::node;
 
-static PrimitiveContainer<RosTopicConnectorIdType> *connector_container;
-static PrimitiveContainer<RosTopicIdType> 			*topic_container;
+static PrimitiveContainer<mRosTopicConnectorIdType> *connector_container;
+static PrimitiveContainer<mRosTopicIdType> 			*topic_container;
 
 mRosReturnType RosTopicDataPublisher::init(void)
 {
-	topic_container = new PrimitiveContainer<RosTopicIdType>(10); //TODO;
-	connector_container = new PrimitiveContainer<RosTopicConnectorIdType>(10); //TODO;
+	topic_container = new PrimitiveContainer<mRosTopicIdType>(10); //TODO;
+	connector_container = new PrimitiveContainer<mRosTopicConnectorIdType>(10); //TODO;
 
 	return MROS_E_OK;
 }
 
-static void ros_topic_publish(RosTopicIdType topic_id)
+static void ros_topic_publish(mRosTopicIdType topic_id)
 {
 	mRosReturnType ret;
 	RosTopicConnectorType connector;

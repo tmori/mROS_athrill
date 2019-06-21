@@ -9,7 +9,7 @@ using namespace mros::node;
 
 typedef struct {
 	mros_uint32							counter;
-	RosTopicConnectorIdType				connector_id;
+	mRosTopicConnectorIdType				connector_id;
 	topology::RosTopicConnectorType		value;
 } RosConnectorEntryType;
 
@@ -17,7 +17,7 @@ typedef ListEntryType(RosConnectorListEntryType, RosConnectorEntryType) RosConne
 typedef ListHeadType(RosConnectorListEntryType) RosConnectorListHeadType;
 
 typedef struct {
-	RosTopicIdType						topic_id;
+	mRosTopicIdType						topic_id;
 	RosConnectorListHeadType			head;
 } RosConnectorTopicEntryType;
 
@@ -81,7 +81,7 @@ static mRosReturnType mRosTopicConnector_init(mRosSizeType max_connector, RosCon
 	List_Init(&mgrp->conn_head, RosConnectorListEntryType, max_connector, mgrp->conn_entries);
 	return MROS_E_OK;
 }
-static RosConnectorTopicListEntryType *mRosTopicConnector_get_topic_head(RosConnectorManagerType *mgrp, RosTopicIdType topic_id)
+static RosConnectorTopicListEntryType *mRosTopicConnector_get_topic_head(RosConnectorManagerType *mgrp, mRosTopicIdType topic_id)
 {
 	RosConnectorTopicListEntryType *topic_p;
 
@@ -92,7 +92,7 @@ static RosConnectorTopicListEntryType *mRosTopicConnector_get_topic_head(RosConn
 	}
 	return NULL;
 }
-static RosConnectorTopicListEntryType *mRosTopicConnector_create_topic_head(RosConnectorManagerType *mgrp, RosTopicIdType topic_id)
+static RosConnectorTopicListEntryType *mRosTopicConnector_create_topic_head(RosConnectorManagerType *mgrp, mRosTopicIdType topic_id)
 {
 	RosConnectorTopicListEntryType *topic_p;
 
@@ -106,7 +106,7 @@ static RosConnectorTopicListEntryType *mRosTopicConnector_create_topic_head(RosC
 	return NULL;
 }
 
-static mRosReturnType mRosTopicConnector_get_connectors(RosTopicIdType topic_id, RosConnectorManagerType *mgrp, PrimitiveContainer<RosTopicConnectorIdType> &container)
+static mRosReturnType mRosTopicConnector_get_connectors(mRosTopicIdType topic_id, RosConnectorManagerType *mgrp, PrimitiveContainer<mRosTopicConnectorIdType> &container)
 {
 	RosConnectorTopicListEntryType *topic_p;
 	RosConnectorListEntryType *p;
@@ -135,7 +135,7 @@ static mRosReturnType mRosTopicConnector_get_connectors(RosTopicIdType topic_id,
 	return MROS_E_OK;
 }
 
-static mRosReturnType mRosTopicConnector_get_topics(RosConnectorManagerType *mgrp, PrimitiveContainer<RosTopicIdType> &container)
+static mRosReturnType mRosTopicConnector_get_topics(RosConnectorManagerType *mgrp, PrimitiveContainer<mRosTopicIdType> &container)
 {
 	RosConnectorTopicListEntryType *topic_p;
 	container.usecount = 0;
@@ -152,7 +152,7 @@ static mRosReturnType mRosTopicConnector_get_topics(RosConnectorManagerType *mgr
 	return MROS_E_OK;
 }
 
-static mRosReturnType mRosTopicConnector_rel_connectors(RosConnectorManagerType *mgrp, PrimitiveContainer<RosTopicConnectorIdType> &container)
+static mRosReturnType mRosTopicConnector_rel_connectors(RosConnectorManagerType *mgrp, PrimitiveContainer<mRosTopicConnectorIdType> &container)
 {
 	for (mros_uint32 i = 0; i < container.usecount; i++) {
 		CONNECTOR_OBJ(mgrp, container[i]).data.counter--;
@@ -161,7 +161,7 @@ static mRosReturnType mRosTopicConnector_rel_connectors(RosConnectorManagerType 
 	return MROS_E_OK;
 }
 
-static mRosReturnType mRosTopicConnector_get(RosConnectorManagerType *mgrp, RosTopicConnectorIdType id, topology::RosTopicConnectorType &connector)
+static mRosReturnType mRosTopicConnector_get(RosConnectorManagerType *mgrp, mRosTopicConnectorIdType id, topology::RosTopicConnectorType &connector)
 {
 	if (id > mgrp->max_connector) {
 		return MROS_E_RANGE;
@@ -170,7 +170,7 @@ static mRosReturnType mRosTopicConnector_get(RosConnectorManagerType *mgrp, RosT
 	return MROS_E_OK;
 }
 
-static RosConnectorListEntryType *mRosTopicConnector_get_node(RosConnectorTopicListEntryType *topic_p, RosNodeIdType node_id)
+static RosConnectorListEntryType *mRosTopicConnector_get_node(RosConnectorTopicListEntryType *topic_p, mRosNodeIdType node_id)
 {
 	RosConnectorListEntryType *entry;
 
@@ -183,9 +183,9 @@ static RosConnectorListEntryType *mRosTopicConnector_get_node(RosConnectorTopicL
 }
 
 
-static mRosReturnType mRosTopicConnector_add(RosConnectorManagerType *mgrp, const char* topic_name, RosNodeIdType node_id, RosFuncIdType func_id)
+static mRosReturnType mRosTopicConnector_add(RosConnectorManagerType *mgrp, const char* topic_name, mRosNodeIdType node_id, mRosFuncIdType func_id)
 {
-	RosTopicIdType topic_id;
+	mRosTopicIdType topic_id;
 	mRosReturnType ret;
 	RosConnectorTopicListEntryType *topic_p;
 	RosConnectorListEntryType *entry;
@@ -251,51 +251,51 @@ mRosReturnType topology::RosTopicConnector::init(mRosSizeType max_pub_connector,
 }
 
 
-mRosReturnType topology::RosTopicConnector::get_pub_connectors(RosTopicIdType topic_id, PrimitiveContainer<RosTopicConnectorIdType> &container)
+mRosReturnType topology::RosTopicConnector::get_pub_connectors(mRosTopicIdType topic_id, PrimitiveContainer<mRosTopicConnectorIdType> &container)
 {
 	return mRosTopicConnector_get_connectors(topic_id, &conn_manager.pub, container);
 }
 
-mRosReturnType topology::RosTopicConnector::get_sub_connectors(RosTopicIdType topic_id, PrimitiveContainer<RosTopicConnectorIdType> &container)
+mRosReturnType topology::RosTopicConnector::get_sub_connectors(mRosTopicIdType topic_id, PrimitiveContainer<mRosTopicConnectorIdType> &container)
 {
 	return mRosTopicConnector_get_connectors(topic_id, &conn_manager.sub, container);
 }
 
 
-mRosReturnType topology::RosTopicConnector::rel_pub_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container)
+mRosReturnType topology::RosTopicConnector::rel_pub_connectors(PrimitiveContainer<mRosTopicConnectorIdType> &container)
 {
 	return mRosTopicConnector_rel_connectors(&conn_manager.pub, container);
 }
 
-mRosReturnType topology::RosTopicConnector::rel_sub_connectors(PrimitiveContainer<RosTopicConnectorIdType> &container)
+mRosReturnType topology::RosTopicConnector::rel_sub_connectors(PrimitiveContainer<mRosTopicConnectorIdType> &container)
 {
 	return mRosTopicConnector_rel_connectors(&conn_manager.sub, container);
 }
 
-mRosReturnType topology::RosTopicConnector::get_pub(RosTopicConnectorIdType id, RosTopicConnectorType &connector)
+mRosReturnType topology::RosTopicConnector::get_pub(mRosTopicConnectorIdType id, RosTopicConnectorType &connector)
 {
 	return mRosTopicConnector_get(&conn_manager.pub, id, connector);
 }
 
-mRosReturnType topology::RosTopicConnector::get_sub(RosTopicConnectorIdType id, RosTopicConnectorType &connector)
+mRosReturnType topology::RosTopicConnector::get_sub(mRosTopicConnectorIdType id, RosTopicConnectorType &connector)
 {
 	return mRosTopicConnector_get(&conn_manager.sub, id, connector);
 }
 
-mRosReturnType topology::RosTopicConnector::add_pub(const char* topic_name, RosNodeIdType src)
+mRosReturnType topology::RosTopicConnector::add_pub(const char* topic_name, mRosNodeIdType src)
 {
 	return mRosTopicConnector_add(&conn_manager.pub, topic_name, src, MROS_ID_NONE);
 }
 
-mRosReturnType topology::RosTopicConnector::add_sub(const char* topic_name, RosNodeIdType dst, RosFuncIdType func)
+mRosReturnType topology::RosTopicConnector::add_sub(const char* topic_name, mRosNodeIdType dst, mRosFuncIdType func)
 {
 	return mRosTopicConnector_add(&conn_manager.sub, topic_name, dst, func);
 }
-mRosReturnType topology::RosTopicConnector::get_pub_topics(PrimitiveContainer<RosTopicIdType> &container)
+mRosReturnType topology::RosTopicConnector::get_pub_topics(PrimitiveContainer<mRosTopicIdType> &container)
 {
 	return mRosTopicConnector_get_topics(&conn_manager.pub, container);
 }
-mRosReturnType topology::RosTopicConnector::get_sub_topics(PrimitiveContainer<RosTopicIdType> &container)
+mRosReturnType topology::RosTopicConnector::get_sub_topics(PrimitiveContainer<mRosTopicIdType> &container)
 {
 	return mRosTopicConnector_get_topics(&conn_manager.sub, container);
 }

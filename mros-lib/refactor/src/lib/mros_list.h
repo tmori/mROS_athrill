@@ -1,6 +1,10 @@
 #ifndef _MROS_LIST_H_
 #define _MROS_LIST_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mros_types.h"
 
 /*
@@ -136,5 +140,9 @@ do { \
 	for (mros_uint32 _i = 0; \
 		_i < (headp)->entry_num; \
 		(var) = (var)->next, _i++)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MROS_LIST_H_ */

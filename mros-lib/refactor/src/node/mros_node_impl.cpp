@@ -8,7 +8,7 @@ using namespace mros::node;
 using namespace mros::memory;
 
 typedef struct {
-	RosNodeIdType				node_id;
+	mRosNodeIdType				node_id;
 	const char					*node_name;
 	mros_uint32					namelen;
 	struct {
@@ -32,7 +32,7 @@ do {	\
 typedef struct {
 	RosNodeEntryHeadType	 	head;
 	RosNodeListEntryType 		*node_entries;
-	RosNodeIdType				max_node;
+	mRosNodeIdType				max_node;
 } RosNodeManagerType;
 
 #define NODE_ID(index)		((index) + 1U)
@@ -56,14 +56,14 @@ static mRosReturnType init_node_manager(RosNodeType type, mRosSizeType max_node)
 	for (mros_uint32 i = 0; i < max_node; i++) {
 		RosNodeListEntryType *entry = &(node_manager[type].node_entries[i]);
 		ROS_NODE_ENTRY_INIT(entry);
-		entry->data.node_id = NODE_ID(i) + (((RosNodeIdType)type) * max_node);
+		entry->data.node_id = NODE_ID(i) + (((mRosNodeIdType)type) * max_node);
 	}
 	List_Init(&node_manager[type].head, RosNodeListEntryType, max_node, node_manager[type].node_entries);
 	node_manager[type].max_node = max_node;
 
 	return MROS_E_OK;
 }
-static mRosReturnType get_node(const char *node_name, mros_uint32 len, RosNodeType type, RosNodeIdType &id)
+static mRosReturnType get_node(const char *node_name, mros_uint32 len, RosNodeType type, mRosNodeIdType &id)
 {
 	RosNodeListEntryType *p;
 	id = MROS_ID_NONE;
@@ -91,7 +91,7 @@ mRosReturnType RosNode::init(mRosSizeType max_node)
 	ret = init_node_manager(ROS_NODE_TYPE_OUTER, max_node);
 	return ret;
 }
-mRosReturnType RosNode::get(const char *node_name, RosNodeIdType &id)
+mRosReturnType RosNode::get(const char *node_name, mRosNodeIdType &id)
 {
 	mros_uint32 len = strlen(node_name);
 
@@ -103,7 +103,7 @@ mRosReturnType RosNode::get(const char *node_name, RosNodeIdType &id)
 	return ret;
 }
 
-mRosReturnType RosNode::create(const char *node_name, RosNodeType type, RosNodeIdType &id)
+mRosReturnType RosNode::create(const char *node_name, RosNodeType type, mRosNodeIdType &id)
 {
 	RosNodeListEntryType *p;
 
@@ -131,13 +131,13 @@ mRosReturnType RosNode::create(const char *node_name, RosNodeType type, RosNodeI
 
 mRosReturnType RosNode::create(const char *node_name, RosNodeType type)
 {
-	RosTopicIdType id;
+	mRosTopicIdType id;
 	return RosNode::create(node_name, type, id);
 }
 
 mRosReturnType RosNode::remove(const char *node_name)
 {
-	RosTopicIdType id;
+	mRosTopicIdType id;
 
 	mRosReturnType ret = RosNode::get(node_name, id);
 	if (ret != MROS_E_OK) {
@@ -148,7 +148,7 @@ mRosReturnType RosNode::remove(const char *node_name)
 	ListEntry_Free(&node_manager[type].head, &NODE_OBJ(type, id));
 	return MROS_E_OK;
 }
-mRosReturnType RosNode::remove(RosNodeIdType id)
+mRosReturnType RosNode::remove(mRosNodeIdType id)
 {
 	RosNodeType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
@@ -159,7 +159,7 @@ mRosReturnType RosNode::remove(RosNodeIdType id)
 	return MROS_E_OK;
 }
 
-mRosReturnType RosNode::type(RosNodeIdType id, RosNodeType &type)
+mRosReturnType RosNode::type(mRosNodeIdType id, RosNodeType &type)
 {
 	type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
@@ -168,7 +168,7 @@ mRosReturnType RosNode::type(RosNodeIdType id, RosNodeType &type)
 	return MROS_E_OK;
 }
 
-mRosReturnType RosNode::put_pub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType &topic_data)
+mRosReturnType RosNode::put_pub_topic(mRosNodeIdType id, memory::mRosMemoryListEntryType &topic_data)
 {
 	RosNodeType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
@@ -179,13 +179,12 @@ mRosReturnType RosNode::put_pub_topic(RosNodeIdType id, memory::mRosMemoryListEn
 
 	return MROS_E_OK;
 }
-mRosReturnType RosNode::get_pub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType **data)
+mRosReturnType RosNode::get_pub_topic(mRosNodeIdType id, memory::mRosMemoryListEntryType **data)
 {
 	RosNodeType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
 		return MROS_E_RANGE;
 	}
-	memory::mRosMemoryListEntryType *entry;
 	RosNodeListEntryType &node = NODE_OBJ(type, id);
 	if (node.data.topic_data_queue.pub.entry_num == 0) {
 		return MROS_E_NOENT;
@@ -194,7 +193,7 @@ mRosReturnType RosNode::get_pub_topic(RosNodeIdType id, memory::mRosMemoryListEn
 	ListEntry_RemoveEntry(&node.data.topic_data_queue.pub, *data);
 	return MROS_E_OK;
 }
-mRosReturnType RosNode::put_sub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType &topic_data, RosFuncIdType func_id)
+mRosReturnType RosNode::put_sub_topic(mRosNodeIdType id, memory::mRosMemoryListEntryType &topic_data, mRosFuncIdType func_id)
 {
 	RosNodeType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
@@ -212,19 +211,19 @@ mRosReturnType RosNode::put_sub_topic(RosNodeIdType id, memory::mRosMemoryListEn
 
 	return MROS_E_OK;
 }
-mRosReturnType RosNode::get_sub_topic(RosNodeIdType id, memory::mRosMemoryListEntryType **data)
+mRosReturnType RosNode::get_sub_topic(mRosNodeIdType id, memory::mRosMemoryListEntryType **data)
 {
 	RosNodeType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
 		return MROS_E_RANGE;
 	}
-	memory::mRosMemoryListEntryType *entry;
 	RosNodeListEntryType &node = NODE_OBJ(type, id);
 	if (node.data.topic_data_queue.sub.entry_num == 0) {
 		return MROS_E_NOENT;
 	}
 	ListEntry_GetFirst(&node.data.topic_data_queue.sub, data);
 	ListEntry_RemoveEntry(&node.data.topic_data_queue.sub, *data);
+	//TODO send topic data for outer node
 	return MROS_E_OK;
 }
 

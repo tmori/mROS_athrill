@@ -1,15 +1,21 @@
 #ifndef _MROS_TYPES_H_
 #define _MROS_TYPES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef int mros_int32;
+typedef unsigned char mros_uint8;
+typedef unsigned short mros_uint16;
 typedef unsigned int mros_uint32;
 
 #define MROS_ID_NONE	0
-typedef mros_uint32 RosNodeIdType;
-typedef mros_uint32 RosTopicIdType;
-typedef mros_uint32 RosTopicConnectorIdType;
-typedef mros_uint32 RosPacketIdType;
-typedef mros_uint32 RosFuncIdType;
+typedef mros_uint32 mRosNodeIdType;
+typedef mros_uint32 mRosTopicIdType;
+typedef mros_uint32 mRosTopicConnectorIdType;
+typedef mros_uint32 mRosPacketIdType;
+typedef mros_uint32 mRosFuncIdType;
 typedef mros_uint32 mRosIdType;
 
 typedef mros_uint32 mRosSizeType;
@@ -22,5 +28,9 @@ typedef mros_uint32 mRosSizeType;
 #define MROS_E_RANGE		34
 #define MROS_E_LIMIT		111
 typedef mros_int32 mRosReturnType;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MROS_TYPES_H_ */

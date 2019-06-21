@@ -1,30 +1,31 @@
 #ifndef _MROS_MEMORY_H_
 #define _MROS_MEMORY_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mros_types.h"
 #include "mros_list.h"
 
-namespace mros {
-namespace memory {
-
-typedef enum {
-	MROS_MEMSIZE_16B = 0,
-	MROS_MEMSIZE_32B,
-	MROS_MEMSIZE_64B,
-	MROS_MEMSIZE_128B,
-	MROS_MEMSIZE_256B,
-	MROS_MEMSIZE_512B,
-	MROS_MEMSIZE_1KB,
-	MROS_MEMSIZE_2KB,
-	MROS_MEMSIZE_4KB,
-	MROS_MEMSIZE_8KB,
-	MROS_MEMSIZE_NUM,
-} mRosMemorySizeIdType;
+typedef mros_uint32 mRosMemorySizeIdType;
 
 typedef struct {
-	mRosMemorySizeIdType	memsize_id;
+	/*
+	 * id of memory_entries
+	 */
 	mRosIdType				memory_id;
+	/*
+	 * id of parent header
+	 */
+	mRosMemorySizeIdType	header_id;
+	/*
+	 * preallocation unit size
+	 */
 	mRosSizeType			memsize;
+	/*
+	 * real using size
+	 */
 	mRosSizeType			size;
 	char 					*memp;
 } mRosMemoryEntryType;
@@ -33,26 +34,52 @@ typedef ListEntryType(mRosMemoryListEntryType, mRosMemoryEntryType) mRosMemoryLi
 typedef ListHeadType(mRosMemoryListEntryType) mRosMemoryListHeadType;
 
 typedef struct {
-	mRosMemoryListHeadType head;
-	mRosSizeType max_memory_num;
+	mRosMemoryListHeadType 	head;
+	mRosSizeType 			max_memory_num;
+	mRosSizeType			memsize;
 	mRosMemoryListEntryType *memory_entries;
 	char					*memory;
+} mRosMemoryHeaderType;
+
+typedef struct {
+	mRosSizeType 			mgr_num;
+	mRosMemoryHeaderType 	*mgr_array;
 } mRosMemoryManagerType;
 
-class mRosMemory {
-public:
-	mRosMemory();
-	~mRosMemory();
+typedef struct {
+	mRosSizeType 			max_memory_num;
+	mRosSizeType			memsize;
+	mRosMemoryListEntryType *memory_entries;
+	char					*memory;
+} mRosMemoryConfigType;
 
-	mRosReturnType init(mRosSizeType preallocation_count[MROS_MEMSIZE_NUM]);
-	mRosReturnType memory_alloc(mRosSizeType size, mRosMemoryListEntryType **memory);
-	mRosReturnType memory_free(mRosMemoryListEntryType &memory);
+extern mRosReturnType mros_mem_init(mRosSizeType config_num, mRosMemoryConfigType **config, mRosMemoryManagerType *mgrp);
+extern mRosReturnType mros_mem_alloc(mRosMemoryManagerType *mgrp, mRosSizeType size, mRosMemoryListEntryType **memory);
+extern mRosReturnType mros_mem_free(mRosMemoryManagerType *mgrp, mRosMemoryListEntryType *memory);
 
-private:
-	mRosMemoryManagerType memory_manager[MROS_MEMSIZE_NUM];
-};
+/*
+ * Memory Config APIs
+ */
+#define MROS_MEMORY_CONFIG_DECLARE_ENTRY(entry_name, max_memory_num, memsize)	\
+	static mRosMemoryListEntryType entry_name##_entries [(max_memory_num)];	\
+	static char entry_name##_memory [(max_memory_num) * (memsize)];	\
+	static mRosMemoryConfigType entry_name##_config = {	\
+			(max_memory_num), \
+			(memsize), \
+			entry_name##_entries ,	\
+			entry_name##_memory ,	\
+	};
 
+#define MROS_MEMORY_CONFIG_DECLARE_MANAGER(mem_manager_name, config_num)	\
+	static mRosMemoryHeaderType mem_manager_name##_head_array [(config_num)];	\
+	static mRosMemoryManagerType mem_manager_name = {	\
+		(config_num),	\
+		mem_manager_name##_head_array,	\
+	};
+
+
+#ifdef __cplusplus
 }
-}
+#endif
 
 #endif /* _MROS_MEMORY_H_ */

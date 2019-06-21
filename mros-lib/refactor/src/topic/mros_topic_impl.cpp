@@ -9,7 +9,7 @@ using namespace mros::memory;
 
 typedef struct {
 	mros_uint32					counter;
-	RosTopicIdType				topic_id;
+	mRosTopicIdType				topic_id;
 	/*
 	 * topic名は，アプリケーションの subscribe, advertise の引数に渡される
 	 * ROMデータを利用する．動的メモリ確保は行わない．
@@ -39,7 +39,7 @@ do {	\
 typedef struct {
 	RosTopicEntryHeadType	 	head;
 	RosTopicListEntryType 		*topic_entries;
-	RosTopicIdType				max_topic;
+	mRosTopicIdType				max_topic;
 } RosTopicManagerType;
 
 #define TOPIC_ID(index)		((index) + 1U)
@@ -66,7 +66,7 @@ mRosReturnType RosTopic::init(mRosSizeType max_topic)
 	return MROS_E_OK;
 }
 
-mRosReturnType RosTopic::get_topics(PrimitiveContainer<RosTopicIdType> &container)
+mRosReturnType RosTopic::get_topics(PrimitiveContainer<mRosTopicIdType> &container)
 {
 	RosTopicListEntryType *p;
 	mros_uint32 i = 0;
@@ -82,7 +82,7 @@ mRosReturnType RosTopic::get_topics(PrimitiveContainer<RosTopicIdType> &containe
 	}
 	return MROS_E_OK;
 }
-mRosReturnType RosTopic::rel_topics(PrimitiveContainer<RosTopicIdType> &container)
+mRosReturnType RosTopic::rel_topics(PrimitiveContainer<mRosTopicIdType> &container)
 {
 	for (mros_uint32 i = 0; i < container.usecount; i++) {
 		TOPIC_OBJ(container[i]).data.counter--;
@@ -91,7 +91,7 @@ mRosReturnType RosTopic::rel_topics(PrimitiveContainer<RosTopicIdType> &containe
 	return MROS_E_OK;
 }
 
-mRosReturnType RosTopic::get(const char *topic_name, RosTopicIdType &id)
+mRosReturnType RosTopic::get(const char *topic_name, mRosTopicIdType &id)
 {
 	RosTopicListEntryType *p;
 	mros_uint32 len = strlen(topic_name);
@@ -112,7 +112,7 @@ mRosReturnType RosTopic::get(const char *topic_name, RosTopicIdType &id)
 	return MROS_E_OK;
 }
 
-mRosReturnType RosTopic::create(const char *topic_name, RosTopicIdType &id)
+mRosReturnType RosTopic::create(const char *topic_name, mRosTopicIdType &id)
 {
 	RosTopicListEntryType *p;
 	mros_uint32 len = strlen(topic_name);
@@ -136,12 +136,12 @@ mRosReturnType RosTopic::create(const char *topic_name, RosTopicIdType &id)
 
 mRosReturnType RosTopic::create(const char *topic_name)
 {
-	RosTopicIdType id;
+	mRosTopicIdType id;
 	return RosTopic::create(topic_name, id);
 }
 mRosReturnType RosTopic::set_quesize(const char *topic_name, mRosSizeType size)
 {
-	RosTopicIdType id;
+	mRosTopicIdType id;
 
 	mRosReturnType ret = RosTopic::get(topic_name, id);
 	if (ret != MROS_E_OK) {
@@ -150,7 +150,7 @@ mRosReturnType RosTopic::set_quesize(const char *topic_name, mRosSizeType size)
 	TOPIC_OBJ(id).data.queue_maxsize = size;
 	return MROS_E_OK;
 }
-mRosReturnType RosTopic::set_quesize(RosTopicIdType id, mRosSizeType size)
+mRosReturnType RosTopic::set_quesize(mRosTopicIdType id, mRosSizeType size)
 {
 	if (id > topic_manager.max_topic) {
 		return MROS_E_RANGE;
@@ -164,7 +164,7 @@ mRosReturnType RosTopic::set_quesize(RosTopicIdType id, mRosSizeType size)
 
 mRosReturnType RosTopic::remove(const char *topic_name)
 {
-	RosTopicIdType id;
+	mRosTopicIdType id;
 
 	mRosReturnType ret = RosTopic::get(topic_name, id);
 	if (ret != MROS_E_OK) {
@@ -174,7 +174,7 @@ mRosReturnType RosTopic::remove(const char *topic_name)
 	ListEntry_Free(&topic_manager.head, &TOPIC_OBJ(id));
 	return MROS_E_OK;
 }
-mRosReturnType RosTopic::remove(RosTopicIdType id)
+mRosReturnType RosTopic::remove(mRosTopicIdType id)
 {
 	if (id > topic_manager.max_topic) {
 		return MROS_E_RANGE;
@@ -187,7 +187,7 @@ mRosReturnType RosTopic::remove(RosTopicIdType id)
 	return MROS_E_OK;
 }
 
-mRosReturnType RosTopic::add_data(RosTopicIdType id, memory::mRosMemoryListEntryType &data)
+mRosReturnType RosTopic::add_data(mRosTopicIdType id, memory::mRosMemoryListEntryType &data)
 {
 	if (id > topic_manager.max_topic) {
 		return MROS_E_RANGE;
@@ -202,7 +202,7 @@ mRosReturnType RosTopic::add_data(RosTopicIdType id, memory::mRosMemoryListEntry
 	return MROS_E_OK;
 }
 
-mRosReturnType RosTopic::get_data(RosTopicIdType id, memory::mRosMemoryListEntryType **data)
+mRosReturnType RosTopic::get_data(mRosTopicIdType id, memory::mRosMemoryListEntryType **data)
 {
 	memory::mRosMemoryListEntryType *datap;
 	if (id > topic_manager.max_topic) {
