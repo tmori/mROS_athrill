@@ -12,12 +12,14 @@ IFLAGS	+= -I$(ROOT_PATH)/src/config
 VPATH	:= $(ROOT_PATH)/src/lib
 VPATH	+= $(ROOT_PATH)/src/topic
 VPATH	+= $(ROOT_PATH)/src/topic/cimpl
+VPATH	+= $(ROOT_PATH)/src/node/cimpl
 
 
 OBJS	:= mros_memory_impl.o
 OBJS	+= mros_topic_impl.o
 OBJS	+= mros_topic_cimpl.o
 OBJS	+= mros_topic_connector_cimpl.o
+OBJS	+= mros_node_cimpl.o
 
 %.o: %.c
 	$(CC) -c $(IFLAGS) $(CFLAGS) $<
