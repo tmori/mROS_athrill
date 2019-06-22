@@ -34,18 +34,42 @@ typedef ListEntryType(mRosMemoryListEntryType, mRosMemoryEntryType) mRosMemoryLi
 typedef ListHeadType(mRosMemoryListEntryType) mRosMemoryListHeadType;
 
 typedef struct {
+	/*
+	 * memory list header
+	 */
 	mRosMemoryListHeadType 	head;
+	/*
+	 * num of preallocation memory
+	 */
 	mRosSizeType 			max_memory_num;
+	/*
+	 * preallocation unit size
+	 */
 	mRosSizeType			memsize;
+	/*
+	 * memory list entry
+	 */
 	mRosMemoryListEntryType *memory_entries;
+	/*
+	 * raw data
+	 */
 	char					*memory;
 } mRosMemoryHeaderType;
 
 typedef struct {
-	mRosSizeType 			mgr_num;
-	mRosMemoryHeaderType 	*mgr_array;
+	/*
+	 * num of header
+	 */
+	mRosSizeType 			header_num;
+	/*
+	 * header array
+	 */
+	mRosMemoryHeaderType 	*header_array;
 } mRosMemoryManagerType;
 
+/*
+ * config memory
+ */
 typedef struct {
 	mRosSizeType 			max_memory_num;
 	mRosSizeType			memsize;

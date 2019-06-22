@@ -91,8 +91,8 @@ do { \
 	entry_type *_tmp;	\
 	if ((headp)->free_num > 0) {	\
 		_tmp = ListEntry_First((headp)->free);	\
-		(headp)->free_num--;	\
 		ListEntry_Remove((headp)->free, _tmp); \
+		(headp)->free_num--;	\
 		*(new_entrypp) = _tmp;	\
 	} \
 	else { \

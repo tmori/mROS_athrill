@@ -18,6 +18,9 @@ typedef mros_uint32 mRosPacketIdType;
 typedef mros_uint32 mRosFuncIdType;
 typedef mros_uint32 mRosIdType;
 
+typedef mros_uint32* mRosContainerObjType;
+#define MROS_COBJ_NULL	((mRosContainerObjType)NULL)
+
 typedef mros_uint32 mRosSizeType;
 
 #define MROS_E_OK			0
