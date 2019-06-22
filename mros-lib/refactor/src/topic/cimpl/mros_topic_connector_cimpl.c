@@ -177,6 +177,19 @@ mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, 
 	return MROS_E_OK;
 }
 
+mRosReturnType mros_topic_connector_get(mRosContainerObjType obj, mRosTopicConnectorType *connector)
+{
+	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
+	*connector = entry->data.value;
+	return MROS_E_OK;
+}
+mRosReturnType mros_topic_connector_get_topic(mRosContainerObjType topic_obj, mRosTopicIdType *topic_id)
+{
+	mRosTopicConnectorListEntryRootType *topic_p = (mRosTopicConnectorListEntryRootType*)topic_obj;
+	*topic_id = topic_p->data.topic_id;
+	return MROS_E_OK;
+}
+
 
 mRosReturnType mros_topic_connector_add_data(mRosContainerObjType obj, mRosMemoryListEntryType *data)
 {
@@ -184,6 +197,11 @@ mRosReturnType mros_topic_connector_add_data(mRosContainerObjType obj, mRosMemor
 	if (entry->data.queue_head.entry_num >= entry->data.queue_maxsize) {
 		return MROS_E_LIMIT;
 	}
+	//TODO 要検討
+	//購読の場合は，キューにつなげるのではなく，
+	//INNER：コールバック関数呼び出し
+	//OUTER:TCP送信
+	//の方がよいと思われる
 	ListEntry_AddEntry(&entry->data.queue_head, data);
 	return MROS_E_OK;
 }
@@ -196,7 +214,12 @@ mRosMemoryListEntryType *mros_topic_connector_get_data(mRosContainerObjType obj)
 	if (entry->data.queue_head.entry_num == 0) {
 		return NULL;
 	}
+	//TODO 要検討
+	//出版の場合は，キューから取り出すのではなく，
+	//OUTER:TCP受信
+	//になるとと思われる
 	ListEntry_GetFirst(&entry->data.queue_head, &data);
 	ListEntry_RemoveEntry(&entry->data.queue_head, data);
 	return data;
 }
+

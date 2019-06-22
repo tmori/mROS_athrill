@@ -63,6 +63,9 @@ extern mRosContainerObjType mros_topic_connector_get_topic_next(mRosTopicConnect
 extern mRosContainerObjType mros_topic_connector_get_first(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType topic_obj);
 extern mRosContainerObjType mros_topic_connector_get_next(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType topic_obj, mRosContainerObjType obj);
 
+extern mRosReturnType mros_topic_connector_get_topic(mRosContainerObjType topic_obj, mRosTopicIdType *topic_id);
+extern mRosReturnType mros_topic_connector_get(mRosContainerObjType obj, mRosTopicConnectorType *connector);
+
 extern mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector);
 extern mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector);
 

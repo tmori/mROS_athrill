@@ -9,6 +9,9 @@ typedef int mros_int32;
 typedef unsigned char mros_uint8;
 typedef unsigned short mros_uint16;
 typedef unsigned int mros_uint32;
+typedef unsigned char mros_boolean;
+#define MROS_FALSE		0
+#define MROS_TRUE		0
 
 #define MROS_ID_NONE	0
 #define MROS_ID(index)		((index) + 1U)
