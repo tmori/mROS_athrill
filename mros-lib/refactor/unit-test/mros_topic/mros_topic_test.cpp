@@ -1,7 +1,11 @@
 #include "mros_topic.h"
+#include "mros_config.h"
+#include "mros_topic_connector_cimpl.h"
 #include <stdio.h>
 
 using namespace mros::topic;
+
+MROS_TOPIC_CONNECTOR_CONFIG_DECLARE_MANAGER(conn_mgr, 10);
 
 int main(int argc, const char* argv[])
 {
@@ -27,5 +31,9 @@ int main(int argc, const char* argv[])
 		printf("topic_name=%s\n", mRosTopic::get_topic_name(id));
 		obj = mRosTopic::get_next(obj);
 	}
+
+	ret = mros_topic_connector_init(&conn_mgr_config, &conn_mgr);
+	printf("ret=%d\n", ret);
+
 	return 0;
 }

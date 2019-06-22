@@ -1,9 +1,8 @@
 #include "mros_topic_cimpl.h"
-#include <stdlib.h>
 #include <string.h>
 
-static RosTopicManagerType 	topic_manager;
-#define TOPIC_OBJ(id)		topic_manager.topic_entries[TOPIC_INDEX((id))]
+static mRosTopicManagerType 	topic_manager;
+#define TOPIC_OBJ(id)		topic_manager.topic_entries[MROS_INDEX((id))]
 
 static mRosTopicListEntryType topic_entries[MROS_TOPIC_MAX_NUM];
 
@@ -14,8 +13,8 @@ mRosReturnType mros_topic_init(void)
 	for (mros_uint32 i = 0; i < topic_manager.max_topic; i++) {
 		mRosTopicListEntryType *entry = &(topic_manager.topic_entries[i]);
 		MROS_TOPIC_ENTRY_INIT(entry);
-		entry->data.topic_id = TOPIC_ID(i);
-		List_Init(&(entry->data.queue_head), mRosMemoryListEntryType, 0, NULL);
+		entry->data.topic_id = MROS_ID(i);
+		List_InitEmpty(&(entry->data.queue_head), mRosMemoryListEntryType);
 	}
 	List_Init(&topic_manager.head, mRosTopicListEntryType, topic_manager.max_topic, topic_manager.topic_entries);
 

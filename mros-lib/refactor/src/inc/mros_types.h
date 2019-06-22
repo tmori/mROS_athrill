@@ -11,6 +11,9 @@ typedef unsigned short mros_uint16;
 typedef unsigned int mros_uint32;
 
 #define MROS_ID_NONE	0
+#define MROS_ID(index)		((index) + 1U)
+#define MROS_INDEX(id)		((id) - 1U)
+
 typedef mros_uint32 mRosNodeIdType;
 typedef mros_uint32 mRosTopicIdType;
 typedef mros_uint32 mRosTopicConnectorIdType;

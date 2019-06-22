@@ -35,12 +35,7 @@ typedef struct {
 	mRosTopicEntryHeadType	 	head;
 	mRosTopicListEntryType 		*topic_entries;
 	mRosTopicIdType				max_topic;
-} RosTopicManagerType;
-
-#define TOPIC_ID(index)		((index) + 1U)
-#define TOPIC_INDEX(id)		((id) - 1U)
-
-
+} mRosTopicManagerType;
 
 extern mRosReturnType mros_topic_init(void);
 extern mRosContainerObjType mros_topic_get_first(void);
