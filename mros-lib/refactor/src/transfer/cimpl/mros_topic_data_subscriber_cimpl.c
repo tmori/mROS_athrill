@@ -21,12 +21,12 @@ static void mros_topic_subscribe(mRosTopicConnectorManagerType *mgrp, mRosContai
 	}
 	ret = mros_topic_get_data(topic_id, &topic_data);
 	if (ret != MROS_E_OK) {
-		//TODO free topic_data;
+		(void)mros_mem_free(topic_data->data.mgrp, topic_data);
 		return;
 	}
 
 	while (obj != MROS_COBJ_NULL) {
-		ret = mros_topic_connector_add_data(obj, topic_data);
+		ret = mros_topic_connector_add_data(obj, topic_data->data.memp, topic_data->data.size);
 		if (ret != MROS_E_OK) {
 			//TOODO ERROR LOG
 			continue;
@@ -34,7 +34,7 @@ static void mros_topic_subscribe(mRosTopicConnectorManagerType *mgrp, mRosContai
 		obj = mros_topic_connector_get_next(mgrp, topic_obj, obj);
 	}
 
-	//TODO free topic_data
+	(void)mros_mem_free(topic_data->data.mgrp, topic_data);
 	return;
 }
 

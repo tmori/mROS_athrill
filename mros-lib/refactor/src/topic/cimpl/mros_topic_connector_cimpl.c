@@ -1,6 +1,7 @@
 #include "mros_topic_connector_cimpl.h"
 #include "mros_config.h"
 #include <stdlib.h>
+#include <string.h>
 
 mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, mRosTopicConnectorManagerType *mgrp)
 {
@@ -116,7 +117,7 @@ static mRosTopicConnectorListEntryType *mros_topic_connector_get_node(mRosTopicC
 	return NULL;
 }
 
-mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector)
+mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector, mRosSizeType queue_length, mRosMemoryManagerType *mempool)
 {
 	mRosReturnType ret;
 	mRosTopicConnectorListEntryRootType *topic_p;
@@ -143,6 +144,9 @@ mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRo
 			entry->data.value.topic_id = connector->topic_id;
 			entry->data.value.node_id = connector->node_id;
 			entry->data.value.func_id = connector->func_id;
+			entry->data.queue_maxsize = queue_length;
+			entry->data.mempool = mempool;
+			List_InitEmpty(&entry->data.queue_head, mRosMemoryListEntryType);
 			ListEntry_AddEntry(&topic_p->data.head, entry);
 		}
 		else {
@@ -183,6 +187,36 @@ mRosReturnType mros_topic_connector_get(mRosContainerObjType obj, mRosTopicConne
 	*connector = entry->data.value;
 	return MROS_E_OK;
 }
+
+mRosContainerObjType mros_topic_connector_get_obj(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector)
+{
+	mRosTopicConnectorListEntryRootType *tp;
+	mRosTopicConnectorListEntryRootType *topic_p = NULL;
+	mRosTopicConnectorListEntryType *p;
+	mRosTopicConnectorListEntryType *entry = NULL;
+
+	ListEntry_Foreach(&mgrp->topic_head, tp) {
+		if (tp->data.topic_id == connector->topic_id) {
+			topic_p = tp;
+			break;
+		}
+	}
+	if (tp == NULL) {
+		return MROS_COBJ_NULL;
+	}
+
+	ListEntry_Foreach(&topic_p->data.head, p) {
+		if ((p->data.value.node_id == connector->node_id)) {
+			entry = p;
+			break;
+		}
+	}
+	if (entry == NULL) {
+		return MROS_COBJ_NULL;
+	}
+	return (mRosContainerObjType)entry;
+}
+
 mRosReturnType mros_topic_connector_get_topic(mRosContainerObjType topic_obj, mRosTopicIdType *topic_id)
 {
 	mRosTopicConnectorListEntryRootType *topic_p = (mRosTopicConnectorListEntryRootType*)topic_obj;
@@ -191,18 +225,33 @@ mRosReturnType mros_topic_connector_get_topic(mRosContainerObjType topic_obj, mR
 }
 
 
-mRosReturnType mros_topic_connector_add_data(mRosContainerObjType obj, mRosMemoryListEntryType *data)
+mRosReturnType mros_topic_connector_add_data(mRosContainerObjType obj, const char* data, mRosSizeType len)
 {
+	mRosReturnType ret;
+	mRosMemoryListEntryType *mem_entryp;
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 	if (entry->data.queue_head.entry_num >= entry->data.queue_maxsize) {
 		return MROS_E_LIMIT;
 	}
-	//TODO 要検討
-	//購読の場合は，キューにつなげるのではなく，
-	//INNER：コールバック関数呼び出し
-	//OUTER:TCP送信
-	//の方がよいと思われる
-	ListEntry_AddEntry(&entry->data.queue_head, data);
+
+	if (entry->data.mempool == NULL) {
+		//TODO 要検討
+		//購読の場合は，キューにつなげるのではなく，
+		//INNER：コールバック関数呼び出し
+		//OUTER:TCP送信
+		//の方がよいと思われる
+		return MROS_E_INVAL;
+	}
+
+	ret = mros_mem_alloc(entry->data.mempool, len, &mem_entryp);
+	if (ret != MROS_E_OK) {
+		return ret;
+	}
+
+	mem_entryp->data.size = len;
+	memcpy(mem_entryp->data.memp, data, mem_entryp->data.size);
+	ListEntry_AddEntry(&entry->data.queue_head, mem_entryp);
+
 	return MROS_E_OK;
 }
 

@@ -26,7 +26,7 @@ static void mros_topic_publish(mRosTopicConnectorManagerType *mgrp, mRosContaine
 		}
 		ret = mros_topic_add_data(topic_id, topic_data);
 		if (ret != MROS_E_OK) {
-			//TODO free topic_data;
+			(void)mros_mem_free(topic_data->data.mgrp, topic_data);
 			continue;
 		}
 		obj = mros_topic_connector_get_next(mgrp, topic_obj, obj);

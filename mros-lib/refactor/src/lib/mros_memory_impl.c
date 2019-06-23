@@ -19,6 +19,7 @@ mRosReturnType mros_mem_init(mRosSizeType config_num, mRosMemoryConfigType **con
 
 		for (mros_uint32 j = 0; j < mgrp->header_array[i].max_memory_num; j++) {
 			mRosMemoryListEntryType *entry = &(mgrp->header_array[i].memory_entries[j]);
+			entry->data.mgrp = mgrp;
 			entry->data.header_id = (mRosMemorySizeIdType)i;
 			entry->data.memory_id = MEMORY_ID(j);
 			entry->data.memsize = mgrp->header_array[i].memsize;

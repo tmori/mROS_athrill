@@ -18,6 +18,7 @@ typedef struct {
 	mRosTopicConnectorIdType	connector_id;
 	mRosTopicConnectorType		value;
 	mRosSizeType				queue_maxsize;
+	mRosMemoryManagerType		*mempool;
 	mRosMemoryListHeadType 		queue_head;
 } mRosTopicConnectorEntryType;
 typedef ListEntryType(mRosTopicConnectorListEntryType, mRosTopicConnectorEntryType) mRosTopicConnectorListEntryType;
@@ -65,12 +66,13 @@ extern mRosContainerObjType mros_topic_connector_get_next(mRosTopicConnectorMana
 
 extern mRosReturnType mros_topic_connector_get_topic(mRosContainerObjType topic_obj, mRosTopicIdType *topic_id);
 extern mRosReturnType mros_topic_connector_get(mRosContainerObjType obj, mRosTopicConnectorType *connector);
+extern mRosContainerObjType mros_topic_connector_get_obj(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector);
 
-extern mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector);
+extern mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector, mRosSizeType queue_length, mRosMemoryManagerType *mempool);
 extern mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector);
 
 
-extern mRosReturnType mros_topic_connector_add_data(mRosContainerObjType obj, mRosMemoryListEntryType *data);
+extern mRosReturnType mros_topic_connector_add_data(mRosContainerObjType obj, const char *data, mRosSizeType len);
 extern mRosMemoryListEntryType *mros_topic_connector_get_data(mRosContainerObjType obj);
 
 /*

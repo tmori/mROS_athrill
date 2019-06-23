@@ -10,7 +10,12 @@ extern "C" {
 
 typedef mros_uint32 mRosMemorySizeIdType;
 
+struct mRosMemoryManagerType;
 typedef struct {
+	/*
+	 * manager
+	 */
+	struct mRosMemoryManagerType  *mgrp;
 	/*
 	 * id of memory_entries
 	 */
@@ -56,7 +61,7 @@ typedef struct {
 	char					*memory;
 } mRosMemoryHeaderType;
 
-typedef struct {
+typedef struct mRosMemoryManagerType {
 	/*
 	 * num of header
 	 */
