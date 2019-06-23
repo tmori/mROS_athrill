@@ -11,8 +11,10 @@ extern "C" {
 
 typedef struct {
 	mRosTopicIdType				topic_id;
-	const char					*topic_name;
 	mros_uint32					namelen;
+	const char					*topic_name;
+	mros_uint32					typenamelen;
+	const char					*topic_typename;
 
 	/*
 	 * トピックデータ格納用キュー
@@ -28,6 +30,8 @@ typedef ListHeadType(mRosTopicListEntryType) mRosTopicEntryHeadType;
 do {	\
 	(entryp)->data.topic_name = NULL;	\
 	(entryp)->data.namelen = 0;	\
+	(entryp)->data.topic_typename = NULL;	\
+	(entryp)->data.typenamelen = 0;	\
 	(entryp)->data.queue_maxsize = 1; \
 } while (0)
 
@@ -41,9 +45,10 @@ extern mRosReturnType mros_topic_init(void);
 extern mRosContainerObjType mros_topic_get_first(void);
 extern mRosContainerObjType mros_topic_get_next(mRosContainerObjType obj);
 extern const char *mros_topic_get_topic_name(mRosTopicIdType id);
+extern const char *mros_topic_get_topic_typename(mRosTopicIdType id);
 extern mRosTopicIdType mros_topic_get_id(mRosContainerObjType obj);
 extern mRosReturnType mros_topic_get(const char *topic_name, mRosTopicIdType *id);
-extern mRosReturnType mros_topic_create(const char *topic_name, mRosTopicIdType *id);
+extern mRosReturnType mros_topic_create(const char *topic_name, const char *topic_typename, mRosTopicIdType *id);
 extern mRosReturnType mros_topic_set_quesize_byname(const char *topic_name, mRosSizeType size);
 extern mRosReturnType mros_topic_set_quesize_byid(mRosTopicIdType id, mRosSizeType size);
 extern mRosReturnType mros_topic_remove_byname(const char *topic_name);

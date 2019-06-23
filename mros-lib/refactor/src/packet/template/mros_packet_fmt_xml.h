@@ -16,7 +16,7 @@
 	"</methodName>\n"					\
 	"<params>\n"						\
 	"<param>\n<value>"					\
-	"%s" 								\
+	"%u" 								\
 	"</value>\n</param>\n"				\
 	"</params>"							\
 	"<params>\n"						\

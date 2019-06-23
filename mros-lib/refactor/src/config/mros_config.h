@@ -34,4 +34,27 @@
  */
 #define MROS_NODE_MAX_NUM						10U
 
+/**************************************
+ * PROTOCOL
+ **************************************/
+
+/*
+ * portno of master
+ */
+#define MROS_MASTER_PORT_NO						1131
+
+/*
+ * portno of slave
+ */
+#define MROS_SLAVE_PORT_NO						1141
+
+/*
+ * portno of pub
+ */
+#define MROS_PUBLISHER_PORT_NO					1151
+
+#define MROS_PACKET_MAXSIZE						512
+
+#define MROS_IPADDR								"0.0.0.0"
+#define MROS_URI_SLAVE							"http://0.0.0.0/1141"
 #endif /* _MROS_CONFIG_H_ */

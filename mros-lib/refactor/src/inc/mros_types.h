@@ -32,6 +32,7 @@ typedef mros_uint32 mRosSizeType;
 #define MROS_E_OK			0
 #define MROS_E_NOENT		2
 #define MROS_E_NOMEM		12
+#define MROS_E_BUSY			13
 #define MROS_E_EXIST		17
 #define MROS_E_INVAL		22
 #define MROS_E_RANGE		34

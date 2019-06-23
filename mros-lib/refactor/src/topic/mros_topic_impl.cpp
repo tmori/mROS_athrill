@@ -40,13 +40,13 @@ mRosReturnType mRosTopic::get(const char *topic_name, mRosTopicIdType &id)
 
 mRosReturnType mRosTopic::create(const char *topic_name, mRosTopicIdType &id)
 {
-	return mros_topic_create(topic_name, &id);
+	return mros_topic_create(topic_name, "TODO", &id);
 }
 
 mRosReturnType mRosTopic::create(const char *topic_name)
 {
 	mRosTopicIdType id;
-	return mros_topic_create(topic_name, &id);
+	return mros_topic_create(topic_name, "TODO", &id);
 }
 
 mRosReturnType mRosTopic::set_quesize(const char *topic_name, mRosSizeType size)

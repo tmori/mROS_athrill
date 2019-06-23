@@ -1,5 +1,6 @@
 #include "mros_topic_cimpl.h"
 #include <string.h>
+#include <stdlib.h>
 
 static mRosTopicManagerType 	topic_manager;
 #define TOPIC_OBJ(id)		topic_manager.topic_entries[MROS_INDEX((id))]
@@ -73,10 +74,11 @@ mRosReturnType mros_topic_get(const char *topic_name, mRosTopicIdType *id)
 	return MROS_E_OK;
 }
 
-mRosReturnType mros_topic_create(const char *topic_name, mRosTopicIdType *id)
+mRosReturnType mros_topic_create(const char *topic_name, const char *topic_typename, mRosTopicIdType *id)
 {
 	mRosTopicListEntryType *p;
 	mros_uint32 len = strlen(topic_name);
+	mros_uint32 typelen = strlen(topic_typename);
 
 	mRosReturnType ret = mros_topic_get(topic_name, id);
 	if (ret == MROS_E_OK) {
@@ -90,6 +92,8 @@ mRosReturnType mros_topic_create(const char *topic_name, mRosTopicIdType *id)
 	*id = p->data.topic_id;
 	p->data.namelen = len;
 	p->data.topic_name = topic_name;
+	p->data.typenamelen = typelen;
+	p->data.topic_typename = topic_typename;
 	ListEntry_AddEntry(&topic_manager.head, p);
 	return MROS_E_OK;
 }
@@ -121,7 +125,13 @@ const char *mros_topic_get_topic_name(mRosTopicIdType id)
 	}
 	return TOPIC_OBJ(id).data.topic_name;
 }
-
+const char *mros_topic_get_topic_typename(mRosTopicIdType id)
+{
+	if (id > topic_manager.max_topic) {
+		return NULL;
+	}
+	return TOPIC_OBJ(id).data.topic_name;
+}
 
 mRosReturnType mros_topic_remove_byname(const char *topic_name)
 {

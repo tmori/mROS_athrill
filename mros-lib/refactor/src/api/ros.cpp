@@ -77,7 +77,7 @@ Subscriber NodeHandle::subscriber(std::string& topic, int queue_size, void(*fp)(
 		return sub;
 	}
 
-	ret = mros_topic_create(topic.c_str(), &connector.topic_id);
+	ret = mros_topic_create(topic.c_str(), "TODO:typename", &connector.topic_id);//TODO typename
 	if (ret != MROS_E_OK) {
 		//TODO ERROR LOG
 		return sub;
@@ -120,7 +120,7 @@ Publisher NodeHandle::advertise(std::string& topic, int queue_size)
 		return pub;
 	}
 
-	ret = mros_topic_create(topic.c_str(), &connector.topic_id);
+	ret = mros_topic_create(topic.c_str(), "TODO:typename", &connector.topic_id);//TODO typename
 	if (ret != MROS_E_OK) {
 		//TODO ERROR LOG
 		return pub;
