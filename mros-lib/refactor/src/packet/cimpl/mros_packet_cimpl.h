@@ -15,6 +15,7 @@ typedef enum {
 } mRosPacketDataType;
 
 typedef struct {
+	mRosSizeType						total_size;
 	mRosSizeType						data_size;
 	char							 	data[MROS_PACKET_MAXSIZE];
 } mRosPacketType;

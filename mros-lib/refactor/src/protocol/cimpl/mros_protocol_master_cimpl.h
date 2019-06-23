@@ -12,22 +12,20 @@ typedef enum {
 	MROS_PROTOCOL_MASTER_STATE_REGISTER_PUBLISHER,
 	MROS_PROTOCOL_MASTER_STATE_REGISTER_SUBSCRIBER,
 	MROS_PROTOCOL_MASTER_STATE_REQUESTING_TOPIC,
-} mRosProtocolMasterStateType;
+} mRosProtocolMasterStateEnumType;
 
-/*
- * ・ノードID(caller_id)
- * ・トピック名(topic)
- * ・トピック・データ型(topic_type)
- * ・自マシンのIP，ポート(1141)(caller_api)
- */
+typedef enum {
+	MROS_PROTOCOL_MASTER_REQ_REGISTER_PUBLISHER = 0,
+	MROS_PROTOCOL_MASTER_REQ_REGISTER_SUBSCRIBER,
+} mRosProtocolMasterRequestEnumType;
+
 typedef struct {
-	mRosContainerObjType connector_obj;
+	mRosProtocolMasterRequestEnumType 	req_type;
+	mRosContainerObjType 				connector_obj;
 } mRosProtocolMasterRequestType;
 
 extern mRosReturnType mros_protocol_master_init(void);
-extern mRosReturnType mros_protocol_master_register_publisher(mRosProtocolMasterRequestType *pub_req);
-extern mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMasterRequestType *sub_req);
-
+extern void mros_protocol_master_run(void);
 
 #ifdef __cplusplus
 }

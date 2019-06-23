@@ -2,6 +2,9 @@
 #include "mros_node_cimpl.h"
 #include "mros_topic_cimpl.h"
 #include "mros_topic_connector_factory_cimpl.h"
+#include "mros_exclusive_area.h"
+#include "mros_wait_queue.h"
+#include "mros_protocol_master_cimpl.h"
 #include <string.h>
 
 using namespace ros;
@@ -101,7 +104,21 @@ Subscriber NodeHandle::subscriber(std::string& topic, int queue_size, void(*fp)(
 	}
 	sub.set(obj);
 
-	//TODO ROSマスタへ登録する
+	{
+		//ROSマスタへ登録する
+		mRosProtocolMasterRequestType req;
+		mRosWaitListEntryType client_wait;
+
+		req.connector_obj = obj;
+		req.req_type = MROS_PROTOCOL_MASTER_REQ_REGISTER_SUBSCRIBER;
+		mros_client_wait_entry_init(&client_wait, &req);
+
+		mros_exclusive_lock(&mros_master_exclusive_area);
+		mros_server_queue_put(&mros_master_wait_queue, &client_wait);
+		mros_server_queue_wakeup(&mros_master_wait_queue);
+		mros_client_wait(&mros_master_exclusive_area, &client_wait);
+		mros_exclusive_unlock(&mros_master_exclusive_area);
+	}
 	return sub;
 }
 
@@ -150,7 +167,22 @@ Publisher NodeHandle::advertise(std::string& topic, int queue_size)
 	}
 
 	pub.set(obj);
-	//TODO ROSマスタへ登録する
+
+	{
+		//ROSマスタへ登録する
+		mRosProtocolMasterRequestType req;
+		mRosWaitListEntryType client_wait;
+
+		req.connector_obj = obj;
+		req.req_type = MROS_PROTOCOL_MASTER_REQ_REGISTER_PUBLISHER;
+		mros_client_wait_entry_init(&client_wait, &req);
+
+		mros_exclusive_lock(&mros_master_exclusive_area);
+		mros_server_queue_put(&mros_master_wait_queue, &client_wait);
+		mros_server_queue_wakeup(&mros_master_wait_queue);
+		mros_client_wait(&mros_master_exclusive_area, &client_wait);
+		mros_exclusive_unlock(&mros_master_exclusive_area);
+	}
 	return pub;
 }
 

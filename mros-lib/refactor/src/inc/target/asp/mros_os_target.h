@@ -8,7 +8,10 @@ extern "C" {
 #include "mros_types.h"
 
 typedef mros_uint32	mRosTaskIdType;
+typedef mros_uint32	mRosTaskPriorityType;
 
+#define TMAX_TPRI 10 //TODO include os.h
+#define MROS_TASK_MAX_PRIORITY 	TMAX_TPRI
 
 #ifdef __cplusplus
 }

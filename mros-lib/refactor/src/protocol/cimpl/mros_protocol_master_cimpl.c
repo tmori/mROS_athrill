@@ -3,15 +3,19 @@
 #include "mros_topic_cimpl.h"
 #include "mros_topic_connector_factory_cimpl.h"
 #include "mros_config.h"
+#include "mros_exclusive_area.h"
+#include "mros_wait_queue.h"
 #include <stdlib.h>
 
 typedef struct {
-	mRosProtocolMasterStateType 	state;
-	mRosEncodeArgType 				arg;
-	mRosPacketType					packet;
+	mRosProtocolMasterStateEnumType 	state;
+	mRosEncodeArgType 					arg;
+	mRosPacketType						packet;
 } mRosProtocolMasterType;
 
 static mRosProtocolMasterType mros_protocol_master;
+static mRosReturnType mros_protocol_master_register_publisher(mRosProtocolMasterRequestType *pub_req);
+static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMasterRequestType *sub_req);
 
 mRosReturnType mros_protocol_master_init(void)
 {
@@ -23,12 +27,39 @@ mRosReturnType mros_protocol_master_init(void)
 	return MROS_E_OK;
 }
 
-static mRosReturnType mros_protocol_master_register(mRosProtocolMasterRequestType req, mRosTopicConnectorEnumType type)
+void mros_protocol_master_run(void)
+{
+	while (MROS_TRUE) {
+		mros_exclusive_lock(&mros_master_exclusive_area);
+		mros_server_queue_wait(&mros_master_exclusive_area, &mros_master_wait_queue);
+		mRosWaitListEntryType *wait_entry = mros_server_queue_get(&mros_master_wait_queue);
+		mros_exclusive_unlock(&mros_master_exclusive_area);
+
+		if (wait_entry == NULL) {
+			continue;
+		}
+		mRosProtocolMasterRequestType *req = (mRosProtocolMasterRequestType*)wait_entry->data.reqp;
+		switch (req->req_type) {
+		case MROS_PROTOCOL_MASTER_REQ_REGISTER_PUBLISHER:
+			mros_protocol_master_register_publisher(req);
+			break;
+		case MROS_PROTOCOL_MASTER_REQ_REGISTER_SUBSCRIBER:
+			mros_protocol_master_register_subscriber(req);
+			break;
+		default:
+			break;
+		}
+		mros_client_wakeup(wait_entry);
+	}
+	return;
+}
+
+static mRosReturnType mros_protocol_master_register(mRosProtocolMasterRequestType *req, mRosTopicConnectorEnumType type)
 {
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;
 	mRosTopicConnectorManagerType *mgrp = mros_topic_connector_factory_get(type);
-	char* method;
+	const char* method;
 
 	if (type == MROS_TOPIC_CONNECTOR_PUB) {
 		method = "registerPublisher";
@@ -64,7 +95,7 @@ static mRosReturnType mros_protocol_master_register(mRosProtocolMasterRequestTyp
 	return ret;
 }
 
-static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterRequestType req)
+static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterRequestType *req)
 {
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;
@@ -95,39 +126,27 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 	return ret;
 }
 
-mRosReturnType mros_protocol_master_register_publisher(mRosProtocolMasterRequestType *pub_req)
+static mRosReturnType mros_protocol_master_register_publisher(mRosProtocolMasterRequestType *pub_req)
 {
 	mRosReturnType ret;
 
-	//TODO lock
-	while (mros_protocol_master.state != MROS_PROTOCOL_MASTER_STATE_WAITING) {
-		//TODO wait ...
-	}
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_REGISTER_PUBLISHER;
-	//TODO unlock
 
 	//TODO ROSマスタと接続
 	ret = mros_protocol_master_register(pub_req, MROS_TOPIC_CONNECTOR_PUB);
-
 	//TODO ROSマスタと切断
-	//TODO lock
+
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
-	//TODO wakeup
-	//TODO unlock
+
 	return ret;
 }
 
 
-mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMasterRequestType *sub_req)
+static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMasterRequestType *sub_req)
 {
 	mRosReturnType ret;
 
-	//TODO lock
-	while (mros_protocol_master.state != MROS_PROTOCOL_MASTER_STATE_WAITING) {
-		//TODO wait ...
-	}
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_REGISTER_SUBSCRIBER;
-	//TODO unlock
 
 	//TODO ROSマスタと接続
 	ret = mros_protocol_master_register(sub_req, MROS_TOPIC_CONNECTOR_SUB);
@@ -144,14 +163,10 @@ mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMasterReques
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-
 	//TODO SLAVEと切断
 	//TODO ROSマスタと切断
 
-	//TODO lock
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
-	//TODO wakeup
-	//TODO unlock
 
 	return ret;
 }

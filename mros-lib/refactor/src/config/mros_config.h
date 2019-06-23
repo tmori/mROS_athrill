@@ -58,3 +58,11 @@
 #define MROS_IPADDR								"0.0.0.0"
 #define MROS_URI_SLAVE							"http://0.0.0.0/1141"
 #endif /* _MROS_CONFIG_H_ */
+
+
+/*****************************************
+ * EXCLUSIVE AREA
+ *****************************************/
+
+#define MROS_GIANT_EXCLUSIVE_AREA_PRIORITY		MROS_TASK_MAX_PRIORITY
+

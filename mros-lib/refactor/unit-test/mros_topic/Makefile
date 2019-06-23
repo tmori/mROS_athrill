@@ -15,6 +15,9 @@ IFLAGS	+= -I$(ROOT_PATH)/src/transfer/cimpl
 IFLAGS	+= -I$(ROOT_PATH)/src/config
 IFLAGS	+= -I$(ROOT_PATH)/src/inc/target/asp
 IFLAGS	+= -I$(ROOT_PATH)/src/inc/target/lwip
+IFLAGS	+= -I$(ROOT_PATH)/src/protocol/cimpl
+IFLAGS	+= -I$(ROOT_PATH)/src/packet/cimpl
+IFLAGS	+= -I$(ROOT_PATH)/src/packet/template
 
 VPATH	:= $(ROOT_PATH)/src/lib
 VPATH	+= $(ROOT_PATH)/src/api
@@ -22,6 +25,9 @@ VPATH	+= $(ROOT_PATH)/src/topic
 VPATH	+= $(ROOT_PATH)/src/topic/cimpl
 VPATH	+= $(ROOT_PATH)/src/node/cimpl
 VPATH	+= $(ROOT_PATH)/src/transfer/cimpl
+VPATH	+= $(ROOT_PATH)/src/target/os
+VPATH	+= $(ROOT_PATH)/src/protocol/cimpl
+VPATH	+= $(ROOT_PATH)/src/packet/cimpl
 
 
 OBJS	:= mros_memory_impl.o
@@ -34,6 +40,11 @@ OBJS	+= mros_node_cimpl.o
 OBJS	+= mros_topic_data_publisher_cimpl.o
 OBJS	+= mros_topic_data_subscriber_cimpl.o
 OBJS	+= mros_os_stub.o
+OBJS	+= mros_protocol_master_cimpl.o
+OBJS	+= mros_exclusive_ops.o
+OBJS	+= mros_exclusive_area.o
+OBJS	+= mros_wait_queue.o
+OBJS	+= mros_packet_cimpl.o
 
 %.o: %.c
 	$(CC) -c $(IFLAGS) $(CFLAGS) $<
