@@ -15,6 +15,7 @@ typedef enum {
 
 typedef struct {
 	mRosNodeIdType				node_id;
+	mRosTaskIdType				task_id;
 	const char					*node_name;
 	mros_uint32					namelen;
 } mRosNodeEntryType;
@@ -36,10 +37,13 @@ typedef struct {
 } mRosNodeManagerType;
 
 extern mRosReturnType mros_node_init(void);
-extern mRosReturnType mros_node_get(const char *node_name, mRosNodeIdType *id);
+extern mRosReturnType mros_node_get_byname(const char *node_name, mRosNodeIdType *id);
+extern mRosReturnType mros_node_get_bytid(mRosNodeIdType *id);
 extern mRosNodeEnumType mros_node_type(mRosNodeIdType id);
 
-extern mRosReturnType mros_node_create(const char *node_name, mRosNodeEnumType type, mRosNodeIdType *id);
+extern mRosReturnType mros_node_create_inner(const char *node_name, mRosNodeIdType *id);
+extern mRosReturnType mros_node_create_outer(const char *node_name, mRosNodeIdType *id);
+
 extern mRosReturnType mros_node_remove(mRosNodeIdType id);
 
 /*

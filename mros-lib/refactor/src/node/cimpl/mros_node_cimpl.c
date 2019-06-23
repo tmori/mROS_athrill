@@ -1,4 +1,5 @@
 #include "mros_node_cimpl.h"
+#include "mros_os.h"
 #include "mros_config.h"
 #include <string.h>
 #include <stdlib.h>
@@ -49,7 +50,7 @@ static mRosReturnType mros_node_get_node(const char *node_name, mros_uint32 len,
 	return MROS_E_OK;
 }
 
-mRosReturnType mros_node_get(const char *node_name, mRosNodeIdType *id)
+mRosReturnType mros_node_get_byname(const char *node_name, mRosNodeIdType *id)
 {
 	mros_uint32 len = strlen(node_name);
 
@@ -61,6 +62,25 @@ mRosReturnType mros_node_get(const char *node_name, mRosNodeIdType *id)
 	return ret;
 }
 
+mRosReturnType mros_node_get_bytid(mRosNodeIdType *id)
+{
+	mRosTaskIdType task_id;
+	task_id = mros_get_taskid();
+	mRosNodeListEntryType *p;
+
+	*id = MROS_ID_NONE;
+	ListEntry_Foreach(&node_manager[ROS_NODE_TYPE_INNER].head, p) {
+		if (task_id == p->data.node_id) {
+			*id = p->data.node_id;
+			break;
+		}
+	}
+	if (*id == MROS_ID_NONE) {
+		return MROS_E_NOENT;
+	}
+	return MROS_E_OK;
+}
+
 mRosNodeEnumType mros_node_type(mRosNodeIdType id)
 {
 	mRosNodeEnumType type = NODE_TYPE(id);
@@ -70,14 +90,14 @@ mRosNodeEnumType mros_node_type(mRosNodeIdType id)
 	return type;
 }
 
-mRosReturnType mros_node_create(const char *node_name, mRosNodeEnumType type, mRosNodeIdType *id)
+static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType task_id, mRosNodeEnumType type, mRosNodeIdType *id)
 {
 	mRosNodeListEntryType *p;
 
 	if (type >= ROS_NODE_TYPE_NUM) {
 		return MROS_E_RANGE;
 	}
-	mRosReturnType ret = mros_node_get(node_name, id);
+	mRosReturnType ret = mros_node_get_byname(node_name, id);
 	if (ret == MROS_E_OK) {
 		return MROS_E_EXIST;
 	}
@@ -92,6 +112,18 @@ mRosReturnType mros_node_create(const char *node_name, mRosNodeEnumType type, mR
 	p->data.node_name = node_name;
 	ListEntry_AddEntry(&node_manager[type].head, p);
 	return MROS_E_OK;
+}
+
+mRosReturnType mros_node_create_inner(const char *node_name, mRosNodeIdType *id)
+{
+	mRosTaskIdType task_id;
+	task_id = mros_get_taskid();
+	return mros_node_create(node_name, task_id, ROS_NODE_TYPE_INNER, id);
+}
+
+mRosReturnType mros_node_create_outer(const char *node_name, mRosNodeIdType *id)
+{
+	return mros_node_create(node_name, MROS_TASKID_NONE, ROS_NODE_TYPE_OUTER, id);
 }
 
 mRosReturnType mros_node_remove(mRosNodeIdType id)

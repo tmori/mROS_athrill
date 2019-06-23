@@ -80,7 +80,7 @@ mRosReturnType mros_topic_create(const char *topic_name, mRosTopicIdType *id)
 
 	mRosReturnType ret = mros_topic_get(topic_name, id);
 	if (ret == MROS_E_OK) {
-		return MROS_E_EXIST;
+		return MROS_E_OK;
 	}
 
 	ListEntry_Alloc(&topic_manager.head, mRosTopicListEntryType, &p);

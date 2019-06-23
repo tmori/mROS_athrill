@@ -21,8 +21,8 @@ typedef mros_uint32 mRosNodeIdType;
 typedef mros_uint32 mRosTopicIdType;
 typedef mros_uint32 mRosTopicConnectorIdType;
 typedef mros_uint32 mRosPacketIdType;
-typedef mros_uint32 mRosFuncIdType;
 typedef mros_uint32 mRosIdType;
+typedef mros_uint32* mRosFuncIdType;
 
 typedef mros_uint32* mRosContainerObjType;
 #define MROS_COBJ_NULL	((mRosContainerObjType)NULL)
@@ -37,6 +37,12 @@ typedef mros_uint32 mRosSizeType;
 #define MROS_E_RANGE		34
 #define MROS_E_LIMIT		111
 typedef mros_int32 mRosReturnType;
+
+/*
+ * Os dependent data types
+ */
+typedef mros_uint32	mRosTaskIdType;
+#define MROS_TASKID_NONE	0U
 
 #ifdef __cplusplus
 }

@@ -7,6 +7,7 @@ using namespace mros::topic;
 
 MROS_TOPIC_CONNECTOR_CONFIG_DECLARE_MANAGER(conn_mgr, 10);
 
+
 int main(int argc, const char* argv[])
 {
 	mRosReturnType ret;
