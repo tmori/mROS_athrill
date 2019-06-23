@@ -13,6 +13,8 @@ IFLAGS	+= -I$(ROOT_PATH)/src/topic/cimpl
 IFLAGS	+= -I$(ROOT_PATH)/src/node/cimpl
 IFLAGS	+= -I$(ROOT_PATH)/src/transfer/cimpl
 IFLAGS	+= -I$(ROOT_PATH)/src/config
+IFLAGS	+= -I$(ROOT_PATH)/src/inc/target/asp
+IFLAGS	+= -I$(ROOT_PATH)/src/inc/target/lwip
 
 VPATH	:= $(ROOT_PATH)/src/lib
 VPATH	+= $(ROOT_PATH)/src/api

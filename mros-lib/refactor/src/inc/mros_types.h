@@ -41,8 +41,14 @@ typedef mros_int32 mRosReturnType;
 /*
  * Os dependent data types
  */
-typedef mros_uint32	mRosTaskIdType;
+#include "mros_os_target.h"
 #define MROS_TASKID_NONE	0U
+
+
+/*
+ * Comm dependent data types
+ */
+#include "mros_comm_target.h"
 
 #ifdef __cplusplus
 }

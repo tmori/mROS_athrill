@@ -9,6 +9,11 @@ using namespace ros;
 /*******************************************************
  * START: Publish Config
  *******************************************************/
+//TODO 要検討
+//本メモリプールは，コネクションごとに作成する必要がある
+//コネクションと本メモリプールをどうやって結び付けるかは要検討
+//おそらく想定するデータ型と想定コネクション数から本コンフィグを自動生成すべきと考える．
+
 #define ROS_TOPIC_PUBLISHER_CONFIG_NUM			3U
 #define ROS_TOPIC_PUBLISHER_MEMPOOL1_SIZE		4U
 #define ROS_TOPIC_PUBLISHER_MEMPOOL1_QUELEN		1U
