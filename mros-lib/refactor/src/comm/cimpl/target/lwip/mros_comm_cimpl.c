@@ -30,6 +30,14 @@ void mros_comm_inet_remote_sockaddr_init(mRosSockAddrInType *addr, mros_int32 po
 	return;
 }
 
+void mros_comm_timeval_set(mros_uint32 sec, mros_uint32 usec, mRosTimeValType *tv)
+{
+	tv->tv_sec = sec;
+	tv->tv_usec = usec;
+	return;
+}
+
+
 void mros_comm_init(void)
 {
 	lwip_init();

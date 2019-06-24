@@ -11,8 +11,9 @@ typedef struct {
 	mRosCommSocketType socket;
 } mRosCommTcpServerType;
 
+extern mRosReturnType mros_comm_tcp_servert_init(mRosCommTcpServerType *server);
 extern mRosReturnType mros_comm_tcp_server_bind(mRosCommTcpServerType *server, mros_int32 port);
-extern mRosReturnType mros_comm_tcp_server_listen(mRosCommTcpServerType *server, mros_int32 backlog);
+extern mRosReturnType mros_comm_tcp_server_listen(mRosCommTcpServerType *server, mros_int32 max);
 extern mRosReturnType mros_comm_tcp_server_accept(mRosCommTcpServerType *server, mRosCommTcpClientType *client);
 
 #ifdef __cplusplus

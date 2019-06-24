@@ -10,6 +10,7 @@ extern "C" {
 
 extern void mros_comm_inet_local_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port);
 extern void mros_comm_inet_remote_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port, const char* ipaddrp);
+extern void mros_comm_timeval_set(mros_uint32 sec, mros_uint32 usec, mRosTimeValType *tv);
 
 extern void mros_comm_init(void);
 extern mros_int32 mros_comm_accept(mros_int32 s, mRosSockAddrType *addr, mRosSizeType addrlen);
