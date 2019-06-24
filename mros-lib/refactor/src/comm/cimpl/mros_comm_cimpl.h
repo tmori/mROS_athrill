@@ -1,11 +1,15 @@
-#ifndef _MROS_COMM_H_
-#define _MROS_COMM_H_
+#ifndef _MROS_COMM_CIMPL_H_
+#define _MROS_COMM_CIMPL_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "mros_types.h"
+
+
+extern void mros_comm_inet_local_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port);
+extern void mros_comm_inet_remote_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port, const char* ipaddrp);
 
 extern void mros_comm_init(void);
 extern mros_int32 mros_comm_accept(mros_int32 s, mRosSockAddrType *addr, mRosSizeType addrlen);
@@ -36,4 +40,4 @@ extern char *mros_comm_ipaddr_ntoa_r(const mRosIpAaddrType *addr, char *buf, mRo
 #endif
 
 
-#endif /* _MROS_COMM_H_ */
+#endif /* _MROS_COMM_CIMPL_H_ */

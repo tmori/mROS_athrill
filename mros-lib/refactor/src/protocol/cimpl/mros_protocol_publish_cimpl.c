@@ -16,8 +16,6 @@ void mros_protocol_publish_run(void)
 		//TODO data read
 		//TODO decode
 		//TODO switch case method(TCPROS)
-		//TODO call method
-		//TODO reply
 	}
 	return;
 }

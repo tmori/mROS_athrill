@@ -19,9 +19,7 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 
 mRosReturnType mros_protocol_master_init(void)
 {
-	//TODO open sever port
-	//TODO open slave port
-	//TODO open pub port
+
 
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
 	return MROS_E_OK;

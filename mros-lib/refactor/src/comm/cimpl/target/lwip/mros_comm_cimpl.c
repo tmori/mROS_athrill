@@ -1,8 +1,39 @@
-#include "mros_comm.h"
+#include "mros_comm_target.h"
+#include <string.h>
+#include <stdio.h>
+#include "../../mros_comm_cimpl.h"
+
+void mros_comm_inet_local_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port)
+{
+    memset(addr, 0, sizeof(mRosSockAddrInType));
+
+    addr->sin_family = AF_INET;
+    addr->sin_port = htons(port);
+    addr->sin_addr.s_addr = INADDR_ANY;
+	return;
+}
+
+void mros_comm_inet_remote_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port, const char* ipaddrp)
+{
+	mros_uint8 addr_array[5];
+    memset(addr, 0, sizeof(mRosSockAddrInType));
+
+    addr->sin_family = AF_INET;
+    addr->sin_port = htons(port);
+    (void)sscanf(ipaddrp, "%3u.%3u.%3u.%3u",
+    		(mros_uint8*)&addr_array[0],
+			(mros_uint8*)&addr_array[1],
+			(mros_uint8*)&addr_array[2],
+			(mros_uint8*)&addr_array[3]);
+
+    memcpy((void*)&addr->sin_addr.s_addr, (void*)&addr_array, 4U);
+	return;
+}
 
 void mros_comm_init(void)
 {
 	lwip_init();
+	return;
 }
 mros_int32 mros_comm_accept(mros_int32 s, mRosSockAddrType *addr, mRosSizeType addrlen)
 {
