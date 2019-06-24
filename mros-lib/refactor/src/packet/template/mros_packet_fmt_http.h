@@ -1,6 +1,10 @@
 #ifndef _MROS_PACKET_FMT_HTTP_H_
 #define _MROS_PACKET_FMT_HTTP_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * ARG1: xml size
  */
@@ -24,5 +28,9 @@
 		"User-Agent: \n"			\
 		"Content-Type: \n"			\
 		"Content-Length: %u\n\n"		\
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MROS_PACKET_FMT_HTTP_H_ */

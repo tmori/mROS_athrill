@@ -1,5 +1,5 @@
 #include "mros_protocol_master_cimpl.h"
-#include "mros_packet_cimpl.h"
+#include "mros_packet_encoder_cimpl.h"
 #include "mros_topic_cimpl.h"
 #include "mros_topic_connector_factory_cimpl.h"
 #include "mros_config.h"

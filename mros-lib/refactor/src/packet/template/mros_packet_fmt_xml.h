@@ -1,6 +1,10 @@
 #ifndef _MROS_PACKET_FMT_XML_H_
 #define _MROS_PACKET_FMT_XML_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * ARGS1: method name
  * ARGS2: id
@@ -67,5 +71,8 @@
 	"</params>"							\
 	"</methodCall>\n"
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MROS_PACKET_FMT_XML_H_ */

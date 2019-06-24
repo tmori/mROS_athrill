@@ -1,6 +1,10 @@
 #ifndef _MROS_PACKET_FMT_TCPROS_H_
 #define _MROS_PACKET_FMT_TCPROS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MROS_PACKET_FMT_TCPROS_CALLER_ID	"callerid=%s"
 #define MROS_PACKET_FMT_TCPROS_TOPIC		"topic=%s"
 #define MROS_PACKET_FMT_TCPROS_TYPE			"type=%s"
@@ -42,6 +46,10 @@
 	"type=%s"		\
 	"SIZE"	\
 	"md5sum=%s"
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif /* _MROS_PACKET_FMT_TCPROS_H_ */

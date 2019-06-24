@@ -45,6 +45,8 @@ OBJS	+= mros_exclusive_ops.o
 OBJS	+= mros_exclusive_area.o
 OBJS	+= mros_wait_queue.o
 OBJS	+= mros_packet_cimpl.o
+OBJS	+= mros_packet_encoder_cimpl.o
+OBJS	+= mros_packet_decoder_cimpl.o
 
 %.o: %.c
 	$(CC) -c $(IFLAGS) $(CFLAGS) $<

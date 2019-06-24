@@ -1,6 +1,10 @@
 #ifndef _MROS_PACKET_CIMPL_H_
 #define _MROS_PACKET_CIMPL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mros_types.h"
 #include "mros_config.h"
 
@@ -20,18 +24,8 @@ typedef struct {
 	char							 	data[MROS_PACKET_MAXSIZE];
 } mRosPacketType;
 
-/*************************************
- * Encoder
- *************************************/
-#define MROS_ENCODE_ARGS_MAX	5
-typedef struct {
-	mRosPacketDataType type;
-	mRosSizeType	args_char;
-	const char* 	argv[MROS_ENCODE_ARGS_MAX];
-	mRosSizeType	args_int;
-	mros_uint32		argi[MROS_ENCODE_ARGS_MAX];
-} mRosEncodeArgType;
-
-extern mRosReturnType mros_packet_encode(mRosEncodeArgType *arg, mRosPacketType *packet);
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MROS_PACKET_CIMPL_H_ */
