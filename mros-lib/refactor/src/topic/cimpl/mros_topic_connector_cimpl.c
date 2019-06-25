@@ -248,24 +248,31 @@ mRosReturnType mros_topic_connector_add_data(mRosContainerObjType obj, const cha
 	if (entry->data.queue_head.entry_num >= entry->data.queue_maxsize) {
 		return MROS_E_LIMIT;
 	}
+	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
+	if (type == ROS_NODE_TYPE_INNER) {
+#if 0
+		//may be direct func call is best...
+		ret = mros_mem_alloc(entry->data.mempool, len, &mem_entryp);
+		if (ret != MROS_E_OK) {
+			return ret;
+		}
 
-	if (entry->data.mempool == NULL) {
-		//TODO 要検討
-		//購読の場合は，キューにつなげるのではなく，
-		//INNER：コールバック関数呼び出し
-		//OUTER:TCP送信
-		//の方がよいと思われる
-		return MROS_E_INVAL;
+		mem_entryp->data.size = len;
+		memcpy(mem_entryp->data.memp, data, mem_entryp->data.size);
+		ListEntry_AddEntry(&entry->data.queue_head, mem_entryp);
+#else
+		mros_topic_callback(data);//TODO no need to change raw data to C++ type based data??
+#endif
+		return MROS_E_OK;
 	}
-
-	ret = mros_mem_alloc(entry->data.mempool, len, &mem_entryp);
-	if (ret != MROS_E_OK) {
-		return ret;
+	//outer node
+	if (entry->data.commp == NULL) {
+		return MROS_E_NOTCONN;
 	}
-
-	mem_entryp->data.size = len;
-	memcpy(mem_entryp->data.memp, data, mem_entryp->data.size);
-	ListEntry_AddEntry(&entry->data.queue_head, mem_entryp);
+	//TODO send topic data to outer node
+	//TODO get packet
+	//TODO encode packet
+	//TODO send
 
 	return MROS_E_OK;
 }
@@ -275,15 +282,24 @@ mRosMemoryListEntryType *mros_topic_connector_get_data(mRosContainerObjType obj)
 	mRosMemoryListEntryType *data;
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 
-	if (entry->data.queue_head.entry_num == 0) {
+	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
+	if (type == ROS_NODE_TYPE_INNER) {
+		if (entry->data.queue_head.entry_num == 0) {
+			return NULL;
+		}
+		ListEntry_GetFirst(&entry->data.queue_head, &data);
+		ListEntry_RemoveEntry(&entry->data.queue_head, data);
+		return data;
+	}
+	//outer node
+	if (entry->data.commp == NULL) {
 		return NULL;
 	}
-	//TODO 要検討
-	//出版の場合は，キューから取り出すのではなく，
-	//OUTER:TCP受信
-	//になるとと思われる
-	ListEntry_GetFirst(&entry->data.queue_head, &data);
-	ListEntry_RemoveEntry(&entry->data.queue_head, data);
+	//TODO judge readable
+	//TODO read header 8bytes
+	//TODO get memory from pool.
+	//TODO read body
+
 	return data;
 }
 
