@@ -19,6 +19,10 @@ extern mRosReturnType mros_packet_decode_message_definition(char* msgdef, mRosPa
 extern mRosReturnType mros_packet_decode_fptr(char* fptr, mRosPacketType *packet);
 extern mRosReturnType mros_packet_decode_req_topic_name(char* topic_name, mRosPacketType *packet);
 
+
+/************************************************
+ * MASTER PACKET
+ ************************************************/
 /*
  * XML response
  */
@@ -38,7 +42,11 @@ extern mRosPtrType mros_packet_get_regsub_first_uri(mRosPacketType *packet, mros
 extern mRosPtrType mros_packet_get_regsub_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port);
 
 
-
+/************************************************
+ * SLAVE PACKET
+ ************************************************/
+extern mros_boolean mros_packet_has_request_end(mRosPacketType *packet);
+extern mRosPacketDataType mros_packet_get_method(mRosPacketType *packet);
 /*
  * RequestTopic response
  */

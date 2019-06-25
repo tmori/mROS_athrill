@@ -60,10 +60,12 @@ MROS_MEMORY_CONFIG_DECLARE_MANAGER(ros_outer_topic_publisher_mempool, ROS_OUTER_
 
 mRosReturnType mros_protocol_subscribe_init(void)
 {
+	mRosReturnType ret;
 	mros_protocol_subscribe.tcpros_packet.data = &mros_subscribe_packet_tcpros_buffer.buffer;
 	mros_protocol_subscribe.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
 	mros_protocol_subscribe.pub_mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_PUB);
-	return MROS_E_OK;
+	ret = mros_mem_init(ROS_OUTER_TOPIC_PUBLISHER_CONFIG_NUM, ros_outer_topic_publisher_config, &ros_outer_topic_publisher_mempool);
+	return ret;
 }
 
 void mros_protocol_subscribe_run(void)
@@ -88,6 +90,18 @@ void mros_protocol_subscribe_run(void)
 			continue;
 		}
 		client_req = (mRosCommTcpClientListReqEntryType*)wait_entry->data.reqp;
+		connector.topic_id = client_req->data.reqobj.topic_id;
+		connector.func_id = (mRosFuncIdType)MROS_ID_NONE;
+		ret = mros_node_create_outer(&connector.node_id);
+		if (ret != MROS_E_OK) {
+			//TODO ERR LOG
+			continue;
+		}
+		ret = mros_topic_connector_add(mros_protocol_subscribe.pub_mgrp, &connector, MROS_OUTER_CONNECTOR_QUEUE_MAXLEN, ros_outer_topic_publisher_mempool);
+		if (ret != MROS_E_OK) {
+			//TODO ERR LOG
+			continue;
+		}
 
 		ret = mros_comm_tcp_client_ip32_init(&client_req->data.client, client_req->data.reqobj.ipaddr, client_req->data.reqobj.port);
 		if (ret != MROS_E_OK) {
@@ -109,18 +123,6 @@ void mros_protocol_subscribe_run(void)
 			continue;
 		}
 
-		connector.topic_id = client_req->data.reqobj.topic_id;
-		connector.func_id = (mRosFuncIdType)MROS_ID_NONE;
-		ret = mros_node_create_outer(&connector.node_id);
-		if (ret != MROS_E_OK) {
-			//TODO ERR LOG
-			continue;
-		}
-		ret = mros_topic_connector_add(mros_protocol_subscribe.pub_mgrp, &connector, MROS_OUTER_CONNECTOR_QUEUE_MAXLEN, ros_outer_topic_publisher_config);
-		if (ret != MROS_E_OK) {
-			//TODO ERR LOG
-			continue;
-		}
 		cobj = mros_topic_connector_get_obj(mros_protocol_subscribe.pub_mgrp, &connector);
 		ret = mros_topic_connector_set_connection(cobj, client_req);
 		if (ret != MROS_E_OK) {

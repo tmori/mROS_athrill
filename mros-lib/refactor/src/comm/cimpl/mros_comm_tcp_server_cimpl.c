@@ -1,6 +1,6 @@
 #include "mros_comm_tcp_server_cimpl.h"
 
-mRosReturnType mros_comm_tcp_servert_init(mRosCommTcpServerType *server)
+mRosReturnType mros_comm_tcp_server_init(mRosCommTcpServerType *server)
 {
 	return mros_comm_socket_init(&server->socket, MROS_COMM_SOCKET_TYPE_TCP);
 }

@@ -1,7 +1,7 @@
 #include "mros_comm_target.h"
 #include <string.h>
 #include <stdio.h>
-#include "../../mros_comm_cimpl.h"
+#include "mros_comm_cimpl.h"
 
 void mros_comm_inet_local_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port)
 {
@@ -25,6 +25,8 @@ void mros_comm_inet_remote_sockaddr_init(mRosSockAddrInType *addr, mros_int32 po
 			(mros_uint8*)&addr_array[1],
 			(mros_uint8*)&addr_array[2],
 			(mros_uint8*)&addr_array[3]);
+
+    //TODO host entry
 
     memcpy((void*)&addr->sin_addr.s_addr, (void*)&addr_array, 4U);
 	return;

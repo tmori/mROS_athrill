@@ -35,14 +35,14 @@ static mRosFmtType mros_tcpros_sub_fmt;
 
 mRosReturnType mros_packet_encoder_init(void)
 {
-	mros_xml_fmt_table[MROS_PACKET_DATA_REGISTER_PUBLISHER].fmt = MROS_PACKET_FMT_XML_REGISTER;
-	mros_xml_fmt_table[MROS_PACKET_DATA_REGISTER_PUBLISHER].len = strlen(MROS_PACKET_FMT_XML_REGISTER) + 1;
+	mros_xml_fmt_table[MROS_PACKET_DATA_REGISTER_PUBLISHER_REQ].fmt = MROS_PACKET_FMT_XML_REGISTER;
+	mros_xml_fmt_table[MROS_PACKET_DATA_REGISTER_PUBLISHER_REQ].len = strlen(MROS_PACKET_FMT_XML_REGISTER) + 1;
 
-	mros_xml_fmt_table[MROS_PACKET_DATA_REGISTER_SUBSCRIBER].fmt = MROS_PACKET_FMT_XML_REGISTER;
-	mros_xml_fmt_table[MROS_PACKET_DATA_REGISTER_SUBSCRIBER].len = strlen(MROS_PACKET_FMT_XML_REGISTER) + 1;
+	mros_xml_fmt_table[MROS_PACKET_DATA_REGISTER_SUBSCRIBER_REQ].fmt = MROS_PACKET_FMT_XML_REGISTER;
+	mros_xml_fmt_table[MROS_PACKET_DATA_REGISTER_SUBSCRIBER_REQ].len = strlen(MROS_PACKET_FMT_XML_REGISTER) + 1;
 
-	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC].fmt = MROS_PACKET_FMT_XML_REQUEST;
-	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC].len = strlen(MROS_PACKET_FMT_XML_REQUEST) + 1;
+	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_REQ].fmt = MROS_PACKET_FMT_XML_REQUEST;
+	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_REQ].len = strlen(MROS_PACKET_FMT_XML_REQUEST) + 1;
 
 	mros_http_post_fmt.fmt = MROS_PACKET_FMT_HTTP_POST;
 	mros_http_post_fmt.len = strlen(MROS_PACKET_FMT_HTTP_POST) + 1;
