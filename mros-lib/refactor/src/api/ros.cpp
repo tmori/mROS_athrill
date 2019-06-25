@@ -192,7 +192,7 @@ void Publisher::publish(std_msgs::String& data)
 	mRosReturnType ret;
 	const char *snd_data = data.data.c_str();
 	mRosSizeType len = strlen(snd_data) + 1U;
-	ret = mros_topic_connector_add_data(this->get(), snd_data, len);
+	ret = mros_topic_connector_put_data(this->get(), snd_data, len);
 	if (ret != MROS_E_OK) {
 		//TODO ERROR LOG
 		return;

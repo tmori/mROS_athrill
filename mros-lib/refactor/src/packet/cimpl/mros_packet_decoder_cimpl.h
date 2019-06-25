@@ -46,6 +46,10 @@ extern mRosReturnType mros_packet_get_reqtopic_result(mRosPacketType *packet);
 extern mRosPtrType mros_packet_get_reqtopic_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port);
 extern mRosPtrType mros_packet_get_reqtopic_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port);
 
+/*
+ * TOPIC DATA
+ */
+extern mRosReturnType mros_packet_get_body_size(mRosPacketType *packet, mRosSizeType *len);
 
 #ifdef __cplusplus
 }

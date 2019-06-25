@@ -20,7 +20,7 @@ static void mros_topic_publish(mRosTopicConnectorManagerType *mgrp, mRosContaine
 		return;
 	}
 	while (obj != MROS_COBJ_NULL) {
-		topic_data = mros_topic_connector_get_data(obj);
+		topic_data = mros_topic_connector_receive_data(obj);
 		if (topic_data == NULL) {
 			continue;
 		}

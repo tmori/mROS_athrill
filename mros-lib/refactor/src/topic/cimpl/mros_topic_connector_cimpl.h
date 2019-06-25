@@ -76,8 +76,9 @@ extern mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mg
 extern mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector);
 
 
-extern mRosReturnType mros_topic_connector_add_data(mRosContainerObjType obj, const char *data, mRosSizeType len);
-extern mRosMemoryListEntryType *mros_topic_connector_get_data(mRosContainerObjType obj);
+extern mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const char *data, mRosSizeType len);
+extern mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const char *data, mRosSizeType len);
+extern mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerObjType obj);
 
 /*
  * topic connector Config APIs

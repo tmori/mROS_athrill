@@ -102,7 +102,7 @@ mRosReturnType mros_comm_tcp_client_send_all(mRosCommTcpClientType *client, cons
     *res = writtenLen;
 	return MROS_E_OK;
 }
-mRosReturnType mros_comm_tcp_client_receive(mRosCommTcpClientType *client, const char* data, mRosSizeType length, mRosSizeType *res)
+mRosReturnType mros_comm_tcp_client_receive(mRosCommTcpClientType *client, char* data, mRosSizeType length, mRosSizeType *res)
 {
 	mRosReturnType ret;
 	mros_int32 rcv_size;
@@ -125,7 +125,7 @@ mRosReturnType mros_comm_tcp_client_receive(mRosCommTcpClientType *client, const
 	return MROS_E_OK;
 }
 
-mRosReturnType mros_comm_tcp_client_receive_all(mRosCommTcpClientType *client, const char* data, mRosSizeType length, mRosSizeType *res)
+mRosReturnType mros_comm_tcp_client_receive_all(mRosCommTcpClientType *client, char* data, mRosSizeType length, mRosSizeType *res)
 {
 	mRosReturnType ret;
     mros_int32 readLen = 0;

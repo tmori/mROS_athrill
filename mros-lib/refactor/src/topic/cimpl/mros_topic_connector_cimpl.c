@@ -240,48 +240,78 @@ mRosReturnType mros_topic_connector_get_topic(mRosContainerObjType topic_obj, mR
 }
 
 
-mRosReturnType mros_topic_connector_add_data(mRosContainerObjType obj, const char* data, mRosSizeType len)
+mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const char* data, mRosSizeType len)
 {
 	mRosReturnType ret;
 	mRosMemoryListEntryType *mem_entryp;
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
+	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
+	if (type != ROS_NODE_TYPE_INNER) {
+		return MROS_E_INVAL;
+	}
 	if (entry->data.queue_head.entry_num >= entry->data.queue_maxsize) {
 		return MROS_E_LIMIT;
 	}
-	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
-	if (type == ROS_NODE_TYPE_INNER) {
-#if 0
-		//may be direct func call is best...
-		ret = mros_mem_alloc(entry->data.mempool, len, &mem_entryp);
-		if (ret != MROS_E_OK) {
-			return ret;
-		}
-
-		mem_entryp->data.size = len;
-		memcpy(mem_entryp->data.memp, data, mem_entryp->data.size);
-		ListEntry_AddEntry(&entry->data.queue_head, mem_entryp);
-#else
-		mros_topic_callback(data);//TODO no need to change raw data to C++ type based data??
-#endif
-		return MROS_E_OK;
+	ret = mros_mem_alloc(entry->data.mempool, len, &mem_entryp);
+	if (ret != MROS_E_OK) {
+		return ret;
 	}
-	//outer node
-	if (entry->data.commp == NULL) {
-		return MROS_E_NOTCONN;
-	}
-	//TODO send topic data to outer node
-	//TODO get packet
-	//TODO encode packet
-	//TODO send
 
+	mem_entryp->data.size = len;
+	memcpy(mem_entryp->data.memp, data, mem_entryp->data.size);
+	ListEntry_AddEntry(&entry->data.queue_head, mem_entryp);
 	return MROS_E_OK;
 }
 
-mRosMemoryListEntryType *mros_topic_connector_get_data(mRosContainerObjType obj)
+mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const char* data, mRosSizeType len)
 {
-	mRosMemoryListEntryType *data;
+	mRosReturnType ret;
+	mRosPacketType packet;
+	mRosSizeType res;
+	mRosMemoryListEntryType *mem_entryp;
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 
+	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
+	if (type == ROS_NODE_TYPE_INNER) {
+		//TOPIC ==> inner node callback
+		mros_topic_callback(data);//TODO no need to change raw data to C++ type based data??
+		return MROS_E_OK;
+	}
+	//TOPIC ==> outer node
+	if (entry->data.commp == NULL) {
+		return MROS_E_NOTCONN;
+	}
+
+	ret = mros_mem_alloc(entry->data.mempool, len + MROS_TCPROS_HEADER_SIZE, &mem_entryp);
+	if (ret != MROS_E_OK) {
+		return ret;
+	}
+	packet.total_size = mem_entryp->data.memsize;
+	packet.data_size = mem_entryp->data.size;
+	packet.data = mem_entryp->data;
+
+	ret = mros_packet_encode_topic_data(&packet, len);
+	if (ret != MROS_E_OK) {
+		goto done;
+	}
+	ret = mros_comm_tcp_client_send_all(entry->data.commp->data.client.socket, packet.data, packet.data_size, &res);
+
+done:
+	mros_mem_free(entry->data.mempool, mem_entryp);
+	return ret;
+}
+
+mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerObjType obj)
+{
+	mRosPacketType packet;
+	mRosSizeType len;
+	mRosSizeType res;
+	mRosMemoryListEntryType *data;
+	mRosReturnType ret;
+	mros_int8 rawdata[MROS_TCPROS_HEADER_SIZE];
+	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
+
+	//TODO pub 用か sub 用かわけがわからん．．．
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
 	if (type == ROS_NODE_TYPE_INNER) {
 		if (entry->data.queue_head.entry_num == 0) {
@@ -295,11 +325,34 @@ mRosMemoryListEntryType *mros_topic_connector_get_data(mRosContainerObjType obj)
 	if (entry->data.commp == NULL) {
 		return NULL;
 	}
-	//TODO judge readable
-	//TODO read header 8bytes
-	//TODO get memory from pool.
-	//TODO read body
+	ret = mros_comm_socket_wait_readable(&entry->data.commp->data.client.socket, 0);
+	if (ret != MROS_E_OK) {
+		return NULL;
+	}
+	ret = mros_comm_tcp_client_receive_all(&entry->data.commp->data.client.socket, rawdata, MROS_TCPROS_HEADER_SIZE, &res);
+	if (ret != MROS_E_OK) {
+		return NULL;
+	}
+	packet.total_size = MROS_TCPROS_HEADER_SIZE;
+	packet.data_size = MROS_TCPROS_HEADER_SIZE;
+	packet.data = rawdata;
+	ret = mros_packet_get_body_size(&packet, &len);
+	if (ret != MROS_E_OK) {
+		return NULL;
+	}
 
+	ret = mros_mem_alloc(entry->data.mempool, len, &data);
+	if (ret != MROS_E_OK) {
+		return ret;
+	}
+	packet.total_size = len;
+	packet.data_size = len;
+	packet.data = data->data.memp;
+
+	ret = mros_comm_tcp_client_receive_all(&entry->data.commp->data.client.socket, packet.data, len, &res);
+	if (ret != MROS_E_OK) {
+		return NULL;
+	}
 	return data;
 }
 

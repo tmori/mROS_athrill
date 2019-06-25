@@ -21,8 +21,8 @@ extern mRosReturnType mros_comm_tcp_client_connect_ip32(mRosCommTcpClientType *c
 extern mros_boolean mros_comm_tcp_client_is_connected(mRosCommTcpClientType *client);
 extern mRosReturnType mros_comm_tcp_client_send(mRosCommTcpClientType *client, const char* data, mRosSizeType length, mRosSizeType *res);
 extern mRosReturnType mros_comm_tcp_client_send_all(mRosCommTcpClientType *client, const char* data, mRosSizeType length, mRosSizeType *res);
-extern mRosReturnType mros_comm_tcp_client_receive(mRosCommTcpClientType *client, const char* data, mRosSizeType length, mRosSizeType *res);
-extern mRosReturnType mros_comm_tcp_client_receive_all(mRosCommTcpClientType *client, const char* data, mRosSizeType length, mRosSizeType *res);
+extern mRosReturnType mros_comm_tcp_client_receive(mRosCommTcpClientType *client, char* data, mRosSizeType length, mRosSizeType *res);
+extern mRosReturnType mros_comm_tcp_client_receive_all(mRosCommTcpClientType *client, char* data, mRosSizeType length, mRosSizeType *res);
 
 
 #ifdef __cplusplus

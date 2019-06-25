@@ -26,7 +26,7 @@ static void mros_topic_subscribe(mRosTopicConnectorManagerType *mgrp, mRosContai
 	}
 
 	while (obj != MROS_COBJ_NULL) {
-		ret = mros_topic_connector_add_data(obj, topic_data->data.memp, topic_data->data.size);
+		ret = mros_topic_connector_send_data(obj, topic_data->data.memp, topic_data->data.size);
 		if (ret != MROS_E_OK) {
 			//TOODO ERROR LOG
 			continue;

@@ -79,6 +79,9 @@
 
 #define MROS_OUTER_CONNECTOR_QUEUE_MAXLEN				1
 
+
+#define MROS_TCPROS_HEADER_SIZE							8
+
 #endif /* _MROS_CONFIG_H_ */
 
 
