@@ -19,6 +19,33 @@ extern mRosReturnType mros_packet_decode_message_definition(char* msgdef, mRosPa
 extern mRosReturnType mros_packet_decode_fptr(char* fptr, mRosPacketType *packet);
 extern mRosReturnType mros_packet_decode_req_topic_name(char* topic_name, mRosPacketType *packet);
 
+/*
+ * XML response
+ */
+extern mros_boolean mros_packet_has_response_end(mRosPacketType *packet);
+
+/*
+ * ReigsterPublish response
+ */
+extern mRosReturnType mros_packet_get_regpub_result(mRosPacketType *packet);
+
+
+/*
+ * ReigsterSubscribe response
+ */
+extern mRosReturnType mros_packet_get_regsub_result(mRosPacketType *packet);
+extern mRosPtrType mros_packet_get_regsub_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port);
+extern mRosPtrType mros_packet_get_regsub_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port);
+
+
+
+/*
+ * RequestTopic response
+ */
+extern mRosReturnType mros_packet_get_reqtopic_result(mRosPacketType *packet);
+extern mRosPtrType mros_packet_get_reqtopic_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port);
+extern mRosPtrType mros_packet_get_reqtopic_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port);
+
 
 #ifdef __cplusplus
 }

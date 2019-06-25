@@ -1,27 +1,47 @@
 #include "mros_comm_tcp_client_cimpl.h"
 
-mRosReturnType mros_comm_tcp_client_init(mRosCommTcpClientType *client)
+mRosReturnType mros_comm_tcp_client_init(mRosCommTcpClientType *client, const char* host, mros_int32 port)
 {
 	client->connected = MROS_FALSE;
-	return mros_comm_socket_open(&client->socket, MROS_COMM_SOCKET_TYPE_TCP);
+	mros_comm_inet_remote_sockaddr_init(&client->remote, port, host);
+	return mros_comm_socket_init(&client->socket, MROS_COMM_SOCKET_TYPE_TCP);
+}
+mRosReturnType mros_comm_tcp_client_ip32_init(mRosCommTcpClientType *client, mros_uint32 ipaddr, mros_int32 port)
+{
+	client->connected = MROS_FALSE;
+	mros_comm_inet_remote_sockaddr_ip32_init(&client->remote, port, ipaddr);
+	return mros_comm_socket_init(&client->socket, MROS_COMM_SOCKET_TYPE_TCP);
 }
 
+void mros_comm_tcp_client_close(mRosCommTcpClientType *client)
+{
+	client->connected = MROS_FALSE;
+	mros_comm_socket_close(&client->socket);
+	return;
+}
 
-mRosReturnType mros_comm_tcp_client_connect(mRosCommTcpClientType *client, const char* host, mros_int32 port)
+mRosReturnType mros_comm_tcp_client_connect(mRosCommTcpClientType *client)
 {
 	mRosReturnType ret;
-	mRosSockAddrInType addr;
 
-	mros_comm_inet_remote_sockaddr_init(&addr, port, host);
-
-	ret = mros_comm_connect(client->socket.sock_fd, (const struct mRosSockAddr *)&addr, sizeof(mRosSockAddrInType));
+	if (client->connected == MROS_TRUE) {
+		return MROS_E_INVAL;
+	}
+	ret = mros_comm_socket_open(&client->socket);
 	if (ret != MROS_E_OK) {
-		(void)mros_comm_socket_close(client->socket.sock_fd);
 		return MROS_E_SYSERR;
+	}
+
+	ret = mros_comm_connect(client->socket.sock_fd, (const struct mRosSockAddr *)&client->remote, sizeof(mRosSockAddrInType));
+	if (ret != MROS_E_OK) {
+		mros_comm_socket_close(&client->socket);
+		return MROS_E_NOTCONN;
 	}
 	client->connected = MROS_TRUE;
 	return MROS_E_OK;
 }
+
+
 
 mros_boolean mros_comm_tcp_client_is_connected(mRosCommTcpClientType *client)
 {
@@ -44,7 +64,6 @@ mRosReturnType mros_comm_tcp_client_send(mRosCommTcpClientType *client, const ch
     }
     snd_size = mros_comm_send(client->socket.sock_fd, data, length, 0);
     if (snd_size == 0) {
-		(void)mros_comm_socket_close(client->socket.sock_fd);
 		client->connected = MROS_FALSE;
     }
     *res = snd_size;
@@ -72,7 +91,6 @@ mRosReturnType mros_comm_tcp_client_send_all(mRosCommTcpClientType *client, cons
             writtenLen += retlen;
             continue;
         } else if (retlen == 0) {
-    		(void)mros_comm_socket_close(client->socket.sock_fd);
     		client->connected = MROS_FALSE;
             *res = writtenLen;
             return MROS_E_SYSERR;
@@ -100,7 +118,6 @@ mRosReturnType mros_comm_tcp_client_receive(mRosCommTcpClientType *client, const
     }
     rcv_size = mros_comm_recv(client->socket.sock_fd, data, length, 0);
     if (rcv_size == 0) {
-		(void)mros_comm_socket_close(client->socket.sock_fd);
 		client->connected = MROS_FALSE;
     }
     *res = rcv_size;
@@ -129,7 +146,6 @@ mRosReturnType mros_comm_tcp_client_receive_all(mRosCommTcpClientType *client, c
         	readLen += retlen;
             continue;
         } else if (retlen == 0) {
-    		(void)mros_comm_socket_close(client->socket.sock_fd);
     		client->connected = MROS_FALSE;
             *res = readLen;
             return MROS_E_SYSERR;

@@ -2,7 +2,7 @@
 
 mRosReturnType mros_comm_tcp_servert_init(mRosCommTcpServerType *server)
 {
-	return mros_comm_socket_open(&server->socket, MROS_COMM_SOCKET_TYPE_TCP);
+	return mros_comm_socket_init(&server->socket, MROS_COMM_SOCKET_TYPE_TCP);
 }
 
 mRosReturnType mros_comm_tcp_server_bind(mRosCommTcpServerType *server, mros_int32 port)
@@ -13,7 +13,6 @@ mRosReturnType mros_comm_tcp_server_bind(mRosCommTcpServerType *server, mros_int
     mros_comm_inet_local_sockaddr_init(&addr, port);
     ret = mros_comm_bind(server->socket.sock_fd, &addr, sizeof(mRosSockAddrInType));
 	if (ret != MROS_E_OK) {
-		(void)mros_comm_socket_close(server->socket.sock_fd);
 		return MROS_E_SYSERR;
 	}
 	return MROS_E_OK;
@@ -27,7 +26,6 @@ mRosReturnType mros_comm_tcp_server_listen(mRosCommTcpServerType *server, mros_i
 
     ret = mros_comm_listen(server->socket.sock_fd, max);
     if (ret != MROS_E_OK) {
-		(void)mros_comm_socket_close(server->socket.sock_fd);
 		return MROS_E_SYSERR;
     }
 	return MROS_E_OK;

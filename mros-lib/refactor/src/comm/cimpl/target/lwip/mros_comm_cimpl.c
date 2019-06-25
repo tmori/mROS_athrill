@@ -29,6 +29,15 @@ void mros_comm_inet_remote_sockaddr_init(mRosSockAddrInType *addr, mros_int32 po
     memcpy((void*)&addr->sin_addr.s_addr, (void*)&addr_array, 4U);
 	return;
 }
+void mros_comm_inet_remote_sockaddr_ip32_init(mRosSockAddrInType *addr, mros_int32 port, mros_uint32 ipaddr)
+{
+    memset(addr, 0, sizeof(mRosSockAddrInType));
+
+    addr->sin_family = AF_INET;
+    addr->sin_port = htons(port);
+    memcpy((void*)&addr->sin_addr.s_addr, (void*)&ipaddr, 4U);
+	return;
+}
 
 void mros_comm_timeval_set(mros_uint32 sec, mros_uint32 usec, mRosTimeValType *tv)
 {

@@ -93,15 +93,23 @@ mRosNodeEnumType mros_node_type(mRosNodeIdType id)
 static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType task_id, mRosNodeEnumType type, mRosNodeIdType *id)
 {
 	mRosNodeListEntryType *p;
+	mros_uint32 len = 0;
+	mRosReturnType ret;
 
 	if (type >= ROS_NODE_TYPE_NUM) {
 		return MROS_E_RANGE;
 	}
-	mRosReturnType ret = mros_node_get_byname(node_name, id);
-	if (ret == MROS_E_OK) {
-		return MROS_E_EXIST;
+
+	if (node_name != NULL) {
+		ret = mros_node_get_byname(node_name, id);
+		if (ret == MROS_E_OK) {
+			return MROS_E_EXIST;
+		}
+		len = strlen(node_name);
 	}
-	mros_uint32 len = strlen(node_name);
+	else {
+		/* outer node */
+	}
 
 	ListEntry_Alloc(&node_manager[type].head, mRosNodeListEntryType, &p);
 	if (p == NULL) {
@@ -121,9 +129,9 @@ mRosReturnType mros_node_create_inner(const char *node_name, mRosNodeIdType *id)
 	return mros_node_create(node_name, task_id, ROS_NODE_TYPE_INNER, id);
 }
 
-mRosReturnType mros_node_create_outer(const char *node_name, mRosNodeIdType *id)
+mRosReturnType mros_node_create_outer(mRosNodeIdType *id)
 {
-	return mros_node_create(node_name, MROS_TASKID_NONE, ROS_NODE_TYPE_OUTER, id);
+	return mros_node_create(NULL, MROS_TASKID_NONE, ROS_NODE_TYPE_OUTER, id);
 }
 
 mRosReturnType mros_node_remove(mRosNodeIdType id)

@@ -11,6 +11,7 @@ typedef struct {
 	mros_int32		sock_fd;
 	mros_uint32		timeout;
 	mros_boolean	blocking;
+	mros_int32		comm_type;
 } mRosCommSocketType;
 
 static inline void mros_comm_set_timeval(mros_uint32 tmo_msec, mRosTimeValType *tv)
@@ -29,8 +30,9 @@ typedef enum {
 
 #define MROS_COMM_DEFAULT_TIMEOUT		1500
 
-extern mRosReturnType mros_comm_socket_open(mRosCommSocketType *socket, mRosCommSocketEnumType type);
-extern mRosReturnType mros_comm_socket_close(mRosCommSocketType *socket);
+extern mRosReturnType mros_comm_socket_init(mRosCommSocketType *socket, mRosCommSocketEnumType type);
+extern mRosReturnType mros_comm_socket_open(mRosCommSocketType *socket);
+extern void mros_comm_socket_close(mRosCommSocketType *socket);
 extern mRosReturnType mros_comm_socket_set_blocking(mRosCommSocketType *socket, mros_boolean blocking, mros_uint32 timeout);
 
 extern mRosReturnType mros_comm_socket_wait_readable(mRosCommSocketType *socket, mros_uint32 timeout);

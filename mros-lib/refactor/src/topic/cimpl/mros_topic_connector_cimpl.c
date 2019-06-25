@@ -11,7 +11,6 @@ mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, m
 	for (mros_uint32 i = 0; i < mgrp->max_connector; i++) {
 		mRosTopicConnectorListEntryType *entry = &(mgrp->conn_entries[i]);
 		MROS_TOPIC_CONNECTOR_ENTRY_INIT(entry);
-		entry->data.connector_id = MROS_ID(i);
 		List_InitEmpty(&entry->data.queue_head, mRosMemoryListEntryType);
 	}
 
@@ -146,6 +145,7 @@ mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRo
 			entry->data.value.func_id = connector->func_id;
 			entry->data.queue_maxsize = queue_length;
 			entry->data.mempool = mempool;
+			entry->data.commp = NULL;
 			List_InitEmpty(&entry->data.queue_head, mRosMemoryListEntryType);
 			ListEntry_AddEntry(&topic_p->data.head, entry);
 		}
@@ -187,6 +187,21 @@ mRosReturnType mros_topic_connector_get(mRosContainerObjType obj, mRosTopicConne
 	*connector = entry->data.value;
 	return MROS_E_OK;
 }
+
+mRosReturnType mros_topic_connector_get_connection(mRosContainerObjType obj, mRosCommTcpClientListEntryType **connection)
+{
+	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
+	*connection = &entry->data.commp;
+	return MROS_E_OK;
+}
+
+mRosReturnType mros_topic_connector_set_connection(mRosContainerObjType obj, mRosCommTcpClientListEntryType *connection)
+{
+	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
+	entry->data.commp = connection;
+	return MROS_E_OK;
+}
+
 
 mRosContainerObjType mros_topic_connector_get_obj(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector)
 {

@@ -2,37 +2,37 @@
 #include "mros_comm_cimpl.h"
 #include <stdlib.h>
 
-mRosReturnType mros_comm_socket_open(mRosCommSocketType *socket, mRosCommSocketEnumType type)
+mRosReturnType mros_comm_socket_init(mRosCommSocketType *socket, mRosCommSocketEnumType type)
 {
-	mros_int32 mros_type;
-
-	if (socket->sock_fd < 0) {
-		return MROS_E_INVAL;
-	}
 	switch (type) {
 	case MROS_COMM_SOCKET_TYPE_TCP:
-		mros_type = MROS_SOCK_STREAM;
+		socket->comm_type = MROS_SOCK_STREAM;
 		break;
 	case MROS_COMM_SOCKET_TYPE_UDP:
-		mros_type = MROS_SOCK_DGRAM;
+		socket->comm_type = MROS_SOCK_DGRAM;
 		break;
 	default:
 		return MROS_E_INVAL;
 	}
-	socket->sock_fd = mros_comm_socket(MROS_SOCK_AF_INET, mros_type, 0);
-    if (socket->sock_fd < 0) {
-    	return MROS_E_INVAL;
-    }
     socket->blocking = MROS_TRUE;
     socket->timeout = MROS_COMM_DEFAULT_TIMEOUT;
 	return MROS_E_OK;
 }
 
-mRosReturnType mros_comm_socket_close(mRosCommSocketType *socket)
+mRosReturnType mros_comm_socket_open(mRosCommSocketType *socket)
+{
+	socket->sock_fd = mros_comm_socket(MROS_SOCK_AF_INET, socket->comm_type, 0);
+    if (socket->sock_fd < 0) {
+    	return MROS_E_INVAL;
+    }
+	return MROS_E_OK;
+}
+
+void mros_comm_socket_close(mRosCommSocketType *socket)
 {
 	mros_comm_close(socket->sock_fd);
 	socket->sock_fd = -1;
-	return MROS_E_OK;
+	return;
 }
 
 static mRosReturnType mros_comm_secket_select(mRosCommSocketType *socket, mros_uint32 timeout, mros_boolean read, mros_boolean write) {

@@ -21,7 +21,7 @@ typedef enum {
 typedef struct {
 	mRosSizeType						total_size;
 	mRosSizeType						data_size;
-	char							 	data[MROS_PACKET_MAXSIZE];
+	char							 	*data;
 } mRosPacketType;
 
 #ifdef __cplusplus

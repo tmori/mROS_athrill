@@ -12,7 +12,7 @@
 
 
 /**************************************
- * TPIC CONNECTOR
+ * TOPIC CONNECTOR
  **************************************/
 /*
  * num of max publish topic connectors
@@ -42,6 +42,10 @@
  * portno of master
  */
 #define MROS_MASTER_PORT_NO						1131
+/*
+ * ipaddr of master
+ */
+#define MROS_MASTER_IPADDR						"0.0.0.0"
 
 /*
  * portno of slave
@@ -53,10 +57,22 @@
  */
 #define MROS_PUBLISHER_PORT_NO					1151
 
-#define MROS_PACKET_MAXSIZE						512
-
 #define MROS_IPADDR								"0.0.0.0"
 #define MROS_URI_SLAVE							"http://0.0.0.0/1141"
+
+
+#define MROS_TOPIC_TCP_CLIENT_MAX_NUM			10
+
+/**************************************
+ * PACKET
+ **************************************/
+#define MROS_PACKET_MAXSIZE_REQ_REGISTER_PUBLISHER		512
+#define MROS_PACKET_MAXSIZE_RES_REGISTER_PUBLISHER		512
+#define MROS_PACKET_MAXSIZE_REQ_REGISTER_SUBSCRIBER		512
+#define MROS_PACKET_MAXSIZE_RES_REGISTER_SUBSCRIBER		512
+#define MROS_PACKET_MAXSIZE_REQ_REQUEST_TOPIC			512
+#define MROS_PACKET_MAXSIZE_RES_REQUEST_TOPIC			512
+
 #endif /* _MROS_CONFIG_H_ */
 
 

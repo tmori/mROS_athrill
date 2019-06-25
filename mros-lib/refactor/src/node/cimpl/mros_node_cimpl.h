@@ -42,7 +42,7 @@ extern mRosReturnType mros_node_get_bytid(mRosNodeIdType *id);
 extern mRosNodeEnumType mros_node_type(mRosNodeIdType id);
 
 extern mRosReturnType mros_node_create_inner(const char *node_name, mRosNodeIdType *id);
-extern mRosReturnType mros_node_create_outer(const char *node_name, mRosNodeIdType *id);
+extern mRosReturnType mros_node_create_outer(mRosNodeIdType *id);
 
 extern mRosReturnType mros_node_remove(mRosNodeIdType id);
 
