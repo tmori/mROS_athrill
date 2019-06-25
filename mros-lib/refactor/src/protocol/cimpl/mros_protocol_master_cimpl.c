@@ -8,6 +8,8 @@
 #include "mros_wait_queue.h"
 #include "mros_comm_tcp_client_cimpl.h"
 #include "mros_packet_decoder_cimpl.h"
+#include "mros_protocol_operation_cimpl.h"
+
 #include <stdlib.h>
 
 typedef union {
@@ -183,6 +185,9 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 		req->data.reqobj.ipaddr = ipaddr;
 		req->data.reqobj.port = port;
 		req->data.reqobj.topic_id = connector.topic_id;
+		req->data.op.free = mros_protocol_client_obj_free;
+		req->data.op.topic_data_receive = mros_protocol_topic_data_receive;
+		req->data.op.topic_data_send = mros_protocol_topic_data_send;
 		mros_client_wait_entry_init(&req->data.reqobj.waitobj, req);
 
 		mros_exclusive_lock(&mros_subscribe_exclusive_area);

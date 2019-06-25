@@ -178,6 +178,10 @@ mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, 
 	if (topic_entryp->data.head.entry_num == 0) {
 		ListEntry_RemoveEntry(&mgrp->topic_head, topic_entryp);
 	}
+	if (entryp->data.commp != NULL) {
+		entryp->data.commp->data.op.free(entryp->data.commp);
+		entryp->data.commp = NULL;
+	}
 	return MROS_E_OK;
 }
 
@@ -265,10 +269,6 @@ mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const cha
 
 mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const char* data, mRosSizeType len)
 {
-	mRosReturnType ret;
-	mRosPacketType packet;
-	mRosSizeType res;
-	mRosMemoryListEntryType *mem_entryp;
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
@@ -281,37 +281,14 @@ mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const ch
 	if (entry->data.commp == NULL) {
 		return MROS_E_NOTCONN;
 	}
-
-	ret = mros_mem_alloc(entry->data.mempool, len + MROS_TCPROS_HEADER_SIZE, &mem_entryp);
-	if (ret != MROS_E_OK) {
-		return ret;
-	}
-	packet.total_size = mem_entryp->data.memsize;
-	packet.data_size = mem_entryp->data.size;
-	packet.data = mem_entryp->data;
-
-	ret = mros_packet_encode_topic_data(&packet, len);
-	if (ret != MROS_E_OK) {
-		goto done;
-	}
-	ret = mros_comm_tcp_client_send_all(entry->data.commp->data.client.socket, packet.data, packet.data_size, &res);
-
-done:
-	mros_mem_free(entry->data.mempool, mem_entryp);
-	return ret;
+	return entry->data.commp->data.op.topic_data_send(&entry->data.commp->data.client, entry->data.mempool, data, len);
 }
 
 mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerObjType obj)
 {
-	mRosPacketType packet;
-	mRosSizeType len;
-	mRosSizeType res;
 	mRosMemoryListEntryType *data;
-	mRosReturnType ret;
-	mros_int8 rawdata[MROS_TCPROS_HEADER_SIZE];
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 
-	//TODO pub 用か sub 用かわけがわからん．．．
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
 	if (type == ROS_NODE_TYPE_INNER) {
 		if (entry->data.queue_head.entry_num == 0) {
@@ -325,34 +302,6 @@ mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerObjType 
 	if (entry->data.commp == NULL) {
 		return NULL;
 	}
-	ret = mros_comm_socket_wait_readable(&entry->data.commp->data.client.socket, 0);
-	if (ret != MROS_E_OK) {
-		return NULL;
-	}
-	ret = mros_comm_tcp_client_receive_all(&entry->data.commp->data.client.socket, rawdata, MROS_TCPROS_HEADER_SIZE, &res);
-	if (ret != MROS_E_OK) {
-		return NULL;
-	}
-	packet.total_size = MROS_TCPROS_HEADER_SIZE;
-	packet.data_size = MROS_TCPROS_HEADER_SIZE;
-	packet.data = rawdata;
-	ret = mros_packet_get_body_size(&packet, &len);
-	if (ret != MROS_E_OK) {
-		return NULL;
-	}
-
-	ret = mros_mem_alloc(entry->data.mempool, len, &data);
-	if (ret != MROS_E_OK) {
-		return ret;
-	}
-	packet.total_size = len;
-	packet.data_size = len;
-	packet.data = data->data.memp;
-
-	ret = mros_comm_tcp_client_receive_all(&entry->data.commp->data.client.socket, packet.data, len, &res);
-	if (ret != MROS_E_OK) {
-		return NULL;
-	}
-	return data;
+	return entry->data.commp->data.op.topic_data_receive(&entry->data.commp->data.client, entry->data.mempool);
 }
 

@@ -23,7 +23,7 @@ extern mRosReturnType mros_packet_encoder_init(void);
 extern mRosReturnType mros_packet_encode(mRosEncodeArgType *arg, mRosPacketType *packet);
 
 //TODO
-extern mRosReturnType mros_packet_encode_topic_data(mRosPacketType *packet, mros_uint32 len);
+extern mRosReturnType mros_packet_encode_topic_data(mRosPacketType *packet, const char* data, mros_uint32 len);
 #ifdef __cplusplus
 }
 #endif
