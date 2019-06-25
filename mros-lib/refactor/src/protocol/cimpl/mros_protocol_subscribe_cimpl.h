@@ -6,12 +6,13 @@ extern "C" {
 #endif
 
 #include "mros_types.h"
+#include "mros_comm_tcp_client_factory_cimpl.h"
 
 typedef enum {
 	MROS_PROTOCOL_SUBSCRIBE_STATE_WAITING = 0,
-	MROS_PROTOCOL_SUBSCRIBE_STATE_STARTING_PUBLISH_TOPIC,
-} mRosProtocolPublishStateEnumType;
-
+	MROS_PROTOCOL_SUBSCRIBE_STATE_PUB_CONNECTING,
+	MROS_PROTOCOL_SUBSCRIBE_STATE_PUB_REQUESTING,
+} mRosProtocolSubscribeStateEnumType;
 
 extern mRosReturnType mros_protocol_subscribe_init(void);
 extern void mros_protocol_subscribe_run(void);

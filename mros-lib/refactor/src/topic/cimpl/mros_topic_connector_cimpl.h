@@ -20,7 +20,7 @@ typedef struct {
 	mRosSizeType						queue_maxsize;
 	mRosMemoryListHeadType 				queue_head;
 	mRosMemoryManagerType				*mempool;
-	mRosCommTcpClientListEntryType		*commp;
+	mRosCommTcpClientListReqEntryType	*commp;
 } mRosTopicConnectorEntryType;
 typedef ListEntryType(mRosTopicConnectorListEntryType, mRosTopicConnectorEntryType) mRosTopicConnectorListEntryType;
 typedef ListHeadType(mRosTopicConnectorListEntryType) mRosTopicConnectorListHeadType;
@@ -69,8 +69,8 @@ extern mRosReturnType mros_topic_connector_get_topic(mRosContainerObjType topic_
 extern mRosReturnType mros_topic_connector_get(mRosContainerObjType obj, mRosTopicConnectorType *connector);
 extern mRosContainerObjType mros_topic_connector_get_obj(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector);
 
-extern mRosReturnType mros_topic_connector_get_connection(mRosContainerObjType obj, mRosCommTcpClientListEntryType **connection);
-extern mRosReturnType mros_topic_connector_set_connection(mRosContainerObjType obj, mRosCommTcpClientListEntryType *connection);
+extern mRosReturnType mros_topic_connector_get_connection(mRosContainerObjType obj, mRosCommTcpClientListReqEntryType **connection);
+extern mRosReturnType mros_topic_connector_set_connection(mRosContainerObjType obj, mRosCommTcpClientListReqEntryType *connection);
 
 extern mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector, mRosSizeType queue_length, mRosMemoryManagerType *mempool);
 extern mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector);

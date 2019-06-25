@@ -188,14 +188,14 @@ mRosReturnType mros_topic_connector_get(mRosContainerObjType obj, mRosTopicConne
 	return MROS_E_OK;
 }
 
-mRosReturnType mros_topic_connector_get_connection(mRosContainerObjType obj, mRosCommTcpClientListEntryType **connection)
+mRosReturnType mros_topic_connector_get_connection(mRosContainerObjType obj, mRosCommTcpClientListReqEntryType **connection)
 {
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 	*connection = &entry->data.commp;
 	return MROS_E_OK;
 }
 
-mRosReturnType mros_topic_connector_set_connection(mRosContainerObjType obj, mRosCommTcpClientListEntryType *connection)
+mRosReturnType mros_topic_connector_set_connection(mRosContainerObjType obj, mRosCommTcpClientListReqEntryType *connection)
 {
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 	entry->data.commp = connection;

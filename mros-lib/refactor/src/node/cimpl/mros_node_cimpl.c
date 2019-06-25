@@ -103,7 +103,7 @@ static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType tas
 	if (node_name != NULL) {
 		ret = mros_node_get_byname(node_name, id);
 		if (ret == MROS_E_OK) {
-			return MROS_E_EXIST;
+			return MROS_E_OK;
 		}
 		len = strlen(node_name);
 	}

@@ -37,6 +37,19 @@ typedef struct {
 } mRosRequestTopicResType;
 extern mRosReturnType mros_rpc_request_topic(mRosCommTcpClientType *client, mRosRequestTopicReqType *req, mRosRequestTopicResType *res);
 
+typedef struct {
+	mRosNodeIdType		node_id;
+	const char*			topic_name;
+	const char*			topic_typename;
+	mRosPacketType 		*req_packet;
+} mRosRcpRosReqType;
+
+typedef struct {
+	mRosReturnType 		result;
+	mRosPacketType 		*reply_packet;
+} mRosTcpRosResType;
+extern mRosReturnType mros_rpc_tcpros(mRosCommTcpClientType *client, mRosRcpRosReqType *req, mRosTcpRosResType *res);
+
 
 #ifdef __cplusplus
 }

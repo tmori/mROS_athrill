@@ -1,4 +1,5 @@
 #include "mros_protocol_master_cimpl.h"
+#include "mros_protocol_subscribe_cimpl.h"
 #include "mros_protocol_client_rpc_cimpl.h"
 #include "mros_topic_cimpl.h"
 #include "mros_topic_connector_factory_cimpl.h"
@@ -146,6 +147,9 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 	mRosTopicConnectorType connector;
 	mRosTopicConnectorManagerType *mgrp;
 	mRosRequestTopicReqType rpc_request;
+	mros_uint32 ipaddr;
+	mros_int32 port;
+	mRosPtrType ptr;
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_SUB);
 	if (mgrp == NULL) {
@@ -166,33 +170,26 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-	mros_uint32 ipaddr;
-	mros_int32 port;
-	mRosPtrType ptr;
 
-	//TODO ここは sub タスクへ要求をなげるだけでいいんだわ．
 	//TODO まだ出版ノードが存在しない場合は，非同期でマスタから情報をもらう
 	ptr = mros_packet_get_reqtopic_first_uri(rpc_response->reply_packet, &ipaddr, &port);
 	while (ptr != NULL) {
-		//TODO connect
-		//TODO create node id
-		//TODO create connector
-		//TODO set connection
-		//TODO send TCPROS
-		mRosCommTcpClientType client;
+		mRosCommTcpClientListReqEntryType *req = mros_comm_tcp_clientc_alloc();
+		if (req == NULL) {
+			ret = MROS_E_NOMEM;
+			//TODO ERR LOG
+			goto done;
+		}
+		req->data.reqobj.ipaddr = ipaddr;
+		req->data.reqobj.port = port;
+		req->data.reqobj.topic_id = connector.topic_id;
+		mros_client_wait_entry_init(&req->data.reqobj.waitobj, req);
 
-		ret = mros_comm_tcp_client_ip32_init(&client, ipaddr, port);
-		if (ret != MROS_E_OK) {
-			goto done;
-		}
-		ret = mros_comm_tcp_client_connect(&client);
-		if (ret != MROS_E_OK) {
-			goto done;
-		}
+		mros_exclusive_lock(&mros_subscribe_exclusive_area);
+		mros_server_queue_put(&mros_subscribe_wait_queue, &req->data.reqobj.waitobj);
+		mros_server_queue_wakeup(&mros_subscribe_wait_queue);
+		mros_exclusive_unlock(&mros_subscribe_wait_queue);
 
-		if (ret != MROS_E_OK) {
-			goto done;
-		}
 		ptr = mros_packet_get_reqtopic_next_uri(ptr, rpc_response->reply_packet, &ipaddr, &port);
 	}
 

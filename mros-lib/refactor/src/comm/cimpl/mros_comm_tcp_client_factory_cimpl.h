@@ -8,17 +8,25 @@ extern "C" {
 #include "mros_list.h"
 #include "mros_config.h"
 #include "mros_comm_tcp_client_cimpl.h"
+#include "mros_wait_queue.h"
 
 typedef struct {
 	mRosTopicIdType 		topic_id;
+	mros_uint32				ipaddr;
+	mros_int32				port;
+	mRosWaitListEntryType	waitobj;
+} mRosRquestObjectType;
+
+typedef struct {
 	mRosCommTcpClientType 	client;
-} mRosCommTcpClientEntryType;
-typedef ListEntryType(mRosCommTcpClientListEntryType, mRosCommTcpClientEntryType) mRosCommTcpClientListEntryType;
-typedef ListHeadType(mRosCommTcpClientListEntryType) mRosCommTcpClientEntryHeadType;
+	mRosRquestObjectType	reqobj;
+} mRosCommTcpClientReqEntryType;
+typedef ListEntryType(mRosCommTcpClientListReqEntryType, mRosCommTcpClientReqEntryType) mRosCommTcpClientListReqEntryType;
+typedef ListHeadType(mRosCommTcpClientListReqEntryType) mRosCommTcpClientEntryHeadType;
 
 extern mRosReturnType mros_comm_tcp_client_factory_init(void);
-extern mRosCommTcpClientListEntryType *mros_comm_tcp_clientc_alloc(void);
-extern void mros_comm_tcp_clientc_free(mRosCommTcpClientListEntryType *client);
+extern mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc(void);
+extern void mros_comm_tcp_clientc_free(mRosCommTcpClientListReqEntryType *client);
 
 
 #ifdef __cplusplus
