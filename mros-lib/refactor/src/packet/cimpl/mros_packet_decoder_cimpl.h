@@ -51,7 +51,7 @@ extern mRosPacketDataType mros_packet_get_method(mRosPacketType *packet);
 /*
  * RequestTopic request
  */
-extern mRosReturnType mros_packet_get_topic_name(mRosPacketType *packet, char* topic_name, mros_uint32 len);
+extern mRosReturnType mros_packet_reqtopic_get_topic_name(mRosPacketType *packet, char* topic_name, mros_uint32 len);
 
 /*
  * RequestTopic response

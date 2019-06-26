@@ -21,7 +21,18 @@ mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc(void)
 	ListEntry_AddEntry(&mros_comm_tcp_client_factory, p);
 	return p;
 }
+mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc_copy(mRosCommTcpClientType *client)
+{
+	mRosCommTcpClientListReqEntryType *p;
 
+	p = mros_comm_tcp_clientc_alloc();
+	if (p == NULL) {
+		return NULL;
+	}
+	p->data.client = *client;
+
+	return p;
+}
 void mros_comm_tcp_clientc_free(mRosCommTcpClientListReqEntryType *client)
 {
 	ListEntry_Free(&mros_comm_tcp_client_factory, client);

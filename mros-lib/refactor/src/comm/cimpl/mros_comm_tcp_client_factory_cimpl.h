@@ -33,6 +33,7 @@ typedef ListHeadType(mRosCommTcpClientListReqEntryType) mRosCommTcpClientEntryHe
 
 extern mRosReturnType mros_comm_tcp_client_factory_init(void);
 extern mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc(void);
+extern mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc_copy(mRosCommTcpClientType *client);
 extern void mros_comm_tcp_clientc_free(mRosCommTcpClientListReqEntryType *client);
 
 

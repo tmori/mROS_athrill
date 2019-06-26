@@ -51,13 +51,14 @@ void mros_protocol_publish_run(void)
 		if (ret != MROS_E_OK) {
 			continue;
 		}
+		//TODO tcprosの受信方法は違う
 		ret = mros_proc_receive(&mros_protocol_publish.client_comm, &mros_protocol_publish.packet);
 		if (ret != MROS_E_OK) {
 			//TODO ERRLOG
 			mros_comm_tcp_client_close(&mros_protocol_publish.client_comm);
 			continue;
 		}
-		ret = mros_proc_pub(&mros_protocol_publish.packet);
+		ret = mros_proc_pub(&mros_protocol_publish.client_comm, &mros_protocol_publish.packet);
 		if (ret != MROS_E_OK) {
 			//TODO ERRLOG
 			mros_comm_tcp_client_close(&mros_protocol_publish.client_comm);
