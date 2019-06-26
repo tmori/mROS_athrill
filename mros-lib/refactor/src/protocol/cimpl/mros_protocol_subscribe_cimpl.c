@@ -61,6 +61,7 @@ MROS_MEMORY_CONFIG_DECLARE_MANAGER(ros_outer_topic_publisher_mempool, ROS_OUTER_
 mRosReturnType mros_protocol_subscribe_init(void)
 {
 	mRosReturnType ret;
+	mros_protocol_subscribe.tcpros_packet.total_size = sizeof(mRosSubscribePacketTcpRosBufferType);
 	mros_protocol_subscribe.tcpros_packet.data = &mros_subscribe_packet_tcpros_buffer.buffer;
 	mros_protocol_subscribe.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
 	mros_protocol_subscribe.pub_mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_PUB);

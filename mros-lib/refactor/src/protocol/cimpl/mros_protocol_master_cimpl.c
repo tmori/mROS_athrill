@@ -100,48 +100,21 @@ static mRosReturnType mros_protocol_master_register(mRosProtocolMasterRequestTyp
 		return MROS_E_INVAL;
 	}
 
-#if 1
 	rpc_response->reply_packet =  &mros_protocol_master.register_packet;
 
 	rpc_request.node_id = connector.node_id;
 	rpc_request.req_packet = &mros_protocol_master.register_packet;
 	rpc_request.topic_name = mros_topic_get_topic_name(connector.topic_id);
 	rpc_request.topic_typename = mros_topic_get_topic_typename(connector.topic_id);
-	ret = mros_rpc_register_publisher(&mros_protocol_master.master_comm, &rpc_request, rpc_response);
-	if (ret != MROS_E_OK) {
-		return ret;
-	}
-#else
 	if (type == MROS_TOPIC_CONNECTOR_PUB) {
-		method = "registerPublisher";
+		ret = mros_rpc_register_publisher(&mros_protocol_master.master_comm, &rpc_request, rpc_response);
 	}
 	else {
-		method = "registerSubscriber";
+		ret = mros_rpc_register_subscriber(&mros_protocol_master.master_comm, &rpc_request, rpc_response);
 	}
-	mros_protocol_master.arg.args_int = 1;
-	mros_protocol_master.arg.argi[0] = connector.node_id;
-
-	mros_protocol_master.arg.args_char = 4;
-	mros_protocol_master.arg.argv[0] = method;
-	mros_protocol_master.arg.argv[1] = mros_topic_get_topic_name(connector.topic_id);
-	mros_protocol_master.arg.argv[2] = mros_topic_get_topic_typename(connector.topic_id);
-	mros_protocol_master.arg.argv[3] = MROS_URI_SLAVE;
-
-	ret = mros_packet_encode(&mros_protocol_master.arg, &mros_protocol_master.request_packet);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-
-	ret = mros_comm_tcp_client_send_all(&mros_protocol_master.master_comm, mros_protocol_master.request_packet.data, mros_protocol_master.request_packet.data_size, &res);
-	if (ret != MROS_E_OK) {
-		return ret;
-	}
-	ret = mros_comm_tcp_client_receive_all(&mros_protocol_master.master_comm, mros_protocol_master.reply_packet.data, mros_protocol_master.reply_packet.data_size, &res);
-	if (ret != MROS_E_OK) {
-		return ret;
-	}
-	//TODO sendReply
-#endif
 	return ret;
 }
 
@@ -164,7 +137,6 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 		return MROS_E_INVAL;
 	}
 
-#if 1
 	rpc_response->reply_packet =  &mros_protocol_master.reqtopic_packet;
 
 	rpc_request.node_id = connector.node_id;
@@ -200,21 +172,6 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 		ptr = mros_packet_get_reqtopic_next_uri(ptr, rpc_response->reply_packet, &ipaddr, &port);
 	}
 
-#else
-	mros_protocol_master.arg.args_int = 1;
-	mros_protocol_master.arg.argi[0] = connector.node_id;
-
-	mros_protocol_master.arg.args_char = 2;
-	mros_protocol_master.arg.argv[0] = "requestTopic";
-	mros_protocol_master.arg.argv[1] = mros_topic_get_topic_name(connector.topic_id);
-	mros_protocol_master.arg.argv[2] = "TCPROS";
-
-	ret = mros_packet_encode(&mros_protocol_master.arg, &mros_protocol_master.request_packet);
-	if (ret != MROS_E_OK) {
-		return ret;
-	}
-	//TODO sendReply
-#endif
 done:
 	return ret;
 }

@@ -33,6 +33,34 @@ mRosReturnType mros_proc_receive(mRosCommTcpClientType *client, mRosPacketType *
 
 	return ret;
 }
+mRosReturnType mros_proc_tcpros_receive(mRosCommTcpClientType *client, mRosPacketType *packet)
+{
+	mRosReturnType ret;
+	mRosSizeType res;
+	mros_boolean is_end;
+	mRosPacketType header_packet;
+	mros_int8 rawdata[MROS_TCPROS_RAWDATA_HEADER_SIZE];
+
+	ret = mros_comm_tcp_client_receive_all(&client->socket, rawdata, MROS_TCPROS_RAWDATA_HEADER_SIZE, &res);
+	if (ret != MROS_E_OK) {
+		return ret;
+	}
+
+	header_packet.total_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
+	header_packet.data_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
+	header_packet.data = rawdata;
+	ret = mros_packet_get_body_size(&packet, &res);
+	if (ret != MROS_E_OK) {
+		return ret;
+	}
+	packet->data_size = 0;
+	packet->total_size = res;
+	ret = mros_comm_tcp_client_receive_all(&client->socket, &packet->data, packet->total_size, &res);
+	if (ret != MROS_E_OK) {
+		return ret;
+	}
+	return ret;
+}
 
 static mRosNodeIdType mros_publisher_is_exist(mRosTopicIdType topic_id)
 {
@@ -146,7 +174,7 @@ static mRosReturnType mros_proc_add_outersub_connector(mRosCommTcpClientType *cl
 }
 
 
-static mRosReturnType mros_proc_pub_tcpros_pub(mRosCommTcpClientType *client, mRosPacketType *packet)
+static mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketType *packet)
 {
 	mRosReturnType ret;
 	mRosTopicIdType topic_id;
@@ -188,7 +216,7 @@ mRosReturnType mros_proc_pub(mRosCommTcpClientType *client, mRosPacketType *pack
 	mRosPacketDataType type = mros_packet_get_method(packet);
 	switch (type) {
 	case MROS_PACKET_DATA_TCPROS_PUB_REQ:
-		ret = mros_proc_pub_tcpros_pub(client, packet);
+		ret = mros_proc_pub_tcpros(client, packet);
 		break;
 	default:
 		//TODO ERRLOG

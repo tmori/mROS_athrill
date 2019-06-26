@@ -11,6 +11,7 @@ extern "C" {
 
 extern mRosReturnType mros_proc_init(void);
 extern mRosReturnType mros_proc_receive(mRosCommTcpClientType *client, mRosPacketType *packet);
+extern mRosReturnType mros_proc_tcpros_receive(mRosCommTcpClientType *client, mRosPacketType *packet);
 extern mRosReturnType mros_proc_slave(mRosCommTcpClientType *client, mRosPacketType *packet);
 extern mRosReturnType mros_proc_pub(mRosCommTcpClientType *client, mRosPacketType *packet);
 
