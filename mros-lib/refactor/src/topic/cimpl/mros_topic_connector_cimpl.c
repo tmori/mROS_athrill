@@ -62,6 +62,7 @@ mRosContainerObjType mros_topic_connector_get_first(mRosTopicConnectorManagerTyp
 	return (mRosContainerObjType)p;
 }
 
+
 mRosContainerObjType mros_topic_connector_get_next(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType topic_obj, mRosContainerObjType obj)
 {
 	mRosTopicConnectorListEntryRootType *topic_entry = (mRosTopicConnectorListEntryRootType*)topic_obj;
@@ -88,6 +89,14 @@ static mRosTopicConnectorListEntryRootType *mros_topic_connector_get_topic_head(
 		}
 	}
 	return NULL;
+}
+mRosContainerObjType mros_topic_connector_get_topic_obj(mRosTopicConnectorManagerType *mgrp, mRosTopicIdType topic_id)
+{
+	mRosTopicConnectorListEntryRootType *root = mros_topic_connector_get_topic_head(mgrp, topic_id);
+	if (root == NULL) {
+		return MROS_COBJ_NULL;
+	}
+	return (mRosContainerObjType)root;
 }
 
 static mRosTopicConnectorListEntryRootType *mros_topic_connector_create_topic_head(mRosTopicConnectorManagerType *mgrp, mRosTopicIdType topic_id)

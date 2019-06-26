@@ -47,7 +47,9 @@ mRosReturnType mros_protocol_master_init(void)
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
+	mros_protocol_master.register_packet.total_size = sizeof(mRosMasterPacketRegisterBufferType);
 	mros_protocol_master.register_packet.data = &mros_master_packet_register_buffer.buffer;
+	mros_protocol_master.reqtopic_packet.total_size = sizeof(mRosMasterPackeReqTopictBufferType);
 	mros_protocol_master.reqtopic_packet.data = &mros_master_packet_reqtopic_buffer.buffer;
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
 	return MROS_E_OK;

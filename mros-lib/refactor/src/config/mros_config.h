@@ -47,6 +47,8 @@
  */
 #define MROS_MASTER_IPADDR						"0.0.0.0"
 
+#define MROS_NODE_IPADDR						"0.0.0.0"
+
 /*
  * portno of slave
  */
@@ -62,6 +64,7 @@
 
 
 #define MROS_TOPIC_TCP_CLIENT_MAX_NUM			10
+#define MROS_TOPIC_NAME_MAXLEN					128
 
 /**************************************
  * PACKET

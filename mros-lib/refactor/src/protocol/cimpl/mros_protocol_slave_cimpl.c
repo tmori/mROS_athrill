@@ -28,6 +28,7 @@ mRosReturnType mros_protocol_slave_init(void)
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
+	mros_protocol_slave.packet.total_size = sizeof(mRosSlavePacketBufferType);
 	mros_protocol_slave.packet.data = &mros_slave_packet_buffer.buffer;
 	mros_protocol_slave.state = MROS_PROTOCOL_SLAVE_STATE_WAITING;
 	ret =  mros_comm_tcp_server_bind(&mros_protocol_slave.server_comm, MROS_SLAVE_PORT_NO);
@@ -56,7 +57,7 @@ void mros_protocol_slave_run(void)
 			mros_comm_tcp_client_close(&mros_protocol_slave.client_comm);
 			continue;
 		}
-		ret = mros_proc_slave(&mros_protocol_slave.packet);
+		ret = mros_proc_slave(&mros_protocol_slave.client_comm, &mros_protocol_slave.packet);
 		if (ret != MROS_E_OK) {
 			//TODO ERRLOG
 			continue;

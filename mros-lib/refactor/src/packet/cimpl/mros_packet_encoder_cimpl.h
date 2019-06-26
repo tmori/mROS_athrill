@@ -24,6 +24,8 @@ extern mRosReturnType mros_packet_encode(mRosEncodeArgType *arg, mRosPacketType 
 
 //TODO
 extern mRosReturnType mros_packet_encode_topic_data(mRosPacketType *packet, const char* data, mros_uint32 len);
+extern mRosReturnType mros_packet_encode_request_topic_res(mRosPacketType *packet, const char* ipaddr, mros_int32 port);
+
 #ifdef __cplusplus
 }
 #endif

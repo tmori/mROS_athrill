@@ -47,6 +47,12 @@ extern mRosPtrType mros_packet_get_regsub_next_uri(mRosPtrType ptr, mRosPacketTy
  ************************************************/
 extern mros_boolean mros_packet_has_request_end(mRosPacketType *packet);
 extern mRosPacketDataType mros_packet_get_method(mRosPacketType *packet);
+
+/*
+ * RequestTopic request
+ */
+extern mRosReturnType mros_packet_get_topic_name(mRosPacketType *packet, char* topic_name, mros_uint32 len);
+
 /*
  * RequestTopic response
  */

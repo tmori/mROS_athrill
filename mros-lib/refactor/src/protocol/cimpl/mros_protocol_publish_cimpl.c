@@ -28,6 +28,7 @@ mRosReturnType mros_protocol_publish_init(void)
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
+	mros_protocol_publish.packet.total_size = sizeof(mRosPublishPacketBufferType);
 	mros_protocol_publish.packet.data = &mros_publish_packet_buffer.buffer;
 	mros_protocol_publish.state = MROS_PROTOCOL_PUBLISH_STATE_WAITING;
 	ret =  mros_comm_tcp_server_bind(&mros_protocol_publish.server_comm, MROS_PUBLISHER_PORT_NO);
