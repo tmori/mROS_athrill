@@ -63,7 +63,7 @@ endif
 #
 #  ソースファイルのディレクトリの定義
 #
-SRCDIR = ../../asp-athrill-mbed/asp-athrill
+SRCDIR = ../../../../mros/asp-athrill-mbed/asp-athrill
 
 #
 #  オブジェクトファイル名の拡張子の設定
@@ -165,7 +165,7 @@ else
   APPL_COBJS = $(APPLNAME).o 
 endif
 APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o
-MBED_LIB_DIR = ../../asp-athrill-mbed/mbed-lib
+MBED_LIB_DIR = ../../../../mros/asp-athrill-mbed/mbed-lib
 APPL_CFLAGS = -I$(MBED_LIB_DIR)/mbed-src/api
 APPL_CFLAGS += -I$(MBED_LIB_DIR)/EthernetInterface
 APPL_CFLAGS += -I$(MBED_LIB_DIR)/EthernetInterface/Socket

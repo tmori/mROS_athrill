@@ -1,13 +1,13 @@
 #ENV FOLDERS
-ATHRILL_ROOT=../../../athrill
+ATHRILL_ROOT=../../../../athrill
 MROS_LIB_DIR=..
-MBED_LIB_DIR=../../asp-athrill-mbed/mbed-lib
+MBED_LIB_DIR=../../../../mros/asp-athrill-mbed/mbed-lib
 PRJROOT_ETHERIF=$(MBED_LIB_DIR)/EthernetInterface
 PRJROOT_MROS=$(MROS_LIB_DIR)/mros-lib
-PRJROOT_ASP=../../asp-athrill-mbed//asp-athrill
+PRJROOT_ASP=../../../../mros/asp-athrill-mbed/asp-athrill
+SRC_ROOT=$(MROS_LIB_DIR)/mros-lib/src
 
-INCLUDE_PATHS += -I$(MBED_LIB_DIR)/EthernetInterface \
-		 -I$(MBED_LIB_DIR)/EthernetInterface/Socket \
+INCLUDE_PATHS += \
   		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip \
   		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip-sys \
  		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip/include \
@@ -37,15 +37,62 @@ IFLAGS	+= -I$(PRJROOT_ASP)/arch
 IFLAGS	+= -I$(PRJROOT_ASP)/arch/v850_gcc
 IFLAGS	+= -I$(ATHRILL_ROOT)/trunk/apl/include
 
-CXX_OBJ += xmlparser.o
-CXX_OBJ += tcp_ros.o
-CXX_OBJ += xmlcall.o
+IFLAGS	+= -I$(SRC_ROOT)/inc
+IFLAGS	+= -I$(SRC_ROOT)/config
+IFLAGS	+= -I$(SRC_ROOT)/api
+IFLAGS	+= -I$(SRC_ROOT)/protocol/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/node/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/topic/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/os/target/asp
+IFLAGS	+= -I$(SRC_ROOT)/comm/cimpl/target/lwip
+IFLAGS	+= -I$(SRC_ROOT)/comm/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/packet/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/packet/template
+IFLAGS	+= -I$(SRC_ROOT)/protocol/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/transfer/cimpl
+
 CXX_OBJ += ros.o
-CXX_OBJ += mros.o
+CXX_OBJ += mros_comm_cimpl.o
+CXX_OBJ += mros_comm_socket_cimpl.o
+CXX_OBJ += mros_comm_tcp_client_cimpl.o
+CXX_OBJ += mros_comm_tcp_client_factory_cimpl.o
+CXX_OBJ += mros_comm_tcp_server_cimpl.o
+CXX_OBJ += mros_memory.o
+CXX_OBJ += mros_wait_queue.o
+CXX_OBJ += mros_node_cimpl.o
+CXX_OBJ += mros_exclusive_area.o
+CXX_OBJ += mros_exclusive_ops.o
+CXX_OBJ += mros_os.o
+CXX_OBJ += mros_packet_cimpl.o
+CXX_OBJ += mros_packet_decoder_cimpl.o
+CXX_OBJ += mros_packet_encoder_cimpl.o
+CXX_OBJ += mros_protocol_client_rpc_cimpl.o
+CXX_OBJ += mros_protocol_master_cimpl.o
+CXX_OBJ += mros_protocol_operation_cimpl.o
+CXX_OBJ += mros_protocol_publish_cimpl.o
+CXX_OBJ += mros_protocol_server_proc_cimpl.o
+CXX_OBJ += mros_protocol_slave_cimpl.o
+CXX_OBJ += mros_protocol_subscribe_cimpl.o
+CXX_OBJ += mros_topic_data_publisher_cimpl.o
+CXX_OBJ += mros_topic_data_subscriber_cimpl.o
+CXX_OBJ += mros_topic_cimpl.o
+CXX_OBJ += mros_topic_connector_cimpl.o
+CXX_OBJ += mros_topic_connector_factory_cimpl.o
 
 OBJS	:= $(C_OBJ) $(CXX_OBJ)
 
-VPATH	:= .
+VPATH	:= $(SRC_ROOT)/api
+VPATH	+= $(SRC_ROOT)/comm/cimpl/target/lwip
+VPATH	+= $(SRC_ROOT)/comm/cimpl/target/lwip
+VPATH	+= $(SRC_ROOT)/comm/cimpl
+VPATH	+= $(SRC_ROOT)/node/cimpl
+VPATH	+= $(SRC_ROOT)/lib
+VPATH	+= $(SRC_ROOT)/os
+VPATH	+= $(SRC_ROOT)/os/target/asp
+VPATH	+= $(SRC_ROOT)/packet/cimpl
+VPATH	+= $(SRC_ROOT)/protocol/cimpl
+VPATH	+= $(SRC_ROOT)/topic/cimpl
+VPATH	+= $(SRC_ROOT)/transfer/cimpl
 VPATH	+= $(PRJROOT_MROS)
 
 %.o: %.S
