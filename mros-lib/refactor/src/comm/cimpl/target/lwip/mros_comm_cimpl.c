@@ -15,20 +15,29 @@ void mros_comm_inet_local_sockaddr_init(mRosSockAddrInType *addr, mros_int32 por
 
 void mros_comm_inet_remote_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port, const char* ipaddrp)
 {
+	mros_int32 result;
 	mros_uint8 addr_array[5];
     memset(addr, 0, sizeof(mRosSockAddrInType));
+    mros_uint8 *paddr = addr_array;
 
     addr->sin_family = AF_INET;
     addr->sin_port = htons(port);
-    (void)sscanf(ipaddrp, "%3u.%3u.%3u.%3u",
+    result = sscanf(ipaddrp, "%3u.%3u.%3u.%3u",
     		(mros_uint8*)&addr_array[0],
 			(mros_uint8*)&addr_array[1],
 			(mros_uint8*)&addr_array[2],
 			(mros_uint8*)&addr_array[3]);
 
-    //TODO host entry
+    if (result != 4) {
+    	mRosHostEntType *host_address = mros_comm_gethostbyname(addr);
+        if (host_address == NULL) {
+        	//TODO ERRLOG
+        	return;
+        }
+        paddr = (mros_uint8*)host_address->h_addr_list[0];
+    }
 
-    memcpy((void*)&addr->sin_addr.s_addr, (void*)&addr_array, 4U);
+    memcpy((void*)&addr->sin_addr.s_addr, (void*)paddr, 4U);
 	return;
 }
 void mros_comm_inet_remote_sockaddr_ip32_init(mRosSockAddrInType *addr, mros_int32 port, mros_uint32 ipaddr)
