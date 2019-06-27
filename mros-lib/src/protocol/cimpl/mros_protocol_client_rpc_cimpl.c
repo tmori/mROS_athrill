@@ -28,7 +28,7 @@ static mRosReturnType mros_rpc_sendreply_xmlpacket(mRosEncodeArgType *arg, mRosC
 		if (res->data_size >= res->total_size) {
 			return MROS_E_NOMEM;
 		}
-		is_end = mros_packet_has_response_end(res);
+		is_end = mros_xmlpacket_has_response_end(res);
 	} while (is_end == MROS_FALSE);
 	return MROS_E_OK;
 }
@@ -106,7 +106,7 @@ static mRosReturnType mros_rpc_sendreply_tcpros(mRosEncodeArgType *arg, mRosComm
 	packet.total_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
 	packet.data_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
 	packet.data = rawdata;
-	ret = mros_packet_get_body_size(&packet, &len);
+	ret = mros_tcprospacket_get_body_size(&packet, &len);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}

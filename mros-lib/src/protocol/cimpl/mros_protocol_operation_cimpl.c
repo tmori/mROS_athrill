@@ -59,7 +59,7 @@ mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType 
 	packet.total_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
 	packet.data_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
 	packet.data = rawdata;
-	ret = mros_packet_get_body_size(&packet, &len);
+	ret = mros_topicpacket_get_body_size(&packet, &len);
 	if (ret != MROS_E_OK) {
 		return NULL;
 	}

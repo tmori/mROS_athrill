@@ -147,7 +147,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 	}
 
 	//TODO まだ出版ノードが存在しない場合は，非同期でマスタから情報をもらう
-	ptr = mros_packet_get_reqtopic_first_uri(rpc_response->reply_packet, &ipaddr, &port);
+	ptr = mros_xmlpacket_reqtopicres_get_first_uri(rpc_response->reply_packet, &ipaddr, &port);
 	while (ptr != NULL) {
 		mRosCommTcpClientListReqEntryType *req = mros_comm_tcp_clientc_alloc();
 		if (req == NULL) {
@@ -168,7 +168,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 		mros_server_queue_wakeup(&mros_subscribe_wait_queue);
 		mros_exclusive_unlock(&mros_subscribe_exclusive_area);
 
-		ptr = mros_packet_get_reqtopic_next_uri(ptr, rpc_response->reply_packet, &ipaddr, &port);
+		ptr = mros_xmlpacket_reqtopicres_get_next_uri(ptr, rpc_response->reply_packet, &ipaddr, &port);
 	}
 
 done:
@@ -190,7 +190,7 @@ static mRosReturnType mros_protocol_master_register_publisher(mRosProtocolMaster
 	if (ret != MROS_E_OK) {
 		goto done;
 	}
-	ret = mros_packet_get_regpub_result(rpc_response.reply_packet);
+	ret = mros_xmlpacket_pubres_result(rpc_response.reply_packet);
 
 	mros_comm_tcp_client_close(&mros_protocol_master.master_comm);
 
@@ -222,7 +222,7 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 		goto done;
 	}
 	mros_comm_tcp_client_close(&mros_protocol_master.master_comm);
-	ret = mros_packet_get_regpub_result(rpc_regc_res.reply_packet);
+	ret = mros_xmlpacket_subres_result(rpc_regc_res.reply_packet);
 	if (ret != MROS_E_OK) {
 		goto done;
 	}
@@ -230,7 +230,7 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_REQUESTING_TOPIC;
 
 	//TODO まだ出版ノードが存在しない場合は，非同期でマスタから情報をもらう
-	ptr = mros_packet_get_regsub_first_uri(rpc_regc_res.reply_packet, &ipaddr, &port);
+	ptr = mros_xmlpacket_subres_get_first_uri(rpc_regc_res.reply_packet, &ipaddr, &port);
 	while (ptr != NULL) {
 		mRosCommTcpClientType client;
 
@@ -247,7 +247,7 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 		if (ret != MROS_E_OK) {
 			goto done;
 		}
-		ptr = mros_packet_get_regsub_next_uri(ptr, rpc_regc_res.reply_packet, &ipaddr, &port);
+		ptr = mros_xmlpacket_subres_get_next_uri(ptr, rpc_regc_res.reply_packet, &ipaddr, &port);
 	}
 
 done:

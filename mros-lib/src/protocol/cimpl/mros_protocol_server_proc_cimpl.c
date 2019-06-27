@@ -31,7 +31,7 @@ mRosReturnType mros_proc_receive(mRosCommTcpClientType *client, mRosPacketType *
 			ret = MROS_E_NOMEM;
 			break;
 		}
-		is_end = mros_packet_has_request_end(packet);
+		is_end = mros_xmlpacket_has_request_end(packet);
 	} while (is_end == MROS_FALSE);
 
 	return ret;
@@ -51,7 +51,7 @@ mRosReturnType mros_proc_tcpros_receive(mRosCommTcpClientType *client, mRosPacke
 	header_packet.total_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
 	header_packet.data_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
 	header_packet.data = rawdata;
-	ret = mros_packet_get_body_size(&header_packet, &res);
+	ret = mros_tcprospacket_get_body_size(&header_packet, &res);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
@@ -98,7 +98,7 @@ static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *clien
 	mRosTopicIdType topic_id;
 	mRosSizeType res;
 
-	ret = mros_packet_reqtopic_get_topic_name(packet, topic_name_buffer, MROS_TOPIC_NAME_MAXLEN);
+	ret = mros_xmlpacket_slave_reqtopic_get_topic_name(packet, topic_name_buffer, MROS_TOPIC_NAME_MAXLEN);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
@@ -132,7 +132,7 @@ mRosReturnType mros_proc_slave(mRosCommTcpClientType *client, mRosPacketType *pa
 {
 	mRosReturnType ret = MROS_E_INVAL;
 
-	mRosPacketDataType type = mros_packet_get_method(packet);
+	mRosPacketDataType type = mros_xmlpacket_slave_request_get_method(packet);
 	switch (type) {
 	case MROS_PACKET_DATA_REQUEST_TOPIC_REQ:
 		ret = mros_proc_slave_request_topic(client, packet);
@@ -182,13 +182,13 @@ static mRosReturnType mros_proc_add_outersub_connector(mRosCommTcpClientType *cl
 }
 
 
-static mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketType *packet)
+mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketType *packet)
 {
 	mRosReturnType ret;
 	mRosTopicIdType topic_id;
 	mRosSizeType res;
 
-	ret = mros_packet_tcprospub_get_topic_name(packet, topic_name_buffer, MROS_TOPIC_NAME_MAXLEN);
+	ret = mros_tcprospacket_get_topic_name(packet, topic_name_buffer, MROS_TOPIC_NAME_MAXLEN);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
@@ -227,19 +227,3 @@ static mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPa
 	return ret;
 }
 
-mRosReturnType mros_proc_pub(mRosCommTcpClientType *client, mRosPacketType *packet)
-{
-	mRosReturnType ret = MROS_E_INVAL;
-
-	mRosPacketDataType type = mros_packet_get_method(packet);
-	switch (type) {
-	case MROS_PACKET_DATA_TCPROS_PUB_REQ:
-		ret = mros_proc_pub_tcpros(client, packet);
-		break;
-	default:
-		//TODO ERRLOG
-		break;
-	}
-
-	return ret;
-}

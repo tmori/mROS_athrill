@@ -52,6 +52,130 @@ mRosReturnType mros_packet_decode_port_integer(mros_uint32 *port, mRosPacketType
 	return MROS_E_OK;
 }
 
+
+/************************************************
+ * XML RPC PACKET
+ ************************************************/
+/*
+ * XML request
+ */
+mros_boolean mros_xmlpacket_has_request_end(mRosPacketType *packet)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+/*
+ * XML response
+ */
+mros_boolean mros_xmlpacket_has_response_end(mRosPacketType *packet)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+
+//MASTER
+/*
+ * ReigsterPublish response
+ */
+mRosReturnType mros_xmlpacket_pubres_result(mRosPacketType *packet)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+
+/*
+ * ReigsterSubscribe response
+ */
+mRosReturnType mros_xmlpacket_subres_result(mRosPacketType *packet)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+mRosPtrType mros_xmlpacket_subres_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+
+
+//SLAVE
+mRosPacketDataType mros_xmlpacket_slave_request_get_method(mRosPacketType *packet)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+
+/*
+ * RequestTopic request
+ */
+mRosReturnType mros_xmlpacket_slave_reqtopic_get_topic_name(mRosPacketType *packet, char** topic_name, mros_uint32 len)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+
+/*
+ * RequestTopic response
+ */
+mRosReturnType mros_xmlpacket_reqtopicres_result(mRosPacketType *packet)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+mRosPtrType mros_xmlpacket_reqtopicres_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+
+/****************************************************
+ * TCPROS
+ ****************************************************/
+mRosReturnType mros_tcprospacket_get_body_size(mRosPacketType *packet, mRosSizeType *len)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+mRosReturnType mros_tcprospacket_get_topic_name(mRosPacketType *packet, char** topic_name, mros_uint32 len)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+
+/****************************************************
+ * TOPIC DATA
+ ****************************************************/
+mRosReturnType mros_topicpacket_get_body_size(mRosPacketType *packet, mRosSizeType *len)
+{
+	//TODO
+	return MROS_E_OK;
+}
+
+
+#if 0
 mRosReturnType mros_packet_decode_port(char *port, mRosPacketType *packet)
 {
 	return MROS_E_OK;
@@ -89,4 +213,4 @@ mRosReturnType mros_packet_decode_req_topic_name(char* topic_name, mRosPacketTyp
 {
 	return MROS_E_OK;
 }
-
+#endif
