@@ -11,6 +11,7 @@ mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, mRos
 	mRosSizeType res;
 	mRosPacketType packet;
 	mRosMemoryListEntryType *mem_entryp;
+	mRosEncodeArgType arg;
 
 	ret = mros_mem_alloc(mempool, datalen + MROS_TOPIC_RAWDATA_HEADER_SIZE, &mem_entryp);
 	if (ret != MROS_E_OK) {
@@ -20,7 +21,14 @@ mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, mRos
 	packet.data_size = mem_entryp->data.size;
 	packet.data = mem_entryp->data.memp;
 
-	ret = mros_packet_encode_topic_data(&packet, data, datalen);
+
+	arg.type = MROS_PACKET_DATA_TOPIC;
+	arg.args_int = 1;
+	arg.argi[0] = datalen;
+	arg.args_char = 1;
+	arg.argv[0] = data;
+
+	ret = mros_packet_encode(&arg, &packet);
 	if (ret != MROS_E_OK) {
 		goto done;
 	}

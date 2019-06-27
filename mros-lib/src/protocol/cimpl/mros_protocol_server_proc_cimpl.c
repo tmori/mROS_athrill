@@ -112,7 +112,13 @@ static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *clien
 		// original code does not support this case...
 	}
 	else {
-		ret = mros_packet_encode_request_topic_res(packet, MROS_NODE_IPADDR, MROS_PUBLISHER_PORT_NO);
+		mRosEncodeArgType arg;
+		arg.type = MROS_PACKET_DATA_REQUEST_TOPIC_RES;
+		arg.args_int = 1;
+		arg.argi[0] = MROS_PUBLISHER_PORT_NO;
+		arg.args_char = 1;
+		arg.argv[0] = MROS_NODE_IPADDR;
+		ret = mros_packet_encode(&arg, packet);
 		if (ret != MROS_E_OK) {
 			return ret;
 		}
@@ -196,8 +202,18 @@ static mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPa
 		// original code does not support this case...
 	}
 	else {
-		//TODO args:node_name, msg_def, topic_name, topic_type, md5sum
-		ret = mros_packet_encode_tcpros_topic_res(packet, MROS_NODE_IPADDR, MROS_PUBLISHER_PORT_NO);
+		mRosEncodeArgType arg;
+		char *msg_def = NULL;//TODO
+		char *md5sum = NULL;//TODO
+		arg.type = MROS_PACKET_DATA_TCPROS_PUB_RES;
+		arg.args_int = 1;
+		arg.argi[0] = node_id;
+		arg.args_char = 3;
+		arg.argv[0] = mros_topic_get_topic_name(topic_id);
+		arg.argv[1] = mros_topic_get_topic_typename(topic_id);
+		arg.argv[2] = msg_def;
+		arg.argv[3] = md5sum;
+		ret = mros_packet_encode(&arg, packet);
 		if (ret != MROS_E_OK) {
 			return ret;
 		}

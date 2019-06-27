@@ -5,21 +5,25 @@
 #include <string.h>
 #include <stdio.h>
 
-static mRosReturnType encode_register_publisher(mRosEncodeArgType *arg, mRosPacketType *packet);
-static mRosReturnType encode_register_subscriber(mRosEncodeArgType *arg, mRosPacketType *packet);
-static mRosReturnType encode_request_topic(mRosEncodeArgType *arg, mRosPacketType *packet);
-static mRosReturnType encode_tcpros_pub(mRosEncodeArgType *arg, mRosPacketType *packet);
-static mRosReturnType encode_tcpros_sub(mRosEncodeArgType *arg, mRosPacketType *packet);
+static mRosReturnType encode_register_publisher_req(mRosEncodeArgType *arg, mRosPacketType *packet);
+static mRosReturnType encode_register_subscriber_req(mRosEncodeArgType *arg, mRosPacketType *packet);
+static mRosReturnType encode_request_topic_req(mRosEncodeArgType *arg, mRosPacketType *packet);
+static mRosReturnType encode_request_topic_res(mRosEncodeArgType *arg, mRosPacketType *packet);
+static mRosReturnType encode_tcpros_pub_req(mRosEncodeArgType *arg, mRosPacketType *packet);
+static mRosReturnType encode_tcpros_sub_req(mRosEncodeArgType *arg, mRosPacketType *packet);
 static mRosReturnType encode_topic(mRosEncodeArgType *arg, mRosPacketType *packet);
 typedef mRosReturnType (*encode_table_type) (mRosEncodeArgType*, mRosPacketType*);
 
 static encode_table_type encode_table[MROS_PACKET_DATA_NUM] = {
-		encode_register_publisher,
-		encode_register_subscriber,
-		encode_request_topic,
-		encode_tcpros_pub,
-		encode_tcpros_sub,
-		encode_topic,
+		encode_register_publisher_req, 			//MROS_PACKET_DATA_REGISTER_PUBLISHER_REQ
+		encode_register_subscriber_req,			//MROS_PACKET_DATA_REGISTER_SUBSCRIBER_REQ
+		encode_request_topic_req,				//MROS_PACKET_DATA_REQUEST_TOPIC_REQ
+		encode_request_topic_res,				//MROS_PACKET_DATA_REQUEST_TOPIC_RES
+		encode_tcpros_pub_req,					//MROS_PACKET_DATA_TCPROS_PUB_REQ
+		NULL,									//MROS_PACKET_DATA_TCPROS_PUB_RES
+		encode_tcpros_sub_req,					//MROS_PACKET_DATA_TCPROS_SUB_REQ
+		NULL,									//MROS_PACKET_DATA_TCPROS_SUB_RES
+		encode_topic,							//MROS_PACKET_DATA_TOPIC
 };
 
 typedef struct {
@@ -88,7 +92,7 @@ mRosReturnType mros_packet_encode(mRosEncodeArgType *arg, mRosPacketType *packet
 }
 
 
-static mRosReturnType encode_register_publisher(mRosEncodeArgType *arg, mRosPacketType *packet)
+static mRosReturnType encode_register_publisher_req(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
 	mRosSizeType len;
 	mRosSizeType off = 0;
@@ -121,7 +125,7 @@ static mRosReturnType encode_register_publisher(mRosEncodeArgType *arg, mRosPack
 	return MROS_E_OK;
 }
 
-static mRosReturnType encode_register_subscriber(mRosEncodeArgType *arg, mRosPacketType *packet)
+static mRosReturnType encode_register_subscriber_req(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
 	mRosSizeType len;
 	mRosSizeType off = 0;
@@ -153,7 +157,7 @@ static mRosReturnType encode_register_subscriber(mRosEncodeArgType *arg, mRosPac
 	return MROS_E_OK;
 }
 
-static mRosReturnType encode_request_topic(mRosEncodeArgType *arg, mRosPacketType *packet)
+static mRosReturnType encode_request_topic_req(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
 	mRosSizeType len;
 	mRosSizeType off = 0;
@@ -183,7 +187,12 @@ static mRosReturnType encode_request_topic(mRosEncodeArgType *arg, mRosPacketTyp
 
 	return MROS_E_OK;
 }
-static mRosReturnType encode_tcpros_pub(mRosEncodeArgType *arg, mRosPacketType *packet)
+mRosReturnType encode_request_topic_res(mRosEncodeArgType *arg, mRosPacketType *packet)
+{
+	//TODO
+	return MROS_E_OK;
+}
+static mRosReturnType encode_tcpros_pub_req(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
 	mRosSizeType len;
 	mRosSizeType off = 0;
@@ -235,7 +244,7 @@ static mRosReturnType encode_tcpros_pub(mRosEncodeArgType *arg, mRosPacketType *
 
 	return MROS_E_OK;
 }
-static mRosReturnType encode_tcpros_sub(mRosEncodeArgType *arg, mRosPacketType *packet)
+static mRosReturnType encode_tcpros_sub_req(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
 	mRosSizeType len;
 	mRosSizeType off = 0;
