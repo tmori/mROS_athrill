@@ -1,9 +1,16 @@
 #include "app.h"
-#include "../mros-lib/ros.h"
+#include "../mros-lib/src/api/ros.h"
+#include <kernel.h>
+#include <t_syslog.h>
+#include <t_stdlib.h>
+#include "syssvc/serial.h"
+#include "syssvc/syslog.h"
+#include "kernel_cfg.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string>
 
-//mbed library 
 #include "mbed.h"
-#include "EthernetInterface.h"
 
 #include <iostream>
 #include <sstream>
@@ -17,10 +24,10 @@ void usr_task1(void)
 	int argc = 0;
 	char *argv = NULL;
 	int i = 0;
-	ros::init(argc,argv,"mros_node");
+	ros::init(argc, argv, "mros_node");
 	ros::NodeHandle n;
 	ros::Publisher chatter_pub = n.advertise("mros_msg", 1);
-	ros::Rate loop_rate(5);
+	//ros::Rate loop_rate(5);
 	char buf[128];
 
 	std_msgs::String str;
@@ -29,15 +36,15 @@ void usr_task1(void)
 	while(1){
 		wait_ms(1000);
 		sprintf(buf, "publish test data(%u)", i++);
-		str.data = string(buf);
+		str.data = buf;
 		chatter_pub.publish(str);
-		loop_rate.sleep();
+		//loop_rate.sleep();
 	}
 }
 
 
 /*******  callback **********/
-void Callback(string *msg){	
+void Callback(std::string *msg){
 	syslog(LOG_NOTICE,"I heard [%s]",msg->c_str());
 }
 
@@ -50,5 +57,5 @@ void usr_task2(void)
 	ros::init(argc,argv,"mros_node2");
 	ros::NodeHandle n;
 	ros::Subscriber sub = n.subscriber("test_string",1, Callback);
-	ros::spin();
+	//ros::spin();
 }

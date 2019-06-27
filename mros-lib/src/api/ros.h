@@ -2,7 +2,6 @@
 #define _ROS_H_
 
 #include <string>
-#include "mros_types.h"
 #include <stdlib.h>
 
 namespace std_msgs{
@@ -15,43 +14,43 @@ public:
 
 namespace ros {
 
-void init(int argc, char *argv, std::string& node_name);
+void init(int argc, char *argv, std::string node_name);
 
 
 class Publisher {
 public:
 	void publish(std_msgs::String& data);
-	void set(mRosContainerObjType cobj)
+	void set(void *cobj)
 	{
 		this->cobj = cobj;
 	}
-	mRosContainerObjType get()
+	void* get()
 	{
 		return this->cobj;
 	}
 private:
-	mRosContainerObjType cobj;
+	void *cobj;
 };
 
 class Subscriber {
 public:
-	void set(mRosContainerObjType cobj)
+	void set(void *cobj)
 	{
 		this->cobj = cobj;
 	}
-	mRosContainerObjType get()
+	void* get()
 	{
 		return this->cobj;
 	}
 private:
-	mRosContainerObjType cobj;
+	void *cobj;
 };
 
 
 class NodeHandle {
 public:
-	Subscriber subscriber(std::string& topic, int queue_size, void(*fp)(std::string*));
-	Publisher advertise(std::string& topic, int queue_size);
+	Subscriber subscriber(std::string topic, int queue_size, void(*fp)(std::string*));
+	Publisher advertise(std::string topic, int queue_size);
 };
 
 }

@@ -7,7 +7,6 @@
 #include "mros_protocol_master_cimpl.h"
 #include <string.h>
 
-using namespace ros;
 
 /*******************************************************
  * START: Publish Config
@@ -41,7 +40,7 @@ MROS_MEMORY_CONFIG_DECLARE_MANAGER(ros_topic_publisher_mempool, ROS_TOPIC_PUBLIS
  *******************************************************/
 
 
-void init(int argc, char *argv, std::string& node_name)
+void ros::init(int argc, char *argv, std::string node_name)
 {
 	mRosNodeIdType id;
 	mRosReturnType ret = mros_node_create_inner(node_name.c_str(), &id);
@@ -52,7 +51,7 @@ void init(int argc, char *argv, std::string& node_name)
 	return;
 }
 
-Subscriber NodeHandle::subscriber(std::string& topic, int queue_size, void(*fp)(std::string*))
+ros::Subscriber ros::NodeHandle::subscriber(std::string topic, int queue_size, void(*fp)(std::string*))
 {
 	Subscriber sub;
 	mRosReturnType ret;
@@ -122,7 +121,7 @@ Subscriber NodeHandle::subscriber(std::string& topic, int queue_size, void(*fp)(
 	return sub;
 }
 
-Publisher NodeHandle::advertise(std::string& topic, int queue_size)
+ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 {
 	Publisher pub;
 	mRosReturnType ret;
@@ -187,12 +186,12 @@ Publisher NodeHandle::advertise(std::string& topic, int queue_size)
 }
 
 
-void Publisher::publish(std_msgs::String& data)
+void ros::Publisher::publish(std_msgs::String& data)
 {
 	mRosReturnType ret;
 	const char *snd_data = data.data.c_str();
 	mRosSizeType len = strlen(snd_data) + 1U;
-	ret = mros_topic_connector_put_data(this->get(), snd_data, len);
+	ret = mros_topic_connector_put_data((mRosContainerObjType)this->get(), snd_data, len);
 	if (ret != MROS_E_OK) {
 		//TODO ERROR LOG
 		return;
