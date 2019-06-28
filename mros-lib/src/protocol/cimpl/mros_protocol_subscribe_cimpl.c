@@ -10,6 +10,7 @@
 #include "mros_packet_encoder_cimpl.h"
 #include "mros_protocol_client_rpc_cimpl.h"
 #include "mros_topic_cimpl.h"
+#include "mros_node_cimpl.h"
 #include <stdlib.h>
 
 typedef union {
@@ -117,8 +118,8 @@ void mros_protocol_subscribe_run(void)
 			//TODO ERR LOG
 			continue;
 		}
-		//TODO send TCPROS
-		req.node_id = connector.node_id;
+
+		req.node_name = mros_node_name(connector.node_id);
 		req.topic_name = mros_topic_get_topic_name(connector.topic_id);
 		req.topic_typename = mros_topic_get_topic_typename(connector.topic_id);
 		ret = mros_rpc_tcpros(&client_req->data.client, &req, &res);

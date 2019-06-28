@@ -204,15 +204,13 @@ mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketTyp
 	}
 	else {
 		mRosEncodeArgType arg;
-		char *msg_def = NULL;//TODO
-		char *md5sum = NULL;//TODO
-		arg.type = MROS_PACKET_DATA_TCPROS_PUB_RES;
-		arg.args_int = 1;
-		arg.argi[0] = node_id;
-		arg.args_char = 3;
-		arg.argv[0] = mros_topic_get_topic_name(topic_id);
-		arg.argv[1] = mros_topic_get_topic_typename(topic_id);
-		arg.argv[2] = msg_def;
+		char *md5sum = "060021388200f6f0f447d0fcd9c64743";//TODO
+		arg.type = MROS_PACKET_DATA_TCPROS_TOPIC_RES;
+		arg.args_int = 0;
+		arg.args_char = 4;
+		arg.argv[0] = mros_node_name(node_id);
+		arg.argv[1] = mros_topic_get_topic_name(topic_id);
+		arg.argv[2] = mros_topic_get_topic_typename(topic_id);
 		arg.argv[3] = md5sum;
 		ret = mros_packet_encode(&arg, packet);
 		if (ret != MROS_E_OK) {

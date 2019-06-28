@@ -17,24 +17,7 @@ extern "C" {
  * ARG3: type
  * ARG4: md5sum
  */
-#define MROS_PACKET_FMT_TCPROS_PUB	\
-	"SIZE"	\
-	"SIZE"	\
-	"callerid=%s"	\
-	"SIZE"	\
-	"topic=%s"	\
-	"SIZE"	\
-	"type=%s"		\
-	"SIZE"	\
-	"md5sum=%s"
-
-/*
- * ARG1: callerid
- * ARG2: topic
- * ARG3: type
- * ARG4: md5sum
- */
-#define MROS_PACKET_FMT_TCPROS_SUB		\
+#define MROS_PACKET_FMT_TCPROS_TOPIC_REQ		\
 	"SIZE"	\
 	"SIZE"	\
 	"callerid=%s"	\
@@ -46,6 +29,25 @@ extern "C" {
 	"type=%s"		\
 	"SIZE"	\
 	"md5sum=%s"
+
+
+/*
+ * ARG1: callerid
+ * ARG2: topic
+ * ARG3: type
+ * ARG4: md5sum
+ */
+#define MROS_PACKET_FMT_TCPROS_TOPIC_RES	\
+	"SIZE"	\
+	"SIZE"	\
+	"callerid=%s"	\
+	"SIZE"	\
+	"topic=%s"	\
+	"SIZE"	\
+	"type=%s"		\
+	"SIZE"	\
+	"md5sum=%s"
+
 
 #ifdef __cplusplus
 }

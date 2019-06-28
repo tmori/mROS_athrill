@@ -9,10 +9,8 @@ static mRosReturnType encode_register_publisher_req(mRosEncodeArgType *arg, mRos
 static mRosReturnType encode_register_subscriber_req(mRosEncodeArgType *arg, mRosPacketType *packet);
 static mRosReturnType encode_request_topic_req(mRosEncodeArgType *arg, mRosPacketType *packet);
 static mRosReturnType encode_request_topic_res(mRosEncodeArgType *arg, mRosPacketType *packet);
-static mRosReturnType encode_tcpros_pub_req(mRosEncodeArgType *arg, mRosPacketType *packet);
-static mRosReturnType encode_tcpros_pub_res(mRosEncodeArgType *arg, mRosPacketType *packet);
-static mRosReturnType encode_tcpros_sub_req(mRosEncodeArgType *arg, mRosPacketType *packet);
-static mRosReturnType encode_tcpros_sub_res(mRosEncodeArgType *arg, mRosPacketType *packet);
+static mRosReturnType encode_tcpros_topic_req(mRosEncodeArgType *arg, mRosPacketType *packet);
+static mRosReturnType encode_tcpros_topic_res(mRosEncodeArgType *arg, mRosPacketType *packet);
 static mRosReturnType encode_topic_data(mRosEncodeArgType *arg, mRosPacketType *packet);
 typedef mRosReturnType (*encode_table_type) (mRosEncodeArgType*, mRosPacketType*);
 
@@ -21,10 +19,8 @@ static encode_table_type encode_table[MROS_PACKET_DATA_NUM] = {
 		encode_register_subscriber_req,			//MROS_PACKET_DATA_REGISTER_SUBSCRIBER_REQ
 		encode_request_topic_req,				//MROS_PACKET_DATA_REQUEST_TOPIC_REQ
 		encode_request_topic_res,				//MROS_PACKET_DATA_REQUEST_TOPIC_RES
-		encode_tcpros_pub_req,					//MROS_PACKET_DATA_TCPROS_PUB_REQ
-		encode_tcpros_pub_res,					//MROS_PACKET_DATA_TCPROS_PUB_RES
-		encode_tcpros_sub_req,					//MROS_PACKET_DATA_TCPROS_SUB_REQ
-		encode_tcpros_sub_res,					//MROS_PACKET_DATA_TCPROS_SUB_RES
+		encode_tcpros_topic_req,				//MROS_PACKET_DATA_TCPROS_TOPIC_REQ
+		encode_tcpros_topic_res,				//MROS_PACKET_DATA_TCPROS_TOPIC_RES
 		encode_topic_data,						//MROS_PACKET_DATA_TOPIC
 };
 
@@ -37,10 +33,8 @@ typedef struct {
 static mRosFmtType mros_xml_fmt_table[MROS_PACKET_DATA_NUM];
 static mRosFmtType mros_http_post_fmt;
 static mRosFmtType mros_http_ok_fmt;
-static mRosFmtType mros_tcpros_pub_req_fmt;
-static mRosFmtType mros_tcpros_pub_res_fmt;
-static mRosFmtType mros_tcpros_sub_req_fmt;
-static mRosFmtType mros_tcpros_sub_res_fmt;
+static mRosFmtType mros_tcpros_topic_req_fmt;
+static mRosFmtType mros_tcpros_topic_res_fmt;
 
 mRosReturnType mros_packet_encoder_init(void)
 {
@@ -53,20 +47,14 @@ mRosReturnType mros_packet_encoder_init(void)
 	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_REQ].fmt = MROS_PACKET_FMT_XML_REQUEST_TOPIC_REQ;
 	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_REQ].len = strlen(MROS_PACKET_FMT_XML_REQUEST_TOPIC_REQ) + 1;
 
-	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_RES].fmt = NULL;//TODO
-	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_RES].len = 0; //TODO
+	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_RES].fmt = NULL;
+	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_RES].len = 0;
 
-	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_PUB_REQ].fmt = NULL;//TODO
-	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_PUB_REQ].len = 0; //TODO
+	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_TOPIC_REQ].fmt = NULL;
+	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_TOPIC_REQ].len = 0;
 
-	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_PUB_RES].fmt = NULL;//TODO
-	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_PUB_RES].len = 0; //TODO
-
-	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_SUB_REQ].fmt = NULL;//TODO
-	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_SUB_REQ].len = 0; //TODO
-
-	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_SUB_RES].fmt = NULL;//TODO
-	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_SUB_RES].len = 0; //TODO
+	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_TOPIC_RES].fmt = NULL;
+	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_TOPIC_RES].len = 0;
 
 	mros_http_post_fmt.fmt = MROS_PACKET_FMT_HTTP_POST;
 	mros_http_post_fmt.len = strlen(MROS_PACKET_FMT_HTTP_POST) + 1;
@@ -74,17 +62,12 @@ mRosReturnType mros_packet_encoder_init(void)
 	mros_http_ok_fmt.fmt = MROS_PACKET_FMT_HTTP_OK;
 	mros_http_ok_fmt.len = strlen(MROS_PACKET_FMT_HTTP_OK) + 1;
 
-	mros_tcpros_pub_req_fmt.fmt = MROS_PACKET_FMT_TCPROS_PUB;
-	mros_tcpros_pub_req_fmt.len = strlen(MROS_PACKET_FMT_TCPROS_PUB) + 1;
+	mros_tcpros_topic_req_fmt.fmt = MROS_PACKET_FMT_TCPROS_TOPIC_REQ;
+	mros_tcpros_topic_req_fmt.len = strlen(MROS_PACKET_FMT_TCPROS_TOPIC_REQ) + 1;
 
-	mros_tcpros_pub_res_fmt.fmt = MROS_PACKET_FMT_TCPROS_PUB;
-	mros_tcpros_pub_res_fmt.len = strlen(MROS_PACKET_FMT_TCPROS_PUB) + 1;
+	mros_tcpros_topic_res_fmt.fmt = MROS_PACKET_FMT_TCPROS_TOPIC_RES;
+	mros_tcpros_topic_res_fmt.len = strlen(MROS_PACKET_FMT_TCPROS_TOPIC_RES) + 1;
 
-	mros_tcpros_sub_req_fmt.fmt = MROS_PACKET_FMT_TCPROS_SUB;
-	mros_tcpros_sub_req_fmt.len = strlen(MROS_PACKET_FMT_TCPROS_SUB) + 1;
-
-	mros_tcpros_sub_res_fmt.fmt = MROS_PACKET_FMT_TCPROS_SUB;
-	mros_tcpros_sub_res_fmt.len = strlen(MROS_PACKET_FMT_TCPROS_SUB) + 1;
 
 	return MROS_E_OK;
 }
@@ -257,64 +240,8 @@ mRosReturnType encode_request_topic_res(mRosEncodeArgType *arg, mRosPacketType *
 
 	return MROS_E_OK;
 }
-static mRosReturnType encode_tcpros_pub_req(mRosEncodeArgType *arg, mRosPacketType *packet)
-{
-	mRosSizeType len;
-	mRosSizeType off = 0;
-	mRosSizeType len_callerid;
-	mRosSizeType len_topic;
-	mRosSizeType len_type;
-	mRosSizeType len_md5sum;
 
-	len = get_arglen(arg);
-	len += mros_tcpros_pub_req_fmt.len;
-
-	if (len > packet->total_size) {
-		return MROS_E_NOMEM;
-	}
-
-	len_callerid = snprintf(&packet->data[off], packet->total_size,
-			MROS_PACKET_FMT_TCPROS_CALLER_ID, arg->argv[0]);
-
-	len_topic = snprintf(&packet->data[off], packet->total_size,
-			MROS_PACKET_FMT_TCPROS_TOPIC, arg->argv[1]);
-
-	len_type = snprintf(&packet->data[off], packet->total_size,
-			MROS_PACKET_FMT_TCPROS_TYPE, arg->argv[2]);
-
-	len_md5sum = snprintf(&packet->data[off], packet->total_size,
-			MROS_PACKET_FMT_TCPROS_MD5SUM, arg->argv[3]);
-
-	packet->data_size = snprintf(&packet->data[off], packet->total_size,
-			MROS_PACKET_FMT_TCPROS_PUB,
-			arg->argv[0],
-			arg->argv[1],
-			arg->argv[2],
-			arg->argv[3]);
-
-	off = 0;
-	add_len((unsigned char*)&packet->data[off], packet->data_size);
-
-	off += 4U;
-	add_len((unsigned char*)&packet->data[off], len_callerid);
-
-	off += (4U + len_callerid);
-	add_len((unsigned char*)&packet->data[off], len_topic);
-
-	off += (4U + len_topic);
-	add_len((unsigned char*)&packet->data[off], len_type);
-
-	off += (4U + len_type);
-	add_len((unsigned char*)&packet->data[off], len_md5sum);
-
-	return MROS_E_OK;
-}
-static mRosReturnType encode_tcpros_pub_res(mRosEncodeArgType *arg, mRosPacketType *packet)
-{
-	//TODO
-	return MROS_E_OK;
-}
-static mRosReturnType encode_tcpros_sub_req(mRosEncodeArgType *arg, mRosPacketType *packet)
+static mRosReturnType encode_tcpros_topic_req(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
 	mRosSizeType len;
 	mRosSizeType off = 0;
@@ -325,7 +252,7 @@ static mRosReturnType encode_tcpros_sub_req(mRosEncodeArgType *arg, mRosPacketTy
 	mRosSizeType len_md5sum;
 
 	len = get_arglen(arg);
-	len += mros_tcpros_pub_req_fmt.len;
+	len += mros_tcpros_topic_req_fmt.len;
 
 	if (len > packet->total_size) {
 		return MROS_E_NOMEM;
@@ -347,7 +274,7 @@ static mRosReturnType encode_tcpros_sub_req(mRosEncodeArgType *arg, mRosPacketTy
 			MROS_PACKET_FMT_TCPROS_MD5SUM, arg->argv[3]);
 
 	packet->data_size = snprintf(&packet->data[off], packet->total_size,
-			MROS_PACKET_FMT_TCPROS_SUB,
+			MROS_PACKET_FMT_TCPROS_TOPIC_REQ,
 			arg->argv[0],
 			arg->argv[1],
 			arg->argv[2],
@@ -373,11 +300,61 @@ static mRosReturnType encode_tcpros_sub_req(mRosEncodeArgType *arg, mRosPacketTy
 
 	return MROS_E_OK;
 }
-static mRosReturnType encode_tcpros_sub_res(mRosEncodeArgType *arg, mRosPacketType *packet)
+
+static mRosReturnType encode_tcpros_topic_res(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
-	//TODO
+	mRosSizeType len;
+	mRosSizeType off = 0;
+	mRosSizeType len_callerid;
+	mRosSizeType len_topic;
+	mRosSizeType len_type;
+	mRosSizeType len_md5sum;
+
+	len = get_arglen(arg);
+	len += mros_tcpros_topic_res_fmt.len;
+
+	if (len > packet->total_size) {
+		return MROS_E_NOMEM;
+	}
+
+	len_callerid = snprintf(&packet->data[off], packet->total_size,
+			MROS_PACKET_FMT_TCPROS_CALLER_ID, arg->argv[0]);
+
+	len_topic = snprintf(&packet->data[off], packet->total_size,
+			MROS_PACKET_FMT_TCPROS_TOPIC, arg->argv[1]);
+
+	len_type = snprintf(&packet->data[off], packet->total_size,
+			MROS_PACKET_FMT_TCPROS_TYPE, arg->argv[2]);
+
+	len_md5sum = snprintf(&packet->data[off], packet->total_size,
+			MROS_PACKET_FMT_TCPROS_MD5SUM, arg->argv[3]);
+
+	packet->data_size = snprintf(&packet->data[off], packet->total_size,
+			MROS_PACKET_FMT_TCPROS_TOPIC_RES,
+			arg->argv[0],
+			arg->argv[1],
+			arg->argv[2],
+			arg->argv[3]);
+
+	off = 0;
+	add_len((unsigned char*)&packet->data[off], packet->data_size);
+
+	off += 4U;
+	add_len((unsigned char*)&packet->data[off], len_callerid);
+
+	off += (4U + len_callerid);
+	add_len((unsigned char*)&packet->data[off], len_topic);
+
+	off += (4U + len_topic);
+	add_len((unsigned char*)&packet->data[off], len_type);
+
+	off += (4U + len_type);
+	add_len((unsigned char*)&packet->data[off], len_md5sum);
+
 	return MROS_E_OK;
 }
+
+
 static mRosReturnType encode_topic_data(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
 	//TODO
