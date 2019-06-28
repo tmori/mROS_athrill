@@ -7,12 +7,12 @@ extern "C" {
 
 /*
  * ARGS1: method name
- * ARGS2: id
+ * ARGS2: node name
  * ARGS3: topic
  * ARGS4: type
  * ARGS5: uri
  */
-#define MROS_PACKET_FMT_XML_REGISTER	\
+#define MROS_PACKET_FMT_XML_REGISTER_REQ	\
 	"<?xml version='1.0'?>\n"			\
 	"<methodCall>\n"					\
 	"<methodName>"						\
@@ -20,7 +20,7 @@ extern "C" {
 	"</methodName>\n"					\
 	"<params>\n"						\
 	"<param>\n<value>"					\
-	"%u" 								\
+	"%s" 								\
 	"</value>\n</param>\n"				\
 	"</params>"							\
 	"<params>\n"						\
@@ -42,11 +42,11 @@ extern "C" {
 
 /*
  * ARGS1: method name
- * ARGS2: id
+ * ARGS2: node name
  * ARGS3: topic
  * ARGS4: tcpros
  */
-#define MROS_PACKET_FMT_XML_REQUEST	\
+#define MROS_PACKET_FMT_XML_REQUEST_TOPIC_REQ		\
 	"<?xml version='1.0'?>\n"			\
 	"<methodCall>\n"					\
 	"<methodName>"						\
@@ -70,6 +70,40 @@ extern "C" {
 	"</value>\n</param>\n"				\
 	"</params>"							\
 	"</methodCall>\n"
+
+/*
+ * ARGS1: TCPROS
+ * ARGS2: ipaddr
+ * ARGS3: port
+ */
+#define MROS_PACKET_FMT_XML_REQUEST_TOPIC_RES		\
+	"<?xml version='1.0'?>\n"		\
+	"<methodResponse>\n"	\
+		"<params>\n"	\
+			"<param>\n"	\
+				"<value>" \
+					"<array>" \
+						"<data>" \
+							"<value>" \
+								"<i4>1</i4>"	\
+							"</value>\n"	\
+							"<value></value>\n"	\
+							"<value>"	\
+								"<array>\n"	\
+									"<data>" \
+										"<value>%s</value>\n"	\
+										"<value>%s</value>\n"	\
+										"<value><i4>%u</i4></value>\n"	\
+									"</data>"	\
+								"</array>"	\
+							"</value>\n"	\
+						"</data>"	\
+					"</array>"	\
+				"</value>"	\
+			"</param>\n"	\
+		"</params>\n"	\
+	"</methodResponse>\n"	\
+
 
 #ifdef __cplusplus
 }

@@ -116,8 +116,9 @@ static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *clien
 		arg.type = MROS_PACKET_DATA_REQUEST_TOPIC_RES;
 		arg.args_int = 1;
 		arg.argi[0] = MROS_PUBLISHER_PORT_NO;
-		arg.args_char = 1;
-		arg.argv[0] = MROS_NODE_IPADDR;
+		arg.args_char = 2;
+		arg.argv[0] ="TCPROS";
+		arg.argv[1] = MROS_NODE_IPADDR;
 		ret = mros_packet_encode(&arg, packet);
 		if (ret != MROS_E_OK) {
 			return ret;

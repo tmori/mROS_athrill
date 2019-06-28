@@ -12,7 +12,7 @@ extern "C" {
 
 typedef struct {
 	mRosTopicConnectorEnumType	type;
-	mRosNodeIdType				node_id;
+	const char*					node_name;
 	const char*					topic_name;
 	const char*					topic_typename;
 	mRosPacketType 				*req_packet;
@@ -26,7 +26,7 @@ extern mRosReturnType mros_rpc_register_publisher(mRosCommTcpClientType *client,
 extern mRosReturnType mros_rpc_register_subscriber(mRosCommTcpClientType *client, mRosRegisterTopicReqType *req, mRosRegisterTopicResType *res);
 
 typedef struct {
-	mRosNodeIdType		node_id;
+	const char*			node_name;
 	const char*			topic_name;
 	mRosPacketType 		*req_packet;
 } mRosRequestTopicReqType;

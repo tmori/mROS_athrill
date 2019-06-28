@@ -6,6 +6,7 @@
 #include "mros_config.h"
 #include "mros_packet_encoder_cimpl.h"
 #include "mros_exclusive_area.h"
+#include "mros_node_cimpl.h"
 #include "mros_wait_queue.h"
 #include "mros_comm_tcp_client_cimpl.h"
 #include "mros_packet_decoder_cimpl.h"
@@ -101,7 +102,7 @@ static mRosReturnType mros_protocol_master_register(mRosProtocolMasterRequestTyp
 
 	rpc_response->reply_packet =  &mros_protocol_master.register_packet;
 
-	rpc_request.node_id = connector.node_id;
+	rpc_request.node_name = mros_node_name(connector.node_id);
 	rpc_request.req_packet = &mros_protocol_master.register_packet;
 	rpc_request.topic_name = mros_topic_get_topic_name(connector.topic_id);
 	rpc_request.topic_typename = mros_topic_get_topic_typename(connector.topic_id);
@@ -138,7 +139,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 
 	rpc_response->reply_packet =  &mros_protocol_master.reqtopic_packet;
 
-	rpc_request.node_id = connector.node_id;
+	rpc_request.node_name = mros_node_name(connector.node_id);
 	rpc_request.req_packet = &mros_protocol_master.reqtopic_packet;
 	rpc_request.topic_name = mros_topic_get_topic_name(connector.topic_id);
 	ret = mros_rpc_request_topic(&mros_protocol_master.master_comm, &rpc_request, rpc_response);

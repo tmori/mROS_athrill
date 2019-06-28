@@ -20,8 +20,37 @@ typedef struct {
 } mRosEncodeArgType;
 
 extern mRosReturnType mros_packet_encoder_init(void);
-extern mRosReturnType mros_packet_encode(mRosEncodeArgType *arg, mRosPacketType *packet);
 
+/*
+ * 	arg.type = MROS_PACKET_DATA_REGISTER_PUBLISHER_REQ;
+ *	arg.argv[0] = "registerPublisher";
+ *	arg.argv[1] = req->node_name;
+ *	arg.argv[2] = req->topic_name;
+ *	arg.argv[3] = req->topic_typename;
+ *	arg.argv[4] = MROS_URI_SLAVE;
+ */
+/*
+ *	arg.type = MROS_PACKET_DATA_REGISTER_SUBSCRIBER_REQ;
+ *	arg.argv[0] = "registerSubscriber";
+ *	arg.argv[1] = req->node_name;
+ *	arg.argv[2] = req->topic_name;
+ *	arg.argv[3] = req->topic_typename;
+ *	arg.argv[4] = MROS_URI_SLAVE;
+ */
+/*
+ *	arg.type = MROS_PACKET_DATA_REQUEST_TOPIC_REQ;
+ *	arg.argv[0] = "requestTopic";
+ *	arg.argv[1] = req->node_name;
+ *	arg.argv[2] = req->topic_name;
+ *	arg.argv[3] = "TCPROS";
+ */
+/*
+ *	arg.type = MROS_PACKET_DATA_REQUEST_TOPIC_RES;
+ *	arg.argi[0] = MROS_PUBLISHER_PORT_NO;
+ *	arg.argv[0] ="TCPROS";
+ *	arg.argv[1] = MROS_NODE_IPADDR;
+ */
+extern mRosReturnType mros_packet_encode(mRosEncodeArgType *arg, mRosPacketType *packet);
 
 #ifdef __cplusplus
 }

@@ -38,14 +38,12 @@ mRosReturnType mros_rpc_register_publisher(mRosCommTcpClientType *client, mRosRe
 	mRosEncodeArgType arg;
 
 	arg.type = MROS_PACKET_DATA_REGISTER_PUBLISHER_REQ;
-	arg.args_int = 1;
-	arg.argi[0] = req->node_id;
-
-	arg.args_char = 4;
+	arg.args_char = 5;
 	arg.argv[0] = "registerPublisher";
-	arg.argv[1] = req->topic_name;
-	arg.argv[2] = req->topic_typename;
-	arg.argv[3] = MROS_URI_SLAVE;
+	arg.argv[1] = req->node_name;
+	arg.argv[2] = req->topic_name;
+	arg.argv[3] = req->topic_typename;
+	arg.argv[4] = MROS_URI_SLAVE;
 	return mros_rpc_sendreply_xmlpacket(&arg, client, req->req_packet, res->reply_packet);
 }
 
@@ -54,14 +52,12 @@ mRosReturnType mros_rpc_register_subscriber(mRosCommTcpClientType *client, mRosR
 	mRosEncodeArgType arg;
 
 	arg.type = MROS_PACKET_DATA_REGISTER_SUBSCRIBER_REQ;
-	arg.args_int = 1;
-	arg.argi[0] = req->node_id;
-
-	arg.args_char = 4;
+	arg.args_char = 5;
 	arg.argv[0] = "registerSubscriber";
-	arg.argv[1] = req->topic_name;
-	arg.argv[2] = req->topic_typename;
-	arg.argv[3] = MROS_URI_SLAVE;
+	arg.argv[1] = req->node_name;
+	arg.argv[2] = req->topic_name;
+	arg.argv[3] = req->topic_typename;
+	arg.argv[4] = MROS_URI_SLAVE;
 	return mros_rpc_sendreply_xmlpacket(&arg, client, req->req_packet, res->reply_packet);
 }
 
@@ -70,13 +66,11 @@ mRosReturnType mros_rpc_request_topic(mRosCommTcpClientType *client, mRosRequest
 	mRosEncodeArgType arg;
 
 	arg.type = MROS_PACKET_DATA_REQUEST_TOPIC_REQ;
-	arg.args_int = 1;
-	arg.argi[0] = req->node_id;
-
-	arg.args_char = 3;
+	arg.args_char = 4;
 	arg.argv[0] = "requestTopic";
-	arg.argv[1] = req->topic_name;
-	arg.argv[2] = "TCPROS";
+	arg.argv[1] = req->node_name;
+	arg.argv[2] = req->topic_name;
+	arg.argv[3] = "TCPROS";
 
 	return mros_rpc_sendreply_xmlpacket(&arg, client, req->req_packet, res->reply_packet);
 }

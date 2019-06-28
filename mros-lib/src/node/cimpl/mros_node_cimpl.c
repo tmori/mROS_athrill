@@ -91,7 +91,14 @@ mRosNodeEnumType mros_node_type(mRosNodeIdType id)
 	}
 	return type;
 }
-
+const char* mros_node_name(mRosNodeIdType id)
+{
+	mRosNodeEnumType type = NODE_TYPE(id);
+	if (type != ROS_NODE_TYPE_INNER) {
+		return NULL;
+	}
+	return NODE_OBJ(type, id).data.node_name;
+}
 static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType task_id, mRosNodeEnumType type, mRosNodeIdType *id)
 {
 	mRosNodeListEntryType *p;
