@@ -12,32 +12,30 @@ extern "C" {
  * ARGS4: type
  * ARGS5: uri
  */
-#define MROS_PACKET_FMT_XML_REGISTER_REQ	\
-	"<?xml version='1.0'?>\n"			\
-	"<methodCall>\n"					\
-	"<methodName>"						\
-	"%s"								\
-	"</methodName>\n"					\
-	"<params>\n"						\
-	"<param>\n<value>"					\
-	"%s" 								\
-	"</value>\n</param>\n"				\
-	"</params>"							\
-	"<params>\n"						\
-	"<param>\n<value>"					\
-	"%s" 								\
-	"</value>\n</param>\n"				\
-	"</params>"							\
-	"<params>\n"						\
-	"<param>\n<value>"					\
-	"%s" 								\
-	"</value>\n</param>\n"				\
-	"</params>"							\
-	"<params>\n"						\
-	"<param>\n<value>"					\
-	"%s" 								\
-	"</value>\n</param>\n"				\
-	"</params>"							\
+#define MROS_PACKET_FMT_XML_REGISTER_REQ		\
+	"<?xml version='1.0'?>\n"					\
+	"<methodCall>\n"						\
+		"<methodName>%s</methodName>\n"		\
+		"<params>\n"						\
+			"<param>\n"						\
+				"<value>%s</value>\n"		\
+			"</param>\n"					\
+		"</params>"							\
+		"<params>\n"						\
+			"<param>\n"						\
+				"<value>%s</value>\n"		\
+			"</param>\n"					\
+		"</params>"							\
+		"<params>\n"						\
+			"<param>\n"						\
+				"<value>%s</value>\n"		\
+			"</param>\n"					\
+		"</params>"							\
+		"<params>\n"						\
+			"<param>\n"						\
+				"<value>%s</value>\n"		\
+			"</param>\n"					\
+		"</params>"							\
 	"</methodCall>\n"
 
 /*
@@ -46,30 +44,38 @@ extern "C" {
  * ARGS3: topic
  * ARGS4: tcpros
  */
-#define MROS_PACKET_FMT_XML_REQUEST_TOPIC_REQ		\
-	"<?xml version='1.0'?>\n"			\
-	"<methodCall>\n"					\
-	"<methodName>"						\
-	"%s"								\
-	"</methodName>\n"					\
-	"<params>\n"						\
-	"<param>\n<value>"					\
-	"%s" 								\
-	"</value>\n</param>\n"				\
-	"</params>"							\
-	"<params>\n"						\
-	"<param>\n<value>"					\
-	"%s" 								\
-	"</value>\n</param>\n"				\
-	"</params>"							\
-	"<params>\n"						\
-	"<param>\n<value>"					\
-    "<array>\n<data><value><array>\n<data><value>"	\
-    "%s"								\
-    "</value></data>\n</array></value></data>\n</array>"	\
-	"</value>\n</param>\n"				\
-	"</params>"							\
-	"</methodCall>\n"
+#define MROS_PACKET_FMT_XML_REQUEST_TOPIC_REQ				\
+	"<?xml version='1.0'?>\n"								\
+	"<methodCall>\n"										\
+		"<methodName>%s</methodName>\n"						\
+		"<params>\n"										\
+			"<param>\n"										\
+				"<value>%s</value>\n"						\
+			"</param>\n"									\
+		"</params>"											\
+		"<params>\n"										\
+			"<param>\n"										\
+				"<value>%s</value>\n"						\
+			"</param>\n"									\
+		"</params>"											\
+		"<params>\n"										\
+			"<param>\n"										\
+				"<value>"									\
+					"<array>\n"								\
+						"<data>"							\
+							"<value>"						\
+								"<array>\n"					\
+									"<data>"				\
+										"<value>%s</value>"	\
+									"</data>\n"				\
+								"</array>"					\
+							"</value>"						\
+						"</data>\n"							\
+					"</array>"								\
+				"</value>\n"								\
+			"</param>\n"									\
+		"</params>"											\
+	"</methodCall>\n"										\
 
 /*
  * ARGS1: TCPROS
