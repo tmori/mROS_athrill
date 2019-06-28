@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+#define MROS_PACKET_HTT_OK_CODE_LEN		3
+#define MROS_PACKET_HTT_OK_CODE			"200"
+
 /*
  * ARG1: xml size
  */

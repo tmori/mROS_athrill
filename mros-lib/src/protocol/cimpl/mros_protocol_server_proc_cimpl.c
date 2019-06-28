@@ -7,7 +7,7 @@
 #include "mros_packet_decoder_cimpl.h"
 #include "mros_node_cimpl.h"
 
-static char *topic_name_buffer[MROS_TOPIC_NAME_MAXLEN];
+static char topic_name_buffer[MROS_TOPIC_NAME_MAXLEN];
 
 mRosReturnType mros_proc_init(void)
 {
@@ -188,12 +188,13 @@ mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketTyp
 	mRosReturnType ret;
 	mRosTopicIdType topic_id;
 	mRosSizeType res;
+	mRosTcpRosPacketType tcpros_packet;
 
-	ret = mros_tcprospacket_get_topic_name(packet, topic_name_buffer, MROS_TOPIC_NAME_MAXLEN);
+	ret = mros_tcprospacket_decode(packet, &tcpros_packet);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-	ret = mros_topic_get((const char*)topic_name_buffer, &topic_id);
+	ret = mros_topic_get((const char*)tcpros_packet.topic, &topic_id);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}

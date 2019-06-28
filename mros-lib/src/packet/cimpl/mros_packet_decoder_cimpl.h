@@ -7,6 +7,8 @@ extern "C" {
 
 #include "mros_packet_cimpl.h"
 
+extern mRosReturnType mros_packet_decoder_init(void);
+
 
 /************************************************
  * XML RPC PACKET
@@ -40,7 +42,7 @@ extern mRosPacketDataType mros_xmlpacket_slave_request_get_method(mRosPacketType
 /*
  * RequestTopic request
  */
-extern mRosReturnType mros_xmlpacket_slave_reqtopic_get_topic_name(mRosPacketType *packet, char** topic_name, mros_uint32 len);
+extern mRosReturnType mros_xmlpacket_slave_reqtopic_get_topic_name(mRosPacketType *packet, char* topic_name, mros_uint32 len);
 
 /*
  * RequestTopic response
@@ -53,7 +55,14 @@ extern mRosPtrType mros_xmlpacket_reqtopicres_get_next_uri(mRosPtrType ptr, mRos
  * TCPROS
  ****************************************************/
 extern mRosReturnType mros_tcprospacket_get_body_size(mRosPacketType *packet, mRosSizeType *len);
-extern mRosReturnType mros_tcprospacket_get_topic_name(mRosPacketType *packet, char** topic_name, mros_uint32 len);
+typedef struct {
+	char *callerid;
+	char *tcp_nodely;
+	char *topic;
+	char* type;
+	char *md5sum;
+} mRosTcpRosPacketType;
+extern mRosReturnType mros_tcprospacket_decode(mRosPacketType *packet, mRosTcpRosPacketType *decoded_packet);
 
 
 /****************************************************

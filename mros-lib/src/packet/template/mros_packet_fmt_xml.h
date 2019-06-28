@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+#define MROS_PACKET_XMLRPC_REQ_END_STR		"</methodCall>"
+#define MROS_PACKET_XMLRPC_RES_END_STR		"</methodResponse>"
+
 /*
  * ARGS1: method name
  * ARGS2: node name
