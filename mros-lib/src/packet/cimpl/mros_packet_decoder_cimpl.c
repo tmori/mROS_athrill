@@ -15,9 +15,9 @@ mRosReturnType mros_packet_decoder_init(void)
 }
 
 
-static const char *find_string_after(const char* string1, const char* string2)
+static char *find_string_after(const char* string1, const char* string2)
 {
-	const char* str = strstr(string1, string2);
+	char* str = strstr(string1, string2);
 	if (str == NULL) {
 		return NULL;
 	}
@@ -170,12 +170,87 @@ mRosPtrType mros_xmlpacket_subres_get_next_uri(mRosPtrType ptr, mRosPacketType *
 }
 
 
+static mRosReturnType mros_xmlpacket_get_member_info(const char*p, mRosPacketMemberInfoType *infop)
+{
+	infop->res.head = find_string_after(p, infop->req.start_key);
+	if (infop->res.head == NULL) {
+		return MROS_E_INVAL;
+	}
+
+	infop->res.tail = strstr(infop->res.head, "<");
+	if (infop->res.tail == NULL) {
+		return MROS_E_INVAL;
+	}
+	infop->res.len = (infop->res.tail - infop->res.head) + 1;
+	return MROS_E_OK;
+}
 
 //SLAVE
-mRosPacketDataType mros_xmlpacket_slave_request_get_method(mRosPacketType *packet)
+static mRosPacketDataType mros_xmlpacket_slave_request_get_method(mRosPacketType *packet, mRosPacketMemberInfoType *minfop)
 {
-	//TODO
+	mRosReturnType ret;
+	mRosSizeType len = strlen("requestTopic");
+
+	//"<methodName>requestTopic</methodName>"
+	minfop->req.start_key = "<methodName>";
+	minfop->req.end_key = "<";
+
+	ret = mros_xmlpacket_get_member_info(packet->data, minfop);
+	if (ret != MROS_E_OK) {
+		return MROS_PACKET_DATA_INVALID;
+	}
+	if (len != minfop->res.len) {
+		return MROS_PACKET_DATA_INVALID;
+	}
+	if (strncmp(minfop->res.head, "requestTopic", len) == 0) {
+		return MROS_PACKET_DATA_REQUEST_TOPIC_REQ;
+	}
+
+	return MROS_PACKET_DATA_INVALID;
+}
+#ifdef ROS_INDIGO
+#define REQTOPIC_VALUE_TAG_START "<value>"
+#define REQTOPIC_VALUE_TAG_END "</value>"
+#else
+#define REQTOPIC_VALUE_TAG_START "<value><string>"
+#define REQTOPIC_VALUE_TAG_END "</string></value>"
+#endif
+
+static mRosReturnType mros_xmlpacket_request_topic_req_decode(mRosPacketType *packet, mRosPacketDecodedRequestType *decoded_infop)
+{
+	mRosReturnType ret;
+
+	decoded_infop->request.topic.node_name.req.start_key = REQTOPIC_VALUE_TAG_START;
+	decoded_infop->request.topic.node_name.req.end_key = "<";
+	ret = mros_xmlpacket_get_member_info(decoded_infop->method.res.tail, &decoded_infop->request.topic.node_name);
+	if (ret != MROS_E_OK) {
+		return MROS_E_INVAL;
+	}
+	decoded_infop->request.topic.topic_name.req.start_key = REQTOPIC_VALUE_TAG_START;
+	decoded_infop->request.topic.topic_name.req.end_key = "<";
+	ret = mros_xmlpacket_get_member_info(decoded_infop->request.topic.topic_name.res.tail, &decoded_infop->request.topic.topic_name);
+	if (ret != MROS_E_OK) {
+		return MROS_E_INVAL;
+	}
+
 	return MROS_E_OK;
+}
+
+mRosPacketDataType mros_xmlpacket_slave_request_decode(mRosPacketType *packet, mRosPacketDecodedRequestType *decoded_infop)
+{
+	mRosReturnType ret = MROS_E_INVAL;
+	decoded_infop->packet_type = mros_xmlpacket_slave_request_get_method(packet, &decoded_infop->method);
+	switch (decoded_infop->packet_type) {
+	case MROS_PACKET_DATA_REQUEST_TOPIC_REQ:
+		ret = mros_xmlpacket_request_topic_req_decode(packet, decoded_infop);
+		break;
+	default:
+		break;
+	}
+	if (ret != MROS_E_OK) {
+		return MROS_PACKET_DATA_INVALID;
+	}
+	return decoded_infop->packet_type;
 }
 
 
@@ -194,8 +269,7 @@ mRosReturnType mros_xmlpacket_slave_reqtopic_get_topic_name(mRosPacketType *pack
  */
 mRosReturnType mros_xmlpacket_reqtopicres_result(mRosPacketType *packet)
 {
-	//TODO
-	return MROS_E_OK;
+	return mros_xmlpacket_result(packet);
 }
 
 mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)

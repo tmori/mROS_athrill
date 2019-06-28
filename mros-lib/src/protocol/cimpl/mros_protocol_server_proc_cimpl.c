@@ -6,8 +6,10 @@
 #include "mros_packet_encoder_cimpl.h"
 #include "mros_packet_decoder_cimpl.h"
 #include "mros_node_cimpl.h"
+#include <string.h>
 
 static char topic_name_buffer[MROS_TOPIC_NAME_MAXLEN];
+static mRosPacketDecodedRequestType mros_proc_slave_decoded_requst;
 
 mRosReturnType mros_proc_init(void)
 {
@@ -98,10 +100,13 @@ static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *clien
 	mRosTopicIdType topic_id;
 	mRosSizeType res;
 
-	ret = mros_xmlpacket_slave_reqtopic_get_topic_name(packet, topic_name_buffer, MROS_TOPIC_NAME_MAXLEN);
-	if (ret != MROS_E_OK) {
-		return ret;
+	if (mros_proc_slave_decoded_requst.request.topic.topic_name.res.len >= MROS_TOPIC_NAME_MAXLEN) {
+		return MROS_E_INVAL;
 	}
+	memcpy(topic_name_buffer,
+			mros_proc_slave_decoded_requst.request.topic.topic_name.res.head,
+			mros_proc_slave_decoded_requst.request.topic.topic_name.res.len);
+	topic_name_buffer[mros_proc_slave_decoded_requst.request.topic.topic_name.res.len] = '\0';
 	ret = mros_topic_get((const char*)topic_name_buffer, &topic_id);
 	if (ret != MROS_E_OK) {
 		return ret;
@@ -133,7 +138,7 @@ mRosReturnType mros_proc_slave(mRosCommTcpClientType *client, mRosPacketType *pa
 {
 	mRosReturnType ret = MROS_E_INVAL;
 
-	mRosPacketDataType type = mros_xmlpacket_slave_request_get_method(packet);
+	mRosPacketDataType type = mros_xmlpacket_slave_request_decode(packet, &mros_proc_slave_decoded_requst);
 	switch (type) {
 	case MROS_PACKET_DATA_REQUEST_TOPIC_REQ:
 		ret = mros_proc_slave_request_topic(client, packet);

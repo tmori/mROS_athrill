@@ -37,7 +37,30 @@ extern mRosPtrType mros_xmlpacket_subres_get_next_uri(mRosPtrType ptr, mRosPacke
 
 
 //SLAVE
-extern mRosPacketDataType mros_xmlpacket_slave_request_get_method(mRosPacketType *packet);
+typedef struct {
+	struct {
+		char *start_key;
+		char *end_key;
+	} req;
+	struct {
+		char *head;
+		char *tail;
+		mRosSizeType len;
+	} res;
+} mRosPacketMemberInfoType;
+
+typedef struct {
+	mRosPacketDataType		packet_type;
+	mRosPacketMemberInfoType method;
+	union {
+		struct {
+			mRosPacketMemberInfoType node_name;
+			mRosPacketMemberInfoType topic_name;
+		} topic;
+	} request;
+} mRosPacketDecodedRequestType;
+extern mRosPacketDataType mros_xmlpacket_slave_request_decode(mRosPacketType *packet, mRosPacketDecodedRequestType *decoded_infop);
+
 
 /*
  * RequestTopic request

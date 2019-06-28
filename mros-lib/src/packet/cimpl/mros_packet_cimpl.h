@@ -18,6 +18,7 @@ typedef enum {
 	MROS_PACKET_DATA_TOPIC,
 	MROS_PACKET_DATA_NUM,
 } mRosPacketDataType;
+#define MROS_PACKET_DATA_INVALID	MROS_PACKET_DATA_NUM
 
 typedef struct {
 	mRosSizeType						total_size;
