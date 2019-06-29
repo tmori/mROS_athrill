@@ -17,4 +17,5 @@ extern void rsm_all();
 extern void cyclic_handler(intptr_t exinf);
 
 
+
 #endif /* _MROS_OS_CONFIG_H_ */

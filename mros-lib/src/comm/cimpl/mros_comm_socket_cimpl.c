@@ -31,6 +31,11 @@ mRosReturnType mros_comm_socket_init(mRosCommSocketType *socket, mRosCommSocketE
 	default:
 		return MROS_E_INVAL;
 	}
+	socket->sock_fd = mros_comm_socket(MROS_SOCK_AF_INET, socket->comm_type, 0);
+	if (socket->sock_fd < 0) {
+		return MROS_E_INVAL;
+	}
+
     socket->blocking = MROS_TRUE;
     socket->timeout = MROS_COMM_DEFAULT_TIMEOUT;
 	return MROS_E_OK;
