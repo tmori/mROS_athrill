@@ -1,6 +1,7 @@
 #include "mros_packet_decoder_cimpl.h"
 #include "mros_packet_fmt_xml.h"
 #include "mros_packet_fmt_http.h"
+#include "mros_comm_cimpl.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -25,45 +26,8 @@ static char *find_string_after(const char* string1, const char* string2)
 	return str;
 }
 #define PORT_MAX_STR_LEN	6U /* 65536 */
+#define IP_MAX_STR_LEN	15U /* 255.255.255.255 */
 
-static mRosReturnType mros_packet_decode_port_integer(mros_uint32 *port, mRosPacketType *packet)
-{
-	char val[PORT_MAX_STR_LEN];
-
-	//search HERE
-	//        |
-	//        V
-	//"http://xxx.xxx.xx:8080/"
-	const char* head = find_string_after((const char *)&packet->data[0], "http://");
-	if (head == NULL) {
-		return MROS_E_INVAL;
-	}
-
-	//           search HERE
-	//                   |
-	//                   V
-	//"http://xxx.xxx.xx:8080/"
-	head = find_string_after(head, ":");
-	if (head == NULL) {
-		return MROS_E_INVAL;
-	}
-
-	//               search HERE
-	//                       |
-	//                       V
-	//"http://xxx.xxx.xx:8080/"
-	const char* tail = strstr(head, "/");
-	mros_uint32 len = (tail - head) + 1;
-	if (len > PORT_MAX_STR_LEN) {
-		return MROS_E_INVAL;
-	}
-
-	memcpy(&val[0], head, (len - 1));
-	val[len - 1] = '\0';
-
-	*port = strtol(val, NULL, 10);
-	return MROS_E_OK;
-}
 
 
 /************************************************
@@ -156,11 +120,42 @@ mRosReturnType mros_xmlpacket_subres_result(mRosPacketType *packet)
 {
 	return mros_xmlpacket_result(packet);
 }
-
 mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
 {
-	//TODO
-	return MROS_E_OK;
+	char val[PORT_MAX_STR_LEN + 1];
+	//search HERE
+	//        |
+	//        V
+	//"http://xxx.xxx.xx:8080/"
+	const char* head = find_string_after((const char *)&packet->data[0], "http://");
+	if (head == NULL) {
+		return NULL;
+	}
+
+	//           search HERE
+	//                   |
+	//                   V
+	//"http://xxx.xxx.xx:8080/"
+	head = find_string_after(head, ":");
+	if (head == NULL) {
+		return NULL;
+	}
+
+	//               search HERE
+	//                       |
+	//                       V
+	//"http://xxx.xxx.xx:8080/"
+	const char* tail = strstr(head, "/");
+	mros_uint32 len = (tail - head) + 1;
+	if (len > PORT_MAX_STR_LEN) {
+		return NULL;
+	}
+
+	memcpy(&val[0], head, (len - 1));
+	val[len - 1] = '\0';
+
+	*port = strtol(val, NULL, 10);
+	return (mRosPtrType)tail;
 }
 
 mRosPtrType mros_xmlpacket_subres_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
@@ -186,6 +181,9 @@ static mRosReturnType mros_xmlpacket_get_member_info(const char*p, mRosPacketMem
 }
 
 //SLAVE
+/*
+ * RequestTopic request
+ */
 static mRosPacketDataType mros_xmlpacket_slave_request_get_method(mRosPacketType *packet, mRosPacketMemberInfoType *minfop)
 {
 	mRosReturnType ret;
@@ -253,17 +251,6 @@ mRosPacketDataType mros_xmlpacket_slave_request_decode(mRosPacketType *packet, m
 	return decoded_infop->packet_type;
 }
 
-
-/*
- * RequestTopic request
- */
-mRosReturnType mros_xmlpacket_slave_reqtopic_get_topic_name(mRosPacketType *packet, char* topic_name, mros_uint32 len)
-{
-	//TODO
-	return MROS_E_OK;
-}
-
-
 /*
  * RequestTopic response
  */
@@ -271,11 +258,108 @@ mRosReturnType mros_xmlpacket_reqtopicres_result(mRosPacketType *packet)
 {
 	return mros_xmlpacket_result(packet);
 }
+/*
+HTTP/1.0 200 OK
+Server: BaseHTTP/0.3 Python/2.7.12
+Date: Sat, 29 Jun 2019 01:07:58 GMT
+Content-type: text/xml
+Content-length: 377
+
+<?xml version='1.0'?>
+<methodResponse>
+<params>
+<param>
+<value><array><data>
+<value><int>1</int></value>
+<value><string>ready on Chagall:54894</string></value>
+<value><array><data>
+<value><string>TCPROS</string></value>
+<value><string>Chagall</string></value>
+<value><int>54894</int></value>
+</data></array></value>
+</data></array></value>
+</param>
+</params>
+</methodResponse>
+ */
 
 mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
 {
-	//TODO
-	return MROS_E_OK;
+	char port_val[PORT_MAX_STR_LEN + 1];
+	char ip_val[IP_MAX_STR_LEN + 1];
+	mRosReturnType ret;
+	//      search HERE
+	//             |
+	//             V
+	//"<value><array><data>"
+	const char* head = find_string_after((const char *)&packet->data[0], "<array>");
+	if (head == NULL) {
+		return NULL;
+	}
+
+	//      search HERE
+	//              |
+	//              V
+	//"<value><array><data>"
+	head = find_string_after(head, "<array>");
+	if (head == NULL) {
+		return NULL;
+	}
+	//                             search HERE
+	//                                     |
+	//                                     V
+	//<value><string>TCPROS</string></value>
+	head = find_string_after(head, "</value>");
+	if (head == NULL) {
+		return NULL;
+	}
+	//      search HERE
+	//              |
+	//              V
+	//<value><string>Chagall</string></value>
+	head = find_string_after(head, "<value><string>");
+	if (head == NULL) {
+		return NULL;
+	}
+
+	//             search HERE
+	//                      |
+	//                      V
+	//<value><string>Chagall</string></value>
+	char* tail = strstr(head, "<");
+	mros_uint32 len = (tail - head) + 1;
+	if (len > IP_MAX_STR_LEN) {
+		return NULL;
+	}
+	memcpy(&ip_val[0], head, (len - 1));
+	ip_val[len - 1] = '\0';
+	ret = mros_comm_inet_get_ipaddr((const char *)ip_val, ipaddr);
+	if (ret != MROS_E_OK) {
+		return NULL;
+	}
+
+	//   search HERE
+	//           |
+	//           V
+	//<value><int>54894</int></value>
+	head = find_string_after(head, "<value><int>");
+	if (head == NULL) {
+		return NULL;
+	}
+
+	//         search HERE
+	//                 |
+	//                 V
+	//<value><int>54894</int></value>
+	tail = strstr(head, "<");
+	len = (tail - head) + 1;
+	if (len > PORT_MAX_STR_LEN) {
+		return NULL;
+	}
+	memcpy(&port_val[0], head, (len - 1));
+	port_val[len - 1] = '\0';
+	*port = strtol(port_val, NULL, 10);
+	return (mRosPtrType)tail;
 }
 
 mRosPtrType mros_xmlpacket_reqtopicres_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)

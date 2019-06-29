@@ -25,6 +25,7 @@ extern "C" {
 #include "mros_types.h"
 
 
+extern mRosReturnType mros_comm_inet_get_ipaddr(const char *hostname, mros_uint32 *ipaddr);
 extern void mros_comm_inet_local_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port);
 extern void mros_comm_inet_remote_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port, const char* ipaddrp);
 extern void mros_comm_inet_remote_sockaddr_ip32_init(mRosSockAddrInType *addr, mros_int32 port, mros_uint32 ipaddrp);
