@@ -51,6 +51,8 @@ void mros_wakeup_task(mRosTaskIdType task_id)
 	(void)wup_tsk(task_id);
 }
 
+static void do_packet_encoder_test(void);
+
 void main_task()
 {
 	mRosReturnType ret;
@@ -98,7 +100,7 @@ void main_task()
 		syslog(LOG_ERROR, "mros_topic_data_subscriber_init()=%d", ret);
 		return;
 	}
-
+#if 0
 	ret = mros_protocol_subscribe_init();
 	if (ret != MROS_E_OK) {
 		syslog(LOG_ERROR, "mros_protocol_subscribe_init()=%d", ret);
@@ -126,6 +128,9 @@ void main_task()
 	act_tsk(XML_SLV_TASK);
 	act_tsk(XML_MAS_TASK);
 
+#else
+	do_packet_encoder_test();
+#endif
 	syslog(LOG_NOTICE,"**********mROS Main task finish**********");
 	return;
 }
@@ -164,4 +169,46 @@ void cyclic_handler(intptr_t exinf)
 	//iwup_tsk(XML_SLV_TASK);
 	return;
 }
+#include "mros_protocol_client_rpc_cimpl.h"
 
+static void do_packet_encoder_test(void)
+{
+	mRosEncodeArgType arg;
+	mRosPacketType packet;
+	mRosReturnType ret;
+	static char buffer[512];
+	mRosCommTcpClientType client;
+	mRosSizeType rlen;
+
+	ret = mros_comm_tcp_client_init(&client, MROS_MASTER_IPADDR, MROS_MASTER_PORT_NO);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_client_init()=%d", ret);
+		return;
+	}
+	packet.data = buffer;
+	packet.total_size = sizeof(buffer);
+	packet.data_size = 0;
+
+	ret = mros_comm_tcp_client_connect(&client);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_client_connect()=%d", ret);
+		return;
+	}
+	mRosRegisterTopicReqType req;
+	mRosRegisterTopicResType res;
+	req.node_name = "node1";
+	req.req_packet = &packet;
+	req.topic_name = "topic_name1";
+	req.topic_typename = "std_msgs/String";
+	res.reply_packet = &packet;
+
+	ret = mros_rpc_register_publisher(&client, &req, &res);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_rpc_register_publisher()=%d", ret);
+		return;
+	}
+	syslog(LOG_NOTICE, "data_size=%d", packet.data_size);
+	syslog(LOG_NOTICE, "packet=%s", packet.data);
+
+	return;
+}

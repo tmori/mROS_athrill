@@ -41,7 +41,7 @@
 /*
  * portno of master
  */
-#define MROS_MASTER_PORT_NO						1131
+#define MROS_MASTER_PORT_NO						11311
 /*
  * ipaddr of master
  */
@@ -52,12 +52,12 @@
 /*
  * portno of slave
  */
-#define MROS_SLAVE_PORT_NO						1141
+#define MROS_SLAVE_PORT_NO						11411
 
 /*
  * portno of pub
  */
-#define MROS_PUBLISHER_PORT_NO					1151
+#define MROS_PUBLISHER_PORT_NO					11511
 
 #define MROS_IPADDR								"0.0.0.0"
 #define MROS_URI_SLAVE							"http://0.0.0.0/1141"

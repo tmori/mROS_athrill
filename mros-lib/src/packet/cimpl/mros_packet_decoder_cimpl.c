@@ -10,8 +10,8 @@ static mros_int32 mros_packet_xmlrpc_res_end_str_len = 0;
 
 mRosReturnType mros_packet_decoder_init(void)
 {
-	mros_packet_xmlrpc_req_end_str_len = strlen(MROS_PACKET_XMLRPC_REQ_END_STR) + 1;
-	mros_packet_xmlrpc_res_end_str_len = strlen(MROS_PACKET_XMLRPC_RES_END_STR) + 1;
+	mros_packet_xmlrpc_req_end_str_len = strlen(MROS_PACKET_XMLRPC_REQ_END_STR);
+	mros_packet_xmlrpc_res_end_str_len = strlen(MROS_PACKET_XMLRPC_RES_END_STR);
 	return MROS_E_OK;
 }
 
@@ -64,7 +64,7 @@ mros_boolean mros_xmlpacket_has_response_end(mRosPacketType *packet)
 	off = (mros_int32)packet->data_size - (mros_int32)mros_packet_xmlrpc_res_end_str_len;
 	while (off > 0) {
 		if (strncmp(&packet->data[off], MROS_PACKET_XMLRPC_RES_END_STR, mros_packet_xmlrpc_res_end_str_len) == 0) {
-			break;
+			return MROS_TRUE;
 		}
 		off--;
 	}

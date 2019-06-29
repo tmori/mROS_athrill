@@ -44,14 +44,8 @@ mRosReturnType mros_comm_tcp_client_connect(mRosCommTcpClientType *client)
 	if (client->connected == MROS_TRUE) {
 		return MROS_E_INVAL;
 	}
-	ret = mros_comm_socket_open(&client->socket);
-	if (ret != MROS_E_OK) {
-		return MROS_E_SYSERR;
-	}
-
 	ret = mros_comm_connect(client->socket.sock_fd, (const mRosSockAddrType *)&client->remote, sizeof(mRosSockAddrInType));
 	if (ret != MROS_E_OK) {
-		mros_comm_socket_close(&client->socket);
 		return MROS_E_NOTCONN;
 	}
 	client->connected = MROS_TRUE;

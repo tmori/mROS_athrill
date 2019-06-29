@@ -11,7 +11,6 @@ extern "C" {
 #include "mros_topic_connector_factory_cimpl.h"
 
 typedef struct {
-	mRosTopicConnectorEnumType	type;
 	const char*					node_name;
 	const char*					topic_name;
 	const char*					topic_typename;
