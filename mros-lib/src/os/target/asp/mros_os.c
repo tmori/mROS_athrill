@@ -5,6 +5,16 @@
 #include "mros_protocol_publish_cimpl.h"
 #include "mros_os_config.h"
 #include "mros_comm_cimpl.h"
+#include "mros_comm_tcp_client_factory_cimpl.h"
+#include "mros_exclusive_area.h"
+#include "mros_node_cimpl.h"
+#include "mros_packet_decoder_cimpl.h"
+#include "mros_packet_encoder_cimpl.h"
+#include "mros_protocol_server_proc_cimpl.h"
+#include "mros_topic_cimpl.h"
+#include "mros_topic_data_publisher_cimpl.h"
+#include "mros_topic_data_subscriber_cimpl.h"
+
 #include "kernel_cfg.h"
 
 mRosTaskIdType mros_get_taskid(void)
@@ -46,24 +56,67 @@ void main_task()
 	mRosReturnType ret;
 	syslog(LOG_NOTICE, "**********mROS main task start**********");
 	mros_comm_init();
+	mros_exclusive_area_init();
+
+	ret = mros_comm_tcp_client_factory_init();
+	if (ret != MROS_E_OK) {
+		syslog(LOG_ERROR, "mros_comm_tcp_client_factory_init()=%d", ret);
+		return;
+	}
+	ret = mros_node_init();
+	if (ret != MROS_E_OK) {
+		syslog(LOG_ERROR, "mros_node_init()=%d", ret);
+		return;
+	}
+	ret = mros_topic_init();
+	if (ret != MROS_E_OK) {
+		syslog(LOG_ERROR, "mros_topic_init()=%d", ret);
+		return;
+	}
+	ret = mros_packet_decoder_init();
+	if (ret != MROS_E_OK) {
+		syslog(LOG_ERROR, "mros_packet_decoder_init()=%d", ret);
+		return;
+	}
+	ret = mros_packet_encoder_init();
+	if (ret != MROS_E_OK) {
+		syslog(LOG_ERROR, "mros_packet_encoder_init()=%d", ret);
+		return;
+	}
+	ret = mros_proc_init();
+	if (ret != MROS_E_OK) {
+		syslog(LOG_ERROR, "mros_proc_init()=%d", ret);
+		return;
+	}
+	ret = mros_topic_data_publisher_init();
+	if (ret != MROS_E_OK) {
+		syslog(LOG_ERROR, "mros_topic_data_publisher_init()=%d", ret);
+		return;
+	}
+	ret = mros_topic_data_subscriber_init();
+	if (ret != MROS_E_OK) {
+		syslog(LOG_ERROR, "mros_topic_data_subscriber_init()=%d", ret);
+		return;
+	}
+
 	ret = mros_protocol_subscribe_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_NOTICE, "mros_protocol_subscribe_init()=%d", ret);
+		syslog(LOG_ERROR, "mros_protocol_subscribe_init()=%d", ret);
 		return;
 	}
 	ret = mros_protocol_publish_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_NOTICE, "mros_protocol_publish_init()=%d", ret);
+		syslog(LOG_ERROR, "mros_protocol_publish_init()=%d", ret);
 		return;
 	}
 	ret = mros_protocol_slave_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_NOTICE, "mros_protocol_slave_init()=%d", ret);
+		syslog(LOG_ERROR, "mros_protocol_slave_init()=%d", ret);
 		return;
 	}
 	ret = mros_protocol_master_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_NOTICE, "mros_protocol_master_init()=%d", ret);
+		syslog(LOG_ERROR, "mros_protocol_master_init()=%d", ret);
 		return;
 	}
 
@@ -79,6 +132,7 @@ void main_task()
 
 void sub_task()
 {
+	syslog(LOG_NOTICE, "**********mROS sub task start**********");
 	mros_protocol_subscribe_run();
 	return;
 }
