@@ -53,6 +53,7 @@ void mros_wakeup_task(mRosTaskIdType task_id)
 
 static void do_test_register_publisher(void);
 static void do_test_register_subscriber(void);
+static void do_test_request_topic(void);
 
 void main_task()
 {
@@ -131,7 +132,8 @@ void main_task()
 
 #else
 	//do_test_register_publisher();
-	do_test_register_subscriber();
+	//do_test_register_subscriber();
+	do_test_request_topic();
 #endif
 	syslog(LOG_NOTICE,"**********mROS Main task finish**********");
 	return;
@@ -265,6 +267,89 @@ static void do_test_register_subscriber(void)
 	syslog(LOG_NOTICE, "ptr=0x%x ipaddr=0x%x port=%d", ptr, ipaddr, port);
 
 	syslog(LOG_NOTICE, "END: TEST REGISTER SUBSCRIBER");
+
+	return;
+}
+static void do_test_request_topic(void)
+{
+	mRosEncodeArgType arg;
+	mRosPacketType packet;
+	mRosReturnType ret;
+	static char buffer[1024];
+	mRosCommTcpClientType client;
+	mRosSizeType rlen;
+
+	syslog(LOG_NOTICE, "START: TEST REQUEST TOPIC");
+
+
+	ret = mros_comm_tcp_client_init(&client, MROS_MASTER_IPADDR, MROS_MASTER_PORT_NO);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_client_init()=%d", ret);
+		return;
+	}
+	packet.data = buffer;
+	packet.total_size = sizeof(buffer);
+	packet.data_size = 0;
+
+	ret = mros_comm_tcp_client_connect(&client);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_client_connect()=%d", ret);
+		return;
+	}
+	mRosRegisterTopicReqType req;
+	mRosRegisterTopicResType res;
+	req.node_name = "node1";
+	req.req_packet = &packet;
+	req.topic_name = "topic_name1";
+	req.topic_typename = "std_msgs/String";
+	res.reply_packet = &packet;
+	ret = mros_rpc_register_subscriber(&client, &req, &res);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_rpc_register_publisher()=%d", ret);
+		return;
+	}
+	mros_comm_tcp_client_close(&client);
+	mros_uint32 ipaddr = -1;
+	mros_int32 port = -1;
+	mRosPtrType ptr = mros_xmlpacket_subres_get_first_uri(res.reply_packet, &ipaddr, &port);
+	syslog(LOG_NOTICE, "ptr=0x%x ipaddr=0x%x port=%d", ptr, ipaddr, port);
+	if (ptr == NULL) {
+		syslog(LOG_NOTICE, "no publisher");
+		return;
+	}
+	mRosRequestTopicReqType topic_req;
+	mRosRequestTopicResType topic_res;
+	topic_req.node_name = "node1";
+	topic_req.req_packet = &packet;
+	topic_req.topic_name = "topic_name1";
+	topic_res.reply_packet = &packet;
+	while (ptr != NULL) {
+		mRosCommTcpClientType client;
+
+		ret = mros_comm_tcp_client_ip32_init(&client, ipaddr, port);
+		if (ret != MROS_E_OK) {
+			syslog(LOG_NOTICE, "mros_comm_tcp_client_connect()=%d", ret);
+			return;
+		}
+		ret = mros_comm_tcp_client_connect(&client);
+		if (ret != MROS_E_OK) {
+			syslog(LOG_NOTICE, "mros_comm_tcp_client_connect()=%d", ret);
+			return;
+		}
+		ret = mros_rpc_request_topic(&client, &topic_req, &topic_res);
+		mros_comm_tcp_client_close(&client);
+		if (ret != MROS_E_OK) {
+			syslog(LOG_NOTICE, "mros_protocol_master_request_topic()=%d", ret);
+			return;
+		}
+		ptr = mros_xmlpacket_subres_get_next_uri(ptr, topic_res.reply_packet, &ipaddr, &port);
+		syslog(LOG_NOTICE, "ptr=0x%x ipaddr=0x%x port=%d", ptr, ipaddr, port);
+	}
+	syslog(LOG_NOTICE, "data_size=%d", packet.data_size);
+	syslog(LOG_NOTICE, "packet=%s", packet.data);
+
+
+	syslog(LOG_NOTICE, "END: TEST REQUEST TOPIC");
 
 	return;
 }
