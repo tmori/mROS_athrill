@@ -51,7 +51,8 @@ void mros_wakeup_task(mRosTaskIdType task_id)
 	(void)wup_tsk(task_id);
 }
 
-static void do_packet_encoder_test(void);
+static void do_test_register_publisher(void);
+static void do_test_register_subscriber(void);
 
 void main_task()
 {
@@ -129,7 +130,8 @@ void main_task()
 	act_tsk(XML_MAS_TASK);
 
 #else
-	do_packet_encoder_test();
+	//do_test_register_publisher();
+	do_test_register_subscriber();
 #endif
 	syslog(LOG_NOTICE,"**********mROS Main task finish**********");
 	return;
@@ -171,7 +173,7 @@ void cyclic_handler(intptr_t exinf)
 }
 #include "mros_protocol_client_rpc_cimpl.h"
 
-static void do_packet_encoder_test(void)
+static void do_test_register_publisher(void)
 {
 	mRosEncodeArgType arg;
 	mRosPacketType packet;
@@ -179,6 +181,7 @@ static void do_packet_encoder_test(void)
 	static char buffer[512];
 	mRosCommTcpClientType client;
 	mRosSizeType rlen;
+	syslog(LOG_NOTICE, "START: TEST REGISTER PUBLISHER");
 
 	ret = mros_comm_tcp_client_init(&client, MROS_MASTER_IPADDR, MROS_MASTER_PORT_NO);
 	if (ret != MROS_E_OK) {
@@ -209,6 +212,59 @@ static void do_packet_encoder_test(void)
 	}
 	syslog(LOG_NOTICE, "data_size=%d", packet.data_size);
 	syslog(LOG_NOTICE, "packet=%s", packet.data);
+	syslog(LOG_NOTICE, "END: TEST REGISTER PUBLISHER");
+
+	return;
+}
+
+static void do_test_register_subscriber(void)
+{
+	mRosEncodeArgType arg;
+	mRosPacketType packet;
+	mRosReturnType ret;
+	static char buffer[512];
+	mRosCommTcpClientType client;
+	mRosSizeType rlen;
+
+	syslog(LOG_NOTICE, "START: TEST REGISTER SUBSCRIBER");
+
+
+	ret = mros_comm_tcp_client_init(&client, MROS_MASTER_IPADDR, MROS_MASTER_PORT_NO);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_client_init()=%d", ret);
+		return;
+	}
+	packet.data = buffer;
+	packet.total_size = sizeof(buffer);
+	packet.data_size = 0;
+
+	ret = mros_comm_tcp_client_connect(&client);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_client_connect()=%d", ret);
+		return;
+	}
+	mRosRegisterTopicReqType req;
+	mRosRegisterTopicResType res;
+	req.node_name = "node1";
+	req.req_packet = &packet;
+	req.topic_name = "topic_name1";
+	req.topic_typename = "std_msgs/String";
+	res.reply_packet = &packet;
+
+	ret = mros_rpc_register_subscriber(&client, &req, &res);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_rpc_register_publisher()=%d", ret);
+		return;
+	}
+	syslog(LOG_NOTICE, "data_size=%d", packet.data_size);
+	syslog(LOG_NOTICE, "packet=%s", packet.data);
+
+	mros_uint32 ipaddr = -1;
+	mros_int32 port = -1;
+	mRosPtrType ptr = mros_xmlpacket_subres_get_first_uri(res.reply_packet, &ipaddr, &port);
+	syslog(LOG_NOTICE, "ptr=0x%x ipaddr=0x%x port=%d", ptr, ipaddr, port);
+
+	syslog(LOG_NOTICE, "END: TEST REGISTER SUBSCRIBER");
 
 	return;
 }

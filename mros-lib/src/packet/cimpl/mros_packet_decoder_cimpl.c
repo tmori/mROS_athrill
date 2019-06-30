@@ -122,12 +122,11 @@ mRosReturnType mros_xmlpacket_subres_result(mRosPacketType *packet)
 }
 mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
 {
-	char val[PORT_MAX_STR_LEN + 1];
 	//search HERE
 	//        |
 	//        V
 	//"http://xxx.xxx.xx:8080/"
-	const char* head = find_string_after((const char *)&packet->data[0], "http://");
+	char* head = find_string_after((const char *)&packet->data[0], "http://");
 	if (head == NULL) {
 		return NULL;
 	}
@@ -136,8 +135,14 @@ mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uin
 	//                   |
 	//                   V
 	//"http://xxx.xxx.xx:8080/"
-	head = find_string_after(head, ":");
-	if (head == NULL) {
+	char *tail = find_string_after(head, ":");
+	if (tail == NULL) {
+		return NULL;
+	}
+	mros_uint32 len = (tail - head);
+	head[len - 1] = '\0';
+	mRosReturnType ret = mros_comm_inet_get_ipaddr((const char *)head, ipaddr);
+	if (ret != MROS_E_OK) {
 		return NULL;
 	}
 
@@ -145,16 +150,15 @@ mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uin
 	//                       |
 	//                       V
 	//"http://xxx.xxx.xx:8080/"
-	const char* tail = strstr(head, "/");
-	mros_uint32 len = (tail - head) + 1;
+	head = tail;
+	tail = strstr(head, "/");
+	len = (tail - head) + 1;
 	if (len > PORT_MAX_STR_LEN) {
 		return NULL;
 	}
+	head[len - 1] = '\0';
 
-	memcpy(&val[0], head, (len - 1));
-	val[len - 1] = '\0';
-
-	*port = strtol(val, NULL, 10);
+	*port = strtol(head, NULL, 10);
 	return (mRosPtrType)tail;
 }
 
@@ -285,14 +289,12 @@ Content-length: 377
 
 mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
 {
-	char port_val[PORT_MAX_STR_LEN + 1];
-	char ip_val[IP_MAX_STR_LEN + 1];
 	mRosReturnType ret;
 	//      search HERE
 	//             |
 	//             V
 	//"<value><array><data>"
-	const char* head = find_string_after((const char *)&packet->data[0], "<array>");
+	char* head = find_string_after((const char *)&packet->data[0], "<array>");
 	if (head == NULL) {
 		return NULL;
 	}
@@ -327,13 +329,9 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	//                      V
 	//<value><string>Chagall</string></value>
 	char* tail = strstr(head, "<");
-	mros_uint32 len = (tail - head) + 1;
-	if (len > IP_MAX_STR_LEN) {
-		return NULL;
-	}
-	memcpy(&ip_val[0], head, (len - 1));
-	ip_val[len - 1] = '\0';
-	ret = mros_comm_inet_get_ipaddr((const char *)ip_val, ipaddr);
+	mros_uint32 len = (tail - head);
+	head[len - 1] = '\0';
+	ret = mros_comm_inet_get_ipaddr((const char *)head, ipaddr);
 	if (ret != MROS_E_OK) {
 		return NULL;
 	}
@@ -356,9 +354,8 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	if (len > PORT_MAX_STR_LEN) {
 		return NULL;
 	}
-	memcpy(&port_val[0], head, (len - 1));
-	port_val[len - 1] = '\0';
-	*port = strtol(port_val, NULL, 10);
+	head[len - 1] = '\0';
+	*port = strtol(head, NULL, 10);
 	return (mRosPtrType)tail;
 }
 

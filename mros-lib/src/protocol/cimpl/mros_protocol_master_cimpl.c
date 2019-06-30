@@ -185,17 +185,22 @@ static mRosReturnType mros_protocol_master_register_publisher(mRosProtocolMaster
 
 	ret = mros_comm_tcp_client_connect(&mros_protocol_master.master_comm);
 	if (ret != MROS_E_OK) {
+		//TODO ERRLOG
 		goto done;
 	}
 	ret = mros_protocol_master_register(pub_req, MROS_TOPIC_CONNECTOR_PUB, &rpc_response);
 	if (ret != MROS_E_OK) {
+		//TODO ERRLOG
 		goto done;
 	}
 	ret = mros_xmlpacket_pubres_result(rpc_response.reply_packet);
-
-	mros_comm_tcp_client_close(&mros_protocol_master.master_comm);
+	if (ret != MROS_E_OK) {
+		//TODO ERRLOG
+		goto done;
+	}
 
 done:
+	mros_comm_tcp_client_close(&mros_protocol_master.master_comm);
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
 
 	return ret;
