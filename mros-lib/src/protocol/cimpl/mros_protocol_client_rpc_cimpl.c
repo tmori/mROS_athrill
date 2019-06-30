@@ -84,7 +84,7 @@ static mRosReturnType mros_rpc_sendreply_tcpros(mRosEncodeArgType *arg, mRosComm
 	mRosReturnType ret;
 	mRosSizeType len;
 	mRosSizeType rlen;
-	mros_int8 rawdata[MROS_TOPIC_RAWDATA_HEADER_SIZE];
+	mros_int8 rawdata[MROS_TCPROS_RAWDATA_HEADER_SIZE];
 
 	ret = mros_packet_encode(arg, req->req_packet);
 	if (ret != MROS_E_OK) {
@@ -96,12 +96,12 @@ static mRosReturnType mros_rpc_sendreply_tcpros(mRosEncodeArgType *arg, mRosComm
 		return ret;
 	}
 
-	ret = mros_comm_tcp_client_receive_all(client, rawdata, MROS_TOPIC_RAWDATA_HEADER_SIZE, &rlen);
+	ret = mros_comm_tcp_client_receive_all(client, rawdata, MROS_TCPROS_RAWDATA_HEADER_SIZE, &rlen);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-	packet.total_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
-	packet.data_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
+	packet.total_size = MROS_TCPROS_RAWDATA_HEADER_SIZE;
+	packet.data_size = MROS_TCPROS_RAWDATA_HEADER_SIZE;
 	packet.data = rawdata;
 	ret = mros_tcprospacket_get_body_size(&packet, &len);
 	if (ret != MROS_E_OK) {
@@ -111,6 +111,7 @@ static mRosReturnType mros_rpc_sendreply_tcpros(mRosEncodeArgType *arg, mRosComm
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
+	res->reply_packet->data_size = len;
 	res->result = MROS_E_OK;
 	return MROS_E_OK;
 }

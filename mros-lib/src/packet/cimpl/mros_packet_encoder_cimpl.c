@@ -281,7 +281,7 @@ static mRosReturnType encode_tcpros_topic_req(mRosEncodeArgType *arg, mRosPacket
 			arg->argv[3]);
 
 	off = 0;
-	add_len((unsigned char*)&packet->data[off], packet->data_size);
+	add_len((unsigned char*)&packet->data[off], packet->data_size - 4);
 
 	off += 4U;
 	add_len((unsigned char*)&packet->data[off], len_callerid);
@@ -337,7 +337,7 @@ static mRosReturnType encode_tcpros_topic_res(mRosEncodeArgType *arg, mRosPacket
 			arg->argv[3]);
 
 	off = 0;
-	add_len((unsigned char*)&packet->data[off], packet->data_size);
+	add_len((unsigned char*)&packet->data[off], packet->data_size - 4);
 
 	off += 4U;
 	add_len((unsigned char*)&packet->data[off], len_callerid);

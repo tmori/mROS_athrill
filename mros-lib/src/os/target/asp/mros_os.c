@@ -54,6 +54,7 @@ void mros_wakeup_task(mRosTaskIdType task_id)
 static void do_test_register_publisher(void);
 static void do_test_register_subscriber(void);
 static void do_test_request_topic(void);
+static void do_test_tcpros_topic(void);
 
 void main_task()
 {
@@ -133,7 +134,8 @@ void main_task()
 #else
 	//do_test_register_publisher();
 	//do_test_register_subscriber();
-	do_test_request_topic();
+	//do_test_request_topic();
+	do_test_tcpros_topic();
 #endif
 	syslog(LOG_NOTICE,"**********mROS Main task finish**********");
 	return;
@@ -177,12 +179,10 @@ void cyclic_handler(intptr_t exinf)
 
 static void do_test_register_publisher(void)
 {
-	mRosEncodeArgType arg;
 	mRosPacketType packet;
 	mRosReturnType ret;
-	static char buffer[512];
+	static char buffer[1024];
 	mRosCommTcpClientType client;
-	mRosSizeType rlen;
 	syslog(LOG_NOTICE, "START: TEST REGISTER PUBLISHER");
 
 	ret = mros_comm_tcp_client_init(&client, MROS_MASTER_IPADDR, MROS_MASTER_PORT_NO);
@@ -203,7 +203,7 @@ static void do_test_register_publisher(void)
 	mRosRegisterTopicResType res;
 	req.node_name = "node1";
 	req.req_packet = &packet;
-	req.topic_name = "topic_name1";
+	req.topic_name = "/test_string";
 	req.topic_typename = "std_msgs/String";
 	res.reply_packet = &packet;
 
@@ -221,12 +221,10 @@ static void do_test_register_publisher(void)
 
 static void do_test_register_subscriber(void)
 {
-	mRosEncodeArgType arg;
 	mRosPacketType packet;
 	mRosReturnType ret;
-	static char buffer[512];
+	static char buffer[1024];
 	mRosCommTcpClientType client;
-	mRosSizeType rlen;
 
 	syslog(LOG_NOTICE, "START: TEST REGISTER SUBSCRIBER");
 
@@ -249,7 +247,7 @@ static void do_test_register_subscriber(void)
 	mRosRegisterTopicResType res;
 	req.node_name = "node1";
 	req.req_packet = &packet;
-	req.topic_name = "topic_name1";
+	req.topic_name = "/test_string";
 	req.topic_typename = "std_msgs/String";
 	res.reply_packet = &packet;
 
@@ -270,14 +268,16 @@ static void do_test_register_subscriber(void)
 
 	return;
 }
+
+static mros_uint32 test_request_topic_ipaddr;
+static mros_int32 test_request_topic_port;
+
 static void do_test_request_topic(void)
 {
-	mRosEncodeArgType arg;
 	mRosPacketType packet;
 	mRosReturnType ret;
 	static char buffer[1024];
 	mRosCommTcpClientType client;
-	mRosSizeType rlen;
 
 	syslog(LOG_NOTICE, "START: TEST REQUEST TOPIC");
 
@@ -300,7 +300,7 @@ static void do_test_request_topic(void)
 	mRosRegisterTopicResType res;
 	req.node_name = "node1";
 	req.req_packet = &packet;
-	req.topic_name = "topic_name1";
+	req.topic_name = "/test_string";
 	req.topic_typename = "std_msgs/String";
 	res.reply_packet = &packet;
 	ret = mros_rpc_register_subscriber(&client, &req, &res);
@@ -321,11 +321,9 @@ static void do_test_request_topic(void)
 	mRosRequestTopicResType topic_res;
 	topic_req.node_name = "node1";
 	topic_req.req_packet = &packet;
-	topic_req.topic_name = "topic_name1";
+	topic_req.topic_name = "/test_string";
 	topic_res.reply_packet = &packet;
-	while (ptr != NULL) {
-		mRosCommTcpClientType client;
-
+	if (ptr != NULL) {
 		ret = mros_comm_tcp_client_ip32_init(&client, ipaddr, port);
 		if (ret != MROS_E_OK) {
 			syslog(LOG_NOTICE, "mros_comm_tcp_client_connect()=%d", ret);
@@ -342,14 +340,73 @@ static void do_test_request_topic(void)
 			syslog(LOG_NOTICE, "mros_protocol_master_request_topic()=%d", ret);
 			return;
 		}
-		ptr = mros_xmlpacket_subres_get_next_uri(ptr, topic_res.reply_packet, &ipaddr, &port);
-		syslog(LOG_NOTICE, "ptr=0x%x ipaddr=0x%x port=%d", ptr, ipaddr, port);
+		ptr = mros_xmlpacket_reqtopicres_get_first_uri(topic_res.reply_packet, &test_request_topic_ipaddr, &test_request_topic_port);
+		syslog(LOG_NOTICE, "ptr=0x%x ipaddr=0x%x port=%d", ptr, test_request_topic_ipaddr, test_request_topic_port);
 	}
 	syslog(LOG_NOTICE, "data_size=%d", packet.data_size);
 	syslog(LOG_NOTICE, "packet=%s", packet.data);
+	mros_comm_tcp_client_close(&client);
 
 
 	syslog(LOG_NOTICE, "END: TEST REQUEST TOPIC");
+
+	return;
+}
+
+static void do_test_tcpros_topic(void)
+{
+	mRosPacketType packet;
+	mRosReturnType ret;
+	static char buffer[1024];
+	mRosCommTcpClientType client;
+	mRosRcpRosReqType req;
+	mRosTcpRosResType res;
+
+
+	do_test_request_topic();
+
+	syslog(LOG_NOTICE, "START: TEST TCPROS TOPIC");
+	packet.data = buffer;
+	packet.total_size = sizeof(buffer);
+	packet.data_size = 0;
+
+	req.node_name = "node1";
+	req.req_packet = &packet;
+	req.topic_name = "/test_string";
+	req.topic_typename = "std_msgs/String";
+	res.reply_packet = &packet;
+
+	ret = mros_comm_tcp_client_ip32_init(&client, test_request_topic_ipaddr, test_request_topic_port);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_client_connect()=%d", ret);
+		return;
+	}
+	ret = mros_comm_tcp_client_connect(&client);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_client_connect()=%d", ret);
+		return;
+	}
+	syslog(LOG_NOTICE, "mros_comm_tcp_client_connect(): SUCCESS");
+
+	ret = mros_rpc_tcpros(&client, &req, &res);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_rpc_tcpros()=%d", ret);
+		return;
+	}
+	syslog(LOG_NOTICE, "data_size=%d", packet.data_size);
+	mRosTcpRosPacketType tcpros_packet;
+	ret = mros_tcprospacket_decode(&packet, &tcpros_packet);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_tcprospacket_decode()=%d", ret);
+		return;
+	}
+	syslog(LOG_NOTICE, "callerid=%s", tcpros_packet.callerid);
+	syslog(LOG_NOTICE, "tcp_nodely=%s", tcpros_packet.tcp_nodely);
+	syslog(LOG_NOTICE, "topic=%s", tcpros_packet.topic);
+	syslog(LOG_NOTICE, "type=%s", tcpros_packet.type);
+	syslog(LOG_NOTICE, "md5sum=%s", tcpros_packet.md5sum);
+	mros_comm_tcp_client_close(&client);
+	syslog(LOG_NOTICE, "END: TEST TCPROS TOPIC");
 
 	return;
 }

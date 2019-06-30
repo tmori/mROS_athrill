@@ -340,7 +340,7 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	//           |
 	//           V
 	//<value><int>54894</int></value>
-	head = find_string_after(head, "<value><int>");
+	head = find_string_after(tail, "<value><int>");
 	if (head == NULL) {
 		return NULL;
 	}
@@ -378,12 +378,11 @@ mRosReturnType mros_tcprospacket_get_body_size(mRosPacketType *packet, mRosSizeT
 mRosReturnType mros_tcprospacket_decode(mRosPacketType *packet, mRosTcpRosPacketType *decoded_packet)
 {
 	mros_uint32 len;
-	mros_uint32 off = 4;
+	mros_uint32 off = 0;
 	mros_uint32 memlen;
 	mros_uint32 entrylen;
 
-	len = *((mRosSizeType*)&packet->data[off]);
-	off += 4;
+	len = packet->data_size;
 
 	decoded_packet->callerid = NULL;
 	decoded_packet->md5sum = NULL;
@@ -399,29 +398,48 @@ mRosReturnType mros_tcprospacket_decode(mRosPacketType *packet, mRosTcpRosPacket
 			break;
 		}
 
+		memlen = strlen("callerid=");
 		if (strncmp(&packet->data[off], "callerid=", memlen) == 0) {
-			memlen = strlen("callerid=");
+			decoded_packet->callerid_len = entrylen - memlen;
 			decoded_packet->callerid = (char*)&packet->data[off + memlen];
 		}
-		else if (strncmp(&packet->data[off], "md5sum=", memlen) == 0) {
-			memlen = strlen("md5sum=");
+		memlen = strlen("md5sum=");
+		if (strncmp(&packet->data[off], "md5sum=", memlen) == 0) {
+			decoded_packet->md5sum_len = entrylen - memlen;
 			decoded_packet->md5sum = (char*)&packet->data[off + memlen];
 		}
-		else if (strncmp(&packet->data[off], "tcp_nodely=", memlen) == 0) {
-			memlen = strlen("tcp_nodely=");
+		memlen = strlen("tcp_nodely=");
+		if (strncmp(&packet->data[off], "tcp_nodely=", memlen) == 0) {
+			decoded_packet->tcp_nodelay_len = entrylen - memlen;
 			decoded_packet->tcp_nodely = (char*)&packet->data[off + memlen];
 		}
-		else if (strncmp(&packet->data[off], "topic=", memlen) == 0) {
-			memlen = strlen("topic=");
+		memlen = strlen("topic=");
+		if (strncmp(&packet->data[off], "topic=", memlen) == 0) {
+			decoded_packet->topic_len = entrylen - memlen;
 			decoded_packet->topic = (char*)&packet->data[off + memlen];
 		}
-		else if (strncmp(&packet->data[off], "type=", memlen) == 0) {
-			memlen = strlen("type=");
+		memlen = strlen("type=");
+		if (strncmp(&packet->data[off], "type=", memlen) == 0) {
+			decoded_packet->type_len = entrylen - memlen;
 			decoded_packet->type = (char*)&packet->data[off + memlen];
 		}
 		off += entrylen;
 	}
-
+	if (decoded_packet->callerid != NULL) {
+		decoded_packet->callerid[decoded_packet->callerid_len] = '\0';
+	}
+	if (decoded_packet->md5sum != NULL) {
+		decoded_packet->md5sum[decoded_packet->md5sum_len] = '\0';
+	}
+	if (decoded_packet->tcp_nodely != NULL) {
+		decoded_packet->tcp_nodely[decoded_packet->tcp_nodelay_len] = '\0';
+	}
+	if (decoded_packet->topic != NULL) {
+		decoded_packet->topic[decoded_packet->topic_len] = '\0';
+	}
+	if (decoded_packet->type != NULL) {
+		decoded_packet->type[decoded_packet->type_len] = '\0';
+	}
 
 	return MROS_E_OK;
 }

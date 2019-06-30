@@ -79,6 +79,11 @@ extern mRosPtrType mros_xmlpacket_reqtopicres_get_next_uri(mRosPtrType ptr, mRos
  ****************************************************/
 extern mRosReturnType mros_tcprospacket_get_body_size(mRosPacketType *packet, mRosSizeType *len);
 typedef struct {
+	mros_uint16 callerid_len;
+	mros_uint16 tcp_nodelay_len;
+	mros_uint16 topic_len;
+	mros_uint16 type_len;
+	mros_uint16 md5sum_len;
 	char *callerid;
 	char *tcp_nodely;
 	char *topic;
