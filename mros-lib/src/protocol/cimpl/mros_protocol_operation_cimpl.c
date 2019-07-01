@@ -10,13 +10,28 @@ mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, cons
 	mRosReturnType ret;
 	mRosSizeType res;
 	mRosPacketType packet;
+	mRosEncodeArgType arg;
+	mros_int8 rawdata[MROS_TOPIC_RAWDATA_HEADER_SIZE];
 
-	ret = mros_comm_tcp_client_send_all(client, (const char*)&packet.data_size, sizeof(packet.data_size), &res);
+	packet.total_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
+	packet.data_size = 0;
+
+	packet.data = rawdata;
+	arg.args_int = 1;
+	arg.argi[0] = datalen;
+	arg.args_char = 0;
+	ret = mros_packet_encode(&arg, &packet);
+	if (ret != MROS_E_OK) {
+		return ret;
+	}
+	//send header
+	ret = mros_comm_tcp_client_send_all(client, (const char*)packet.data, packet.data_size, &res);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
 
-	return mros_comm_tcp_client_send_all(client, packet.data, packet.data_size, &res);
+	//send body
+	return mros_comm_tcp_client_send_all(client, data, datalen, &res);
 }
 
 mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType *client, mRosMemoryManagerType *mempool)
@@ -32,10 +47,12 @@ mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType 
 	if (ret != MROS_E_OK) {
 		return NULL;
 	}
+	//receive header
 	ret = mros_comm_tcp_client_receive_all(client, rawdata, MROS_TOPIC_RAWDATA_HEADER_SIZE, &res);
 	if (ret != MROS_E_OK) {
 		return NULL;
 	}
+	//decode header
 	packet.total_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
 	packet.data_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
 	packet.data = rawdata;
@@ -43,7 +60,7 @@ mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType 
 	if (ret != MROS_E_OK) {
 		return NULL;
 	}
-
+	//receive body
 	ret = mros_mem_alloc(mempool, len, &mem_entryp);
 	if (ret != MROS_E_OK) {
 		return NULL;

@@ -11,6 +11,7 @@ static mRosReturnType encode_request_topic_req(mRosEncodeArgType *arg, mRosPacke
 static mRosReturnType encode_request_topic_res(mRosEncodeArgType *arg, mRosPacketType *packet);
 static mRosReturnType encode_tcpros_topic_req(mRosEncodeArgType *arg, mRosPacketType *packet);
 static mRosReturnType encode_tcpros_topic_res(mRosEncodeArgType *arg, mRosPacketType *packet);
+static mRosReturnType encode_topic_data(mRosEncodeArgType *arg, mRosPacketType *packet);
 typedef mRosReturnType (*encode_table_type) (mRosEncodeArgType*, mRosPacketType*);
 
 static encode_table_type encode_table[MROS_PACKET_DATA_NUM] = {
@@ -20,7 +21,7 @@ static encode_table_type encode_table[MROS_PACKET_DATA_NUM] = {
 		encode_request_topic_res,				//MROS_PACKET_DATA_REQUEST_TOPIC_RES
 		encode_tcpros_topic_req,				//MROS_PACKET_DATA_TCPROS_TOPIC_REQ
 		encode_tcpros_topic_res,				//MROS_PACKET_DATA_TCPROS_TOPIC_RES
-		NULL,									//MROS_PACKET_DATA_TOPIC
+		encode_topic_data,						//MROS_PACKET_DATA_TOPIC
 };
 
 typedef struct {
@@ -353,20 +354,15 @@ static mRosReturnType encode_tcpros_topic_res(mRosEncodeArgType *arg, mRosPacket
 	return MROS_E_OK;
 }
 
-#if 0
 static mRosReturnType encode_topic_data(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
-	//TODO
-	mRosSizeType len = arg->argi[0] + 8U;//TODO INDIGO
-	if (len <= packet->total_size) {
+	if (packet->total_size < MROS_TOPIC_RAWDATA_HEADER_SIZE) {
 		return MROS_E_NOMEM;
 	}
-
-	memcpy(&packet->data[8], &arg->argv[0], arg->argi[0]);
-
+	//TODO INDIGO
     add_len((unsigned char*)&packet->data[0], arg->argi[0] + 4);
     add_len((unsigned char*)&packet->data[4], arg->argi[0]);
+    packet->data_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
 
 	return MROS_E_OK;
 }
-#endif
