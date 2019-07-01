@@ -50,7 +50,7 @@ typedef struct {
 } mRosPacketMemberInfoType;
 
 typedef struct {
-	mRosPacketDataType		packet_type;
+	mRosPacketDataEnumType		packet_type;
 	mRosPacketMemberInfoType method;
 	union {
 		struct {
@@ -59,7 +59,7 @@ typedef struct {
 		} topic;
 	} request;
 } mRosPacketDecodedRequestType;
-extern mRosPacketDataType mros_xmlpacket_slave_request_decode(mRosPacketType *packet, mRosPacketDecodedRequestType *decoded_infop);
+extern mRosPacketDataEnumType mros_xmlpacket_slave_request_decode(mRosPacketType *packet, mRosPacketDecodedRequestType *decoded_infop);
 
 
 /*

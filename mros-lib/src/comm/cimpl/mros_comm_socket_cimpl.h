@@ -42,7 +42,6 @@ static inline void mros_comm_set_timeval(mros_uint32 tmo_msec, mRosTimeValType *
 typedef enum {
 	MROS_COMM_SOCKET_TYPE_TCP = 0,
 	MROS_COMM_SOCKET_TYPE_UDP,
-	MROS_COMM_SOCKET_TYPE_INNER, //TODO?? 必要か？
 } mRosCommSocketEnumType;
 
 #define MROS_COMM_DEFAULT_TIMEOUT		1500

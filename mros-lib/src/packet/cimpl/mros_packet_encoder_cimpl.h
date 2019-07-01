@@ -12,7 +12,7 @@ extern "C" {
  *************************************/
 #define MROS_ENCODE_ARGS_MAX	5
 typedef struct {
-	mRosPacketDataType type;
+	mRosPacketDataEnumType type;
 	mRosSizeType	args_char;
 	const char* 	argv[MROS_ENCODE_ARGS_MAX];
 	mRosSizeType	args_int;

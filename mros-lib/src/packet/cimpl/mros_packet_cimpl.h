@@ -17,7 +17,7 @@ typedef enum {
 	MROS_PACKET_DATA_TCPROS_TOPIC_RES,
 	MROS_PACKET_DATA_TOPIC,
 	MROS_PACKET_DATA_NUM,
-} mRosPacketDataType;
+} mRosPacketDataEnumType;
 #define MROS_PACKET_DATA_INVALID	MROS_PACKET_DATA_NUM
 
 typedef struct {

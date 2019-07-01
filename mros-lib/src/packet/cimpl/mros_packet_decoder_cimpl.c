@@ -188,7 +188,7 @@ static mRosReturnType mros_xmlpacket_get_member_info(const char*p, mRosPacketMem
 /*
  * RequestTopic request
  */
-static mRosPacketDataType mros_xmlpacket_slave_request_get_method(mRosPacketType *packet, mRosPacketMemberInfoType *minfop)
+static mRosPacketDataEnumType mros_xmlpacket_slave_request_get_method(mRosPacketType *packet, mRosPacketMemberInfoType *minfop)
 {
 	mRosReturnType ret;
 	mRosSizeType len = strlen("requestTopic");
@@ -238,7 +238,7 @@ static mRosReturnType mros_xmlpacket_request_topic_req_decode(mRosPacketType *pa
 	return MROS_E_OK;
 }
 
-mRosPacketDataType mros_xmlpacket_slave_request_decode(mRosPacketType *packet, mRosPacketDecodedRequestType *decoded_infop)
+mRosPacketDataEnumType mros_xmlpacket_slave_request_decode(mRosPacketType *packet, mRosPacketDecodedRequestType *decoded_infop)
 {
 	mRosReturnType ret = MROS_E_INVAL;
 	decoded_infop->packet_type = mros_xmlpacket_slave_request_get_method(packet, &decoded_infop->method);

@@ -138,7 +138,7 @@ mRosReturnType mros_proc_slave(mRosCommTcpClientType *client, mRosPacketType *pa
 {
 	mRosReturnType ret = MROS_E_INVAL;
 
-	mRosPacketDataType type = mros_xmlpacket_slave_request_decode(packet, &mros_proc_slave_decoded_requst);
+	mRosPacketDataEnumType type = mros_xmlpacket_slave_request_decode(packet, &mros_proc_slave_decoded_requst);
 	switch (type) {
 	case MROS_PACKET_DATA_REQUEST_TOPIC_REQ:
 		ret = mros_proc_slave_request_topic(client, packet);

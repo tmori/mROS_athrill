@@ -15,10 +15,10 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#include "mros_comm_target.h"
+#include "mros_types.h"
+#include "mros_comm_cimpl.h"
 #include <string.h>
 #include <stdio.h>
-#include "mros_comm_cimpl.h"
 
 void mros_comm_inet_local_sockaddr_init(mRosSockAddrInType *addr, mros_int32 port)
 {
