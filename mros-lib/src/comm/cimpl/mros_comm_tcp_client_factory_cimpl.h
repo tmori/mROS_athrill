@@ -36,7 +36,7 @@ typedef struct {
 } mRosRquestObjectType;
 
 typedef struct {
-	mRosReturnType (*topic_data_send) (mRosCommTcpClientType *client, mRosMemoryManagerType *mempool, const char *data, mRosSizeType datalen);
+	mRosReturnType (*topic_data_send) (mRosCommTcpClientType *client, const char *data, mRosSizeType datalen);
 	mRosMemoryListEntryType* (*topic_data_receive) (mRosCommTcpClientType *client, mRosMemoryManagerType *mempool);
 	void (*free) (void* reqp);
 } mRosCommOperationType;

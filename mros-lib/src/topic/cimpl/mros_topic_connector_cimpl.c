@@ -297,7 +297,7 @@ mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const ch
 	if (entry->data.commp == NULL) {
 		return MROS_E_NOTCONN;
 	}
-	return entry->data.commp->data.op.topic_data_send(&entry->data.commp->data.client, entry->data.mempool, data, len);
+	return entry->data.commp->data.op.topic_data_send(&entry->data.commp->data.client, data, len);
 }
 
 mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerObjType obj)

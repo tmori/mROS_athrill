@@ -5,38 +5,18 @@
 #include "mros_memory.h"
 #include "mros_config.h"
 
-mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, mRosMemoryManagerType *mempool, const char *data, mRosSizeType datalen)
+mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, const char *data, mRosSizeType datalen)
 {
 	mRosReturnType ret;
 	mRosSizeType res;
 	mRosPacketType packet;
-	mRosMemoryListEntryType *mem_entryp;
-	mRosEncodeArgType arg;
 
-	ret = mros_mem_alloc(mempool, datalen + MROS_TOPIC_RAWDATA_HEADER_SIZE, &mem_entryp);
+	ret = mros_comm_tcp_client_send_all(client, (const char*)&packet.data_size, sizeof(packet.data_size), &res);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-	packet.total_size = mem_entryp->data.memsize;
-	packet.data_size = mem_entryp->data.size;
-	packet.data = mem_entryp->data.memp;
 
-
-	arg.type = MROS_PACKET_DATA_TOPIC;
-	arg.args_int = 1;
-	arg.argi[0] = datalen;
-	arg.args_char = 1;
-	arg.argv[0] = data;
-
-	ret = mros_packet_encode(&arg, &packet);
-	if (ret != MROS_E_OK) {
-		goto done;
-	}
-	ret = mros_comm_tcp_client_send_all(client, packet.data, packet.data_size, &res);
-
-done:
-	mros_mem_free(mempool, mem_entryp);
-	return ret;
+	return mros_comm_tcp_client_send_all(client, packet.data, packet.data_size, &res);
 }
 
 mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType *client, mRosMemoryManagerType *mempool)

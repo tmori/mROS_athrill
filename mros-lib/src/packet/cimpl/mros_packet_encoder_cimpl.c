@@ -11,7 +11,6 @@ static mRosReturnType encode_request_topic_req(mRosEncodeArgType *arg, mRosPacke
 static mRosReturnType encode_request_topic_res(mRosEncodeArgType *arg, mRosPacketType *packet);
 static mRosReturnType encode_tcpros_topic_req(mRosEncodeArgType *arg, mRosPacketType *packet);
 static mRosReturnType encode_tcpros_topic_res(mRosEncodeArgType *arg, mRosPacketType *packet);
-static mRosReturnType encode_topic_data(mRosEncodeArgType *arg, mRosPacketType *packet);
 typedef mRosReturnType (*encode_table_type) (mRosEncodeArgType*, mRosPacketType*);
 
 static encode_table_type encode_table[MROS_PACKET_DATA_NUM] = {
@@ -21,7 +20,7 @@ static encode_table_type encode_table[MROS_PACKET_DATA_NUM] = {
 		encode_request_topic_res,				//MROS_PACKET_DATA_REQUEST_TOPIC_RES
 		encode_tcpros_topic_req,				//MROS_PACKET_DATA_TCPROS_TOPIC_REQ
 		encode_tcpros_topic_res,				//MROS_PACKET_DATA_TCPROS_TOPIC_RES
-		encode_topic_data,						//MROS_PACKET_DATA_TOPIC
+		NULL,									//MROS_PACKET_DATA_TOPIC
 };
 
 typedef struct {
@@ -354,7 +353,7 @@ static mRosReturnType encode_tcpros_topic_res(mRosEncodeArgType *arg, mRosPacket
 	return MROS_E_OK;
 }
 
-
+#if 0
 static mRosReturnType encode_topic_data(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
 	//TODO
@@ -370,4 +369,4 @@ static mRosReturnType encode_topic_data(mRosEncodeArgType *arg, mRosPacketType *
 
 	return MROS_E_OK;
 }
-
+#endif

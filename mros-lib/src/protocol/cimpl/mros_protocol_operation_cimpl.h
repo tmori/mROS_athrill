@@ -10,7 +10,7 @@ extern "C" {
 #include "mros_memory.h"
 #include "mros_comm_tcp_client_cimpl.h"
 
-extern mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, mRosMemoryManagerType *mempool, const char *data, mRosSizeType datalen);
+extern mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, const char *data, mRosSizeType datalen);
 extern mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType *client, mRosMemoryManagerType *mempool);
 
 /*
