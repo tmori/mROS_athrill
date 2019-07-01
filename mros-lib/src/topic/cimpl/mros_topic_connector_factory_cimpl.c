@@ -7,8 +7,8 @@ static mros_boolean mros_topic_connector_is_inialized[MROS_TOPIC_CONNECTOR_NUM] 
 	MROS_FALSE,
 };
 
-MROS_TOPIC_CONNECTOR_CONFIG_DECLARE_MANAGER(pub_connector_mgr, (MROS_PUB_TOPIC_CONNECTOR_MAX_NUM * MROS_TOPIC_MAX_NUM) );
-MROS_TOPIC_CONNECTOR_CONFIG_DECLARE_MANAGER(sub_connector_mgr, (MROS_SUB_TOPIC_CONNECTOR_MAX_NUM * MROS_TOPIC_MAX_NUM) );
+MROS_TOPIC_CONNECTOR_CONFIG_DECLARE_MANAGER(pub_connector_mgr, (MROS_PUB_TOPIC_CONNECTOR_MAX_NUM) );
+MROS_TOPIC_CONNECTOR_CONFIG_DECLARE_MANAGER(sub_connector_mgr, (MROS_SUB_TOPIC_CONNECTOR_MAX_NUM) );
 
 mRosTopicConnectorManagerType *mros_topic_connector_factory_create(mRosTopicConnectorEnumType type)
 {

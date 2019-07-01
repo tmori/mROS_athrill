@@ -8,7 +8,6 @@
 #include "mros_node_cimpl.h"
 #include <string.h>
 
-static char topic_name_buffer[MROS_TOPIC_NAME_MAXLEN];
 static mRosPacketDecodedRequestType mros_proc_slave_decoded_requst;
 
 mRosReturnType mros_proc_init(void)
@@ -103,11 +102,8 @@ static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *clien
 	if (mros_proc_slave_decoded_requst.request.topic.topic_name.res.len >= MROS_TOPIC_NAME_MAXLEN) {
 		return MROS_E_INVAL;
 	}
-	memcpy(topic_name_buffer,
-			mros_proc_slave_decoded_requst.request.topic.topic_name.res.head,
-			mros_proc_slave_decoded_requst.request.topic.topic_name.res.len);
-	topic_name_buffer[mros_proc_slave_decoded_requst.request.topic.topic_name.res.len] = '\0';
-	ret = mros_topic_get((const char*)topic_name_buffer, &topic_id);
+	mros_proc_slave_decoded_requst.request.topic.topic_name.res.head[mros_proc_slave_decoded_requst.request.topic.topic_name.res.len] = '\0';
+	ret = mros_topic_get((const char*)mros_proc_slave_decoded_requst.request.topic.topic_name.res.head, &topic_id);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}

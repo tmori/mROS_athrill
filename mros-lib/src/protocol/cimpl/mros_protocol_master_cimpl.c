@@ -20,16 +20,11 @@ typedef union {
 	char buffer2[MROS_PACKET_MAXSIZE_RES_REGISTER_PUBLISHER];
 	char buffer3[MROS_PACKET_MAXSIZE_REQ_REGISTER_SUBSCRIBER];
 	char buffer4[MROS_PACKET_MAXSIZE_RES_REGISTER_SUBSCRIBER];
-} mRosMasterPacketRegisterBufferType;
+	char buffer5[MROS_PACKET_MAXSIZE_REQ_REQUEST_TOPIC];
+	char buffer6[MROS_PACKET_MAXSIZE_RES_REQUEST_TOPIC];
+} mRosMasterPacketBufferType;
 
-typedef union {
-	char buffer;
-	char buffer1[MROS_PACKET_MAXSIZE_REQ_REQUEST_TOPIC];
-	char buffer2[MROS_PACKET_MAXSIZE_RES_REQUEST_TOPIC];
-} mRosMasterPackeReqTopictBufferType;
-
-static mRosMasterPacketRegisterBufferType mros_master_packet_register_buffer;
-static mRosMasterPackeReqTopictBufferType mros_master_packet_reqtopic_buffer;
+static mRosMasterPacketBufferType mros_master_packet_buffer;
 
 typedef struct {
 	mRosProtocolMasterStateEnumType 	state;
@@ -49,10 +44,10 @@ mRosReturnType mros_protocol_master_init(void)
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-	mros_protocol_master.register_packet.total_size = sizeof(mRosMasterPacketRegisterBufferType);
-	mros_protocol_master.register_packet.data = &mros_master_packet_register_buffer.buffer;
-	mros_protocol_master.reqtopic_packet.total_size = sizeof(mRosMasterPackeReqTopictBufferType);
-	mros_protocol_master.reqtopic_packet.data = &mros_master_packet_reqtopic_buffer.buffer;
+	mros_protocol_master.register_packet.total_size = sizeof(mros_master_packet_buffer);
+	mros_protocol_master.register_packet.data = &mros_master_packet_buffer.buffer;
+	mros_protocol_master.reqtopic_packet.total_size = sizeof(mros_master_packet_buffer);
+	mros_protocol_master.reqtopic_packet.data = &mros_master_packet_buffer.buffer;
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
 	return MROS_E_OK;
 }
