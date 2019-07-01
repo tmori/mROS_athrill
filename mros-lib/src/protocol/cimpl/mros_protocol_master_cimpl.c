@@ -58,9 +58,9 @@ void mros_protocol_master_run(void)
 		mros_exclusive_lock(&mros_master_exclusive_area);
 		mros_server_queue_wait(&mros_master_exclusive_area, &mros_master_wait_queue);
 		mRosWaitListEntryType *wait_entry = mros_server_queue_get(&mros_master_wait_queue);
-		mros_exclusive_unlock(&mros_master_exclusive_area);
 
 		if (wait_entry == NULL) {
+			mros_exclusive_unlock(&mros_master_exclusive_area);
 			continue;
 		}
 		mRosProtocolMasterRequestType *req = (mRosProtocolMasterRequestType*)wait_entry->data.reqp;
@@ -75,6 +75,7 @@ void mros_protocol_master_run(void)
 			break;
 		}
 		mros_client_wakeup(wait_entry);
+		mros_exclusive_unlock(&mros_master_exclusive_area);
 	}
 	return;
 }
