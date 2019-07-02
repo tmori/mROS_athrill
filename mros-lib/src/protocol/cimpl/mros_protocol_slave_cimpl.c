@@ -29,6 +29,8 @@ mRosReturnType mros_protocol_slave_init(void)
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
+	(void)mros_comm_socket_set_blocking(&mros_protocol_slave.server_comm.socket, MROS_FALSE, MROS_SLAVE_TIMEOUT);
+
 	mros_protocol_slave.packet.total_size = sizeof(mRosSlavePacketBufferType);
 	mros_protocol_slave.packet.data = &mros_slave_packet_buffer.buffer;
 	mros_protocol_slave.state = MROS_PROTOCOL_SLAVE_STATE_WAITING;
