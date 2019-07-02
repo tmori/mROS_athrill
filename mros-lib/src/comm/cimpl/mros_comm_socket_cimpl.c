@@ -76,7 +76,11 @@ static mRosReturnType mros_comm_secket_select(mRosCommSocketType *socket, mros_u
     }
     mros_comm_set_timeval(timeout, &tmo);
     mRosReturnType ret = mros_comm_select(MROS_FD_SETSIZE, r_set, w_set, NULL, &tmo);
-    if ((ret <= 0 || !MROS_FD_ISSET(socket->sock_fd, &fd_set))) {
+    if (ret < 0) {
+    	//TODO ERRLOG
+    	return MROS_E_SYSERR;
+    }
+    if ((ret == 0 || !MROS_FD_ISSET(socket->sock_fd, &fd_set))) {
     	return MROS_E_NOENT;
     }
     return MROS_E_OK;

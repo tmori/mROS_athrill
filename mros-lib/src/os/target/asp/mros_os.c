@@ -55,6 +55,7 @@ static void do_test_register_publisher(void);
 static void do_test_register_subscriber(void);
 static void do_test_request_topic(void);
 static void do_test_tcpros_topic(void);
+static void do_test_server(void);
 
 void main_task()
 {
@@ -135,7 +136,8 @@ void main_task()
 	//do_test_register_publisher();
 	//do_test_register_subscriber();
 	//do_test_request_topic();
-	do_test_tcpros_topic();
+	//do_test_tcpros_topic();
+	do_test_server();
 #endif
 	syslog(LOG_NOTICE,"**********mROS Main task finish**********");
 	return;
@@ -176,6 +178,39 @@ void cyclic_handler(intptr_t exinf)
 	return;
 }
 #include "mros_protocol_client_rpc_cimpl.h"
+#include "mros_comm_tcp_server_cimpl.h"
+
+static void do_test_server(void)
+{
+	mRosCommTcpServerType server;
+	mRosCommTcpClientType client;
+	mRosReturnType ret = mros_comm_tcp_server_init(&server);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_server_init()=%d", ret);
+		return;
+	}
+	(void)mros_comm_socket_set_blocking(&server.socket, MROS_FALSE, MROS_SLAVE_TIMEOUT);
+	ret =  mros_comm_tcp_server_bind(&server, MROS_SLAVE_PORT_NO);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_server_bind()=%d", ret);
+		return;
+	}
+	ret = mros_comm_tcp_server_listen(&server, MROS_COMM_TCP_SERVER_LISTEN_MAX_DEFAULT_VALUE);
+	if (ret != MROS_E_OK) {
+		syslog(LOG_NOTICE, "mros_comm_tcp_server_bind()=%d", ret);
+		return;
+	}
+	while (MROS_TRUE) {
+		ret = mros_comm_tcp_server_accept(&server, &client);
+		if (ret != MROS_E_OK) {
+			syslog(LOG_NOTICE, "mros_comm_tcp_server_accept()=%d", ret);
+			continue;
+		}
+		syslog(LOG_NOTICE, "connected: ip=0x%x port=%u", client.remote.sin_addr, client.remote.sin_port);
+
+		mros_comm_tcp_client_close(&client);
+	}
+}
 
 static void do_test_register_publisher(void)
 {
