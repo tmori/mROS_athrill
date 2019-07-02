@@ -85,6 +85,12 @@ mRosReturnType mros_topic_create(const char *topic_name, const char *topic_typen
 	if (ret == MROS_E_OK) {
 		return MROS_E_OK;
 	}
+	if (len >= MROS_TOPIC_NAME_MAXLEN) {
+		return MROS_E_NOMEM;
+	}
+	if (typelen >= MROS_TOPIC_NAME_MAXLEN) {
+		return MROS_E_NOMEM;
+	}
 
 	ListEntry_Alloc(&topic_manager.head, mRosTopicListEntryType, &p);
 	if (p == NULL) {
@@ -92,9 +98,11 @@ mRosReturnType mros_topic_create(const char *topic_name, const char *topic_typen
 	}
 	*id = p->data.topic_id;
 	p->data.namelen = len;
-	p->data.topic_name = topic_name;
+	memcpy(p->data.topic_name, topic_name, len);
+	p->data.topic_name[len] = '\0';
 	p->data.typenamelen = typelen;
-	p->data.topic_typename = topic_typename;
+	memcpy(p->data.topic_typename, topic_typename, typelen);
+	p->data.topic_typename[typelen] = '\0';
 	ListEntry_AddEntry(&topic_manager.head, p);
 	return MROS_E_OK;
 }

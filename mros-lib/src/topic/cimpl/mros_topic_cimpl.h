@@ -12,9 +12,9 @@ extern "C" {
 typedef struct {
 	mRosTopicIdType				topic_id;
 	mros_uint32					namelen;
-	const char					*topic_name;
+	char						topic_name[MROS_TOPIC_NAME_MAXLEN];
 	mros_uint32					typenamelen;
-	const char					*topic_typename;
+	char						topic_typename[MROS_TOPIC_TYPENAME_MAXLEN];
 
 	/*
 	 * トピックデータ格納用キュー
@@ -28,9 +28,7 @@ typedef ListHeadType(mRosTopicListEntryType) mRosTopicEntryHeadType;
 
 #define MROS_TOPIC_ENTRY_INIT(entryp)	\
 do {	\
-	(entryp)->data.topic_name = NULL;	\
 	(entryp)->data.namelen = 0;	\
-	(entryp)->data.topic_typename = NULL;	\
 	(entryp)->data.typenamelen = 0;	\
 	(entryp)->data.queue_maxsize = 1; \
 } while (0)

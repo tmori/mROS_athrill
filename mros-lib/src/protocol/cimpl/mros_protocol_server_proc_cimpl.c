@@ -80,14 +80,10 @@ static mRosNodeIdType mros_publisher_is_exist(mRosTopicIdType topic_id)
 	if (topic_obj == MROS_COBJ_NULL) {
 		return MROS_ID_NONE;
 	}
-	obj = mros_topic_connector_get_first(mgrp, topic_obj);
-	while (obj != MROS_COBJ_NULL) {
+	obj = mros_topic_connector_get_first(mgrp, MROS_NODE_TYPE_INNER, topic_obj);
+	if (obj != MROS_COBJ_NULL) {
 		(void)mros_topic_connector_get(obj, &connector);
-		mRosNodeEnumType type = mros_node_type(connector.node_id);
-		if (type == ROS_NODE_TYPE_INNER) {
-			return connector.node_id;
-		}
-		obj = mros_topic_connector_get_next(mgrp, topic_obj, obj);
+		return connector.node_id;
 	}
 	return MROS_ID_NONE;
 }

@@ -6,24 +6,24 @@ extern "C" {
 #endif
 
 #include "mros_list.h"
+#include "mros_config.h"
 
 typedef enum {
-	ROS_NODE_TYPE_INNER = 0,
-	ROS_NODE_TYPE_OUTER,
-	ROS_NODE_TYPE_NUM,
+	MROS_NODE_TYPE_INNER = 0,
+	MROS_NODE_TYPE_OUTER,
+	MROS_NODE_TYPE_NUM,
 } mRosNodeEnumType;
 
 typedef struct {
 	mRosNodeIdType				node_id;
 	mRosTaskIdType				task_id;
-	const char					*node_name;
+	char						node_name[MROS_NODE_NAME_MAXLEN];
 	mros_uint32					namelen;
 } mRosNodeEntryType;
 
 #define MROS_TOPIC_NODE_ENTRY_INIT(entryp)	\
 do {	\
 	(entryp)->data.node_id = MROS_ID_NONE;	\
-	(entryp)->data.node_name = NULL;	\
 	(entryp)->data.namelen = 0;	\
 } while (0)
 

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "mros_topic_data_subscriber_cimpl.h"
 
-static void mros_topic_publish(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType topic_obj)
+static void mros_topic_publish(mRosTopicConnectorManagerType *mgrp, mRosNodeEnumType type, mRosContainerObjType topic_obj)
 {
 	mRosReturnType ret;
 	mRosContainerObjType obj;
@@ -15,7 +15,7 @@ static void mros_topic_publish(mRosTopicConnectorManagerType *mgrp, mRosContaine
 		return;
 	}
 
-	obj = mros_topic_connector_get_first(mgrp, topic_obj);
+	obj = mros_topic_connector_get_first(mgrp, type, topic_obj);
 	if (obj == MROS_COBJ_NULL) {
 		return;
 	}
@@ -52,7 +52,7 @@ void mros_topic_data_publisher_run(void)
 	topic_obj = mros_topic_connector_get_topic_first(mgrp);
 	while (topic_obj != MROS_COBJ_NULL) {
 
-		mros_topic_publish(mgrp, topic_obj);
+		mros_topic_publish(mgrp, MROS_NODE_TYPE_INNER, topic_obj);
 		topic_obj = mros_topic_connector_get_topic_next(mgrp, topic_obj);
 	}
 	return;

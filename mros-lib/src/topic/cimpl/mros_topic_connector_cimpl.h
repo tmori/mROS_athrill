@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "mros_types.h"
+#include "mros_node_cimpl.h"
 #include "mros_memory.h"
 #include "mros_comm_tcp_client_factory_cimpl.h"
 
@@ -36,7 +37,7 @@ do {	\
 
 typedef struct {
 	mRosTopicIdType						topic_id;
-	mRosTopicConnectorListHeadType		head;
+	mRosTopicConnectorListHeadType		head[MROS_NODE_TYPE_NUM];
 } mRosTopicConnectorEntryRootType;
 typedef ListEntryType(mRosTopicConnectorListEntryRootType, mRosTopicConnectorEntryRootType) mRosTopicConnectorListEntryRootType;
 typedef ListHeadType(mRosTopicConnectorListEntryRootType) mRosTopicConnectorListEntryRootHeadType;
@@ -63,7 +64,7 @@ extern mRosContainerObjType mros_topic_connector_get_topic_first(mRosTopicConnec
 extern mRosContainerObjType mros_topic_connector_get_topic_next(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType obj);
 extern mRosContainerObjType mros_topic_connector_get_topic_obj(mRosTopicConnectorManagerType *mgrp, mRosTopicIdType topic_id);
 
-extern mRosContainerObjType mros_topic_connector_get_first(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType topic_obj);
+extern mRosContainerObjType mros_topic_connector_get_first(mRosTopicConnectorManagerType *mgrp, mRosNodeEnumType type, mRosContainerObjType topic_obj);
 extern mRosContainerObjType mros_topic_connector_get_next(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType topic_obj, mRosContainerObjType obj);
 
 

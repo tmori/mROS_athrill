@@ -149,6 +149,7 @@ ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 	}
 	connector.func_id = (mRosFuncIdType)MROS_ID_NONE;
 
+	//TODO 初期化場所はここではない．
 	ret = mros_mem_init(ROS_TOPIC_PUBLISHER_CONFIG_NUM, ros_topic_publisher_config, &ros_topic_publisher_mempool);
 	if (ret != MROS_E_OK) {
 		//TODO ERROR LOG

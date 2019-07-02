@@ -10,6 +10,9 @@
  */
 #define MROS_TOPIC_MAX_NUM						10U
 
+#define MROS_TOPIC_NAME_MAXLEN					20U
+#define MROS_TOPIC_TYPENAME_MAXLEN				20U
+
 
 /**************************************
  * TOPIC CONNECTOR
@@ -33,6 +36,7 @@
  * num of max nodes
  */
 #define MROS_NODE_MAX_NUM						10U
+#define MROS_NODE_NAME_MAXLEN					20U
 
 /**************************************
  * PROTOCOL
@@ -64,7 +68,6 @@
 
 
 #define MROS_TOPIC_TCP_CLIENT_MAX_NUM			10
-#define MROS_TOPIC_NAME_MAXLEN					128
 
 /**************************************
  * PACKET

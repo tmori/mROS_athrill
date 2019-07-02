@@ -19,7 +19,8 @@ mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, m
 	for (i = 0; i < MROS_TOPIC_MAX_NUM; i++) {
 		mRosTopicConnectorListEntryRootType *topic_entry = &(mgrp->topic_entries[i]);
 		topic_entry->data.topic_id = MROS_ID_NONE;
-		List_Init(&topic_entry->data.head, mRosTopicConnectorListEntryType, 0, NULL);
+		List_Init(&topic_entry->data.head[MROS_NODE_TYPE_INNER], mRosTopicConnectorListEntryType, 0, NULL);
+		List_Init(&topic_entry->data.head[MROS_NODE_TYPE_OUTER], mRosTopicConnectorListEntryType, 0, NULL);
 	}
 
 	List_Init(&mgrp->topic_head, mRosTopicConnectorListEntryRootType, MROS_TOPIC_MAX_NUM, mgrp->topic_entries);
@@ -51,15 +52,15 @@ mRosContainerObjType mros_topic_connector_get_topic_next(mRosTopicConnectorManag
 	return (mRosContainerObjType)entry->next;
 }
 
-mRosContainerObjType mros_topic_connector_get_first(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType topic_obj)
+mRosContainerObjType mros_topic_connector_get_first(mRosTopicConnectorManagerType *mgrp, mRosNodeEnumType type, mRosContainerObjType topic_obj)
 {
 	mRosTopicConnectorListEntryRootType *topic_entry = (mRosTopicConnectorListEntryRootType*)topic_obj;
 	mRosTopicConnectorListEntryType *p;
 
-	if (topic_entry->data.head.entry_num == 0) {
+	if (topic_entry->data.head[type].entry_num == 0) {
 		return MROS_COBJ_NULL;
 	}
-	ListEntry_GetFirst(&topic_entry->data.head, &p);
+	ListEntry_GetFirst(&topic_entry->data.head[type], &p);
 
 	return (mRosContainerObjType)p;
 }
@@ -71,7 +72,8 @@ mRosContainerObjType mros_topic_connector_get_next(mRosTopicConnectorManagerType
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 	mRosTopicConnectorListEntryType *first;
 
-	ListEntry_GetFirst(&topic_entry->data.head, &first);
+	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
+	ListEntry_GetFirst(&topic_entry->data.head[type], &first);
 	if (first == NULL) {
 		return MROS_COBJ_NULL;
 	}
@@ -110,7 +112,8 @@ static mRosTopicConnectorListEntryRootType *mros_topic_connector_create_topic_he
 		return NULL;
 	}
 	topic_p->data.topic_id = topic_id;
-	List_InitEmpty(&topic_p->data.head, mRosTopicConnectorListEntryType);
+	List_InitEmpty(&topic_p->data.head[MROS_NODE_TYPE_INNER], mRosTopicConnectorListEntryType);
+	List_InitEmpty(&topic_p->data.head[MROS_NODE_TYPE_OUTER], mRosTopicConnectorListEntryType);
 	ListEntry_AddEntry(&mgrp->topic_head, topic_p);
 	return topic_p;
 }
@@ -118,8 +121,9 @@ static mRosTopicConnectorListEntryRootType *mros_topic_connector_create_topic_he
 static mRosTopicConnectorListEntryType *mros_topic_connector_get_node(mRosTopicConnectorListEntryRootType *topic_p, mRosNodeIdType node_id)
 {
 	mRosTopicConnectorListEntryType *entry;
+	mRosNodeEnumType type = mros_node_type(node_id);
 
-	ListEntry_Foreach(&topic_p->data.head, entry) {
+	ListEntry_Foreach(&topic_p->data.head[type], entry) {
 		if ((entry->data.value.node_id == node_id)) {
 			return entry;
 		}
@@ -148,6 +152,7 @@ mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRo
 	}
 
 	entry = mros_topic_connector_get_node(topic_p, connector->node_id);
+	mRosNodeEnumType type = mros_node_type(connector->node_id);
 	if (entry == NULL) {
 		ListEntry_Alloc(&mgrp->conn_head, mRosTopicConnectorListEntryType, &entry);
 		if (entry != NULL) {
@@ -157,8 +162,8 @@ mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRo
 			entry->data.queue_maxsize = queue_length;
 			entry->data.mempool = mempool;
 			entry->data.commp = NULL;
+			ListEntry_AddEntry(&topic_p->data.head[type], entry);
 			List_InitEmpty(&entry->data.queue_head, mRosMemoryListEntryType);
-			ListEntry_AddEntry(&topic_p->data.head, entry);
 		}
 		else {
 			ret = MROS_E_NOMEM;
@@ -185,9 +190,12 @@ mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, 
 	if (entryp == NULL) {
 		return MROS_E_NOENT;
 	}
-	ListEntry_RemoveEntry(&topic_entryp->data.head, entryp);
-	if (topic_entryp->data.head.entry_num == 0) {
-		ListEntry_RemoveEntry(&mgrp->topic_head, topic_entryp);
+	mRosNodeEnumType type = mros_node_type(connector->node_id);
+	{
+		ListEntry_RemoveEntry(&topic_entryp->data.head[type], entryp);
+		if (topic_entryp->data.head[type].entry_num == 0) {
+			ListEntry_RemoveEntry(&mgrp->topic_head, topic_entryp);
+		}
 	}
 	if (entryp->data.commp != NULL) {
 		entryp->data.commp->data.op.free(entryp->data.commp);
@@ -237,9 +245,9 @@ mRosContainerObjType mros_topic_connector_get_obj(mRosTopicConnectorManagerType 
 		}
 
 	}
-
+	mRosNodeEnumType type = mros_node_type(connector->node_id);
 	{
-		ListEntry_Foreach(&topic_p->data.head, p) {
+		ListEntry_Foreach(&topic_p->data.head[type], p) {
 			if ((p->data.value.node_id == connector->node_id)) {
 				entry = p;
 				break;
@@ -266,7 +274,7 @@ mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const cha
 	mRosMemoryListEntryType *mem_entryp;
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
-	if (type != ROS_NODE_TYPE_INNER) {
+	if (type != MROS_NODE_TYPE_INNER) {
 		return MROS_E_INVAL;
 	}
 	if (entry->data.queue_head.entry_num >= entry->data.queue_maxsize) {
@@ -288,7 +296,7 @@ mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const ch
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
-	if (type == ROS_NODE_TYPE_INNER) {
+	if (type == MROS_NODE_TYPE_INNER) {
 		//TOPIC ==> inner node callback
 		//mros_topic_callback(data);//TODO no need to change raw data to C++ type based data??
 		return MROS_E_OK;
@@ -306,7 +314,7 @@ mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerObjType 
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
-	if (type == ROS_NODE_TYPE_INNER) {
+	if (type == MROS_NODE_TYPE_INNER) {
 		if (entry->data.queue_head.entry_num == 0) {
 			return NULL;
 		}
