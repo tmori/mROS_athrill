@@ -5,20 +5,18 @@
 void mros_exclusive_init(mRosExclusiveObjectType *exobj, mRosTaskPriorityType priority)
 {
 	exobj->priority = priority;
-	exobj->task_priority = 0;
 	return;
 }
 
-void mros_exclusive_lock(mRosExclusiveObjectType *exobj)
+void mros_exclusive_lock(mRosExclusiveObjectType *exobj, mROsExclusiveUnlockObjType *unlock_obj)
 {
-	mRosTaskPriorityType priority = mros_get_taskid();
+	unlock_obj->org_priority = mros_get_taskpri();
 	mros_change_taskpri(exobj->priority);
-	exobj->task_priority = priority;
 	return;
 }
 
-void mros_exclusive_unlock(mRosExclusiveObjectType *exobj)
+void mros_exclusive_unlock(mROsExclusiveUnlockObjType *unlock_obj)
 {
-	mros_change_taskpri(exobj->task_priority);
+	mros_change_taskpri(unlock_obj->org_priority);
 	return;
 }

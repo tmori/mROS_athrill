@@ -11,6 +11,7 @@
 #include "mros_protocol_client_rpc_cimpl.h"
 #include "mros_topic_cimpl.h"
 #include "mros_node_cimpl.h"
+#include "mros_topic_runner_cimpl.h"
 #include <stdlib.h>
 
 typedef union {
@@ -81,17 +82,16 @@ void mros_protocol_subscribe_run(void)
 	mRosContainerObjType cobj;
 	mRosRcpRosReqType req;
 	mRosTcpRosResType res;
+	mROsExclusiveUnlockObjType unlck_obj;
 
 	req.req_packet = &mros_protocol_subscribe.tcpros_packet;
 	res.reply_packet = &mros_protocol_subscribe.tcpros_packet;
 
+	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 	while (MROS_TRUE) {
-		mros_exclusive_lock(&mros_subscribe_exclusive_area);
-		mros_server_queue_wait(&mros_subscribe_exclusive_area, &mros_subscribe_wait_queue);
-		mRosWaitListEntryType *wait_entry = mros_server_queue_get(&mros_subscribe_wait_queue);
-
+		mRosWaitListEntryType *wait_entry = mros_server_queue_wait(&mros_subscribe_wait_queue);
 		if (wait_entry == NULL) {
-			mros_exclusive_unlock(&mros_subscribe_exclusive_area);
+			mros_topic_data_subscriber_run();
 			continue;
 		}
 		client_req = (mRosCommTcpClientListReqEntryType*)wait_entry->data.reqp;
@@ -100,26 +100,22 @@ void mros_protocol_subscribe_run(void)
 		ret = mros_node_create_outer(&connector.node_id);
 		if (ret != MROS_E_OK) {
 			//TODO ERR LOG
-			mros_exclusive_unlock(&mros_subscribe_exclusive_area);
 			continue;
 		}
 		ret = mros_topic_connector_add(mros_protocol_subscribe.pub_mgrp, &connector, MROS_OUTER_CONNECTOR_QUEUE_MAXLEN, &ros_outer_topic_publisher_mempool);
 		if (ret != MROS_E_OK) {
 			//TODO ERR LOG
-			mros_exclusive_unlock(&mros_subscribe_exclusive_area);
 			continue;
 		}
 
 		ret = mros_comm_tcp_client_ip32_init(&client_req->data.client, client_req->data.reqobj.ipaddr, client_req->data.reqobj.port);
 		if (ret != MROS_E_OK) {
 			//TODO ERR LOG
-			mros_exclusive_unlock(&mros_subscribe_exclusive_area);
 			continue;
 		}
 		ret = mros_comm_tcp_client_connect(&client_req->data.client);
 		if (ret != MROS_E_OK) {
 			//TODO ERR LOG
-			mros_exclusive_unlock(&mros_subscribe_exclusive_area);
 			continue;
 		}
 
@@ -129,7 +125,6 @@ void mros_protocol_subscribe_run(void)
 		ret = mros_rpc_tcpros(&client_req->data.client, &req, &res);
 		if (ret != MROS_E_OK) {
 			//TODO ERR LOG
-			mros_exclusive_unlock(&mros_subscribe_exclusive_area);
 			continue;
 		}
 
@@ -137,10 +132,9 @@ void mros_protocol_subscribe_run(void)
 		ret = mros_topic_connector_set_connection(cobj, client_req);
 		if (ret != MROS_E_OK) {
 			//TODO ERR LOG
-			mros_exclusive_unlock(&mros_subscribe_exclusive_area);
 			continue;
 		}
-		mros_exclusive_unlock(&mros_subscribe_exclusive_area);
 	}
+	mros_exclusive_unlock(&unlck_obj);
 	return;
 }

@@ -54,13 +54,11 @@ mRosReturnType mros_protocol_master_init(void)
 
 void mros_protocol_master_run(void)
 {
+	mROsExclusiveUnlockObjType unlck_obj;
+	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 	while (MROS_TRUE) {
-		mros_exclusive_lock(&mros_master_exclusive_area);
-		mros_server_queue_wait(&mros_master_exclusive_area, &mros_master_wait_queue);
-		mRosWaitListEntryType *wait_entry = mros_server_queue_get(&mros_master_wait_queue);
-
+		mRosWaitListEntryType *wait_entry = mros_server_queue_wait(&mros_master_wait_queue);
 		if (wait_entry == NULL) {
-			mros_exclusive_unlock(&mros_master_exclusive_area);
 			continue;
 		}
 		mRosProtocolMasterRequestType *req = (mRosProtocolMasterRequestType*)wait_entry->data.reqp;
@@ -75,8 +73,8 @@ void mros_protocol_master_run(void)
 			break;
 		}
 		mros_client_wakeup(wait_entry);
-		mros_exclusive_unlock(&mros_master_exclusive_area);
 	}
+	mros_exclusive_unlock(&unlck_obj);
 	return;
 }
 
@@ -160,10 +158,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 		req->data.op.topic_data_send = mros_protocol_topic_data_send;
 		mros_client_wait_entry_init(&req->data.reqobj.waitobj, req);
 
-		mros_exclusive_lock(&mros_subscribe_exclusive_area);
-		mros_server_queue_put(&mros_subscribe_wait_queue, &req->data.reqobj.waitobj);
-		mros_server_queue_wakeup(&mros_subscribe_wait_queue);
-		mros_exclusive_unlock(&mros_subscribe_exclusive_area);
+		mros_client_put_request(&mros_subscribe_wait_queue, &req->data.reqobj.waitobj);
 
 		ptr = mros_xmlpacket_reqtopicres_get_next_uri(ptr, rpc_response->reply_packet, &ipaddr, &port);
 	}

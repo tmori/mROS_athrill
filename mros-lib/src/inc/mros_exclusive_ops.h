@@ -12,15 +12,14 @@ typedef struct {
 	 * 排他エリア内では，タスクのプライオリティは本プライオリティに引き上げられる
 	 */
 	mRosTaskPriorityType	priority;
-	/*
-	 * 排他エリア内に入っているタスクプライオリティ
-	 * 排他エリアから復帰する際に使用する
-	 */
-	mRosTaskPriorityType	task_priority;
 } mRosExclusiveObjectType;
 
+typedef struct {
+	mRosTaskPriorityType	org_priority;
+} mROsExclusiveUnlockObjType;
+
 extern void mros_exclusive_init(mRosExclusiveObjectType *exobj, mRosTaskPriorityType priority);
-extern void mros_exclusive_lock(mRosExclusiveObjectType *exobj);
-extern void mros_exclusive_unlock(mRosExclusiveObjectType *exobj);
+extern void mros_exclusive_lock(mRosExclusiveObjectType *exobj, mROsExclusiveUnlockObjType *unlock_obj);
+extern void mros_exclusive_unlock(mROsExclusiveUnlockObjType *unlock_objj);
 
 #endif /* _MROS_EXCLUSIVE_OPS_H_ */

@@ -173,8 +173,7 @@ void xml_mas_task()
 
 void cyclic_handler(intptr_t exinf)
 {
-	//iwup_tsk(SUB_TASK);
-	//iwup_tsk(XML_SLV_TASK);
+	//TODO iwup_tsk(SUB_TASK);
 	return;
 }
 #include "mros_protocol_client_rpc_cimpl.h"

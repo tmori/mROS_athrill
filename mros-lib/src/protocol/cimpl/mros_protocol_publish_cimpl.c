@@ -3,6 +3,8 @@
 #include "mros_comm_tcp_client_cimpl.h"
 #include "mros_comm_tcp_server_cimpl.h"
 #include "mros_packet_encoder_cimpl.h"
+#include "mros_exclusive_area.h"
+#include "mros_topic_runner_cimpl.h"
 #include "mros_types.h"
 #include "mros_config.h"
 
@@ -47,10 +49,14 @@ mRosReturnType mros_protocol_publish_init(void)
 void mros_protocol_publish_run(void)
 {
 	mRosReturnType ret;
+	mROsExclusiveUnlockObjType unlck_obj;
 
 	while (MROS_TRUE) {
 		ret = mros_comm_tcp_server_accept(&mros_protocol_publish.server_comm, &mros_protocol_publish.client_comm);
 		if (ret != MROS_E_OK) {
+			mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
+			mros_topic_data_publisher_run();
+			mros_exclusive_unlock(&unlck_obj);
 			continue;
 		}
 		ret = mros_proc_tcpros_receive(&mros_protocol_publish.client_comm, &mros_protocol_publish.packet);
@@ -59,11 +65,11 @@ void mros_protocol_publish_run(void)
 			mros_comm_tcp_client_close(&mros_protocol_publish.client_comm);
 			continue;
 		}
+		mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 		ret = mros_proc_pub_tcpros(&mros_protocol_publish.client_comm, &mros_protocol_publish.packet);
+		mros_exclusive_unlock(&unlck_obj);
 		if (ret != MROS_E_OK) {
 			//TODO ERRLOG
-			mros_comm_tcp_client_close(&mros_protocol_publish.client_comm);
-			continue;
 		}
 	}
 	return;

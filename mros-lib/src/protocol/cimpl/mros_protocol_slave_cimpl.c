@@ -5,6 +5,7 @@
 #include "mros_types.h"
 #include "mros_config.h"
 #include "mros_packet_encoder_cimpl.h"
+#include "mros_exclusive_area.h"
 
 typedef union {
 	char buffer;
@@ -29,7 +30,6 @@ mRosReturnType mros_protocol_slave_init(void)
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-	(void)mros_comm_socket_set_blocking(&mros_protocol_slave.server_comm.socket, MROS_FALSE, MROS_SLAVE_TIMEOUT);
 
 	mros_protocol_slave.packet.total_size = sizeof(mRosSlavePacketBufferType);
 	mros_protocol_slave.packet.data = &mros_slave_packet_buffer.buffer;
@@ -48,6 +48,7 @@ mRosReturnType mros_protocol_slave_init(void)
 void mros_protocol_slave_run(void)
 {
 	mRosReturnType ret;
+	mROsExclusiveUnlockObjType unlck_obj;
 
 	while (MROS_TRUE) {
 		ret = mros_comm_tcp_server_accept(&mros_protocol_slave.server_comm, &mros_protocol_slave.client_comm);
@@ -60,7 +61,9 @@ void mros_protocol_slave_run(void)
 			mros_comm_tcp_client_close(&mros_protocol_slave.client_comm);
 			continue;
 		}
+		mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 		ret = mros_proc_slave(&mros_protocol_slave.client_comm, &mros_protocol_slave.packet);
+		mros_exclusive_unlock(&unlck_obj);
 		if (ret != MROS_E_OK) {
 			//TODO ERRLOG
 			continue;

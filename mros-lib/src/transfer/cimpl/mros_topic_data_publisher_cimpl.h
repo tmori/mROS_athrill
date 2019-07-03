@@ -8,7 +8,6 @@ extern "C" {
 #include "mros_types.h"
 
 extern mRosReturnType mros_topic_data_publisher_init(void);
-extern void mros_topic_data_publisher_run(void);
 
 #ifdef __cplusplus
 }

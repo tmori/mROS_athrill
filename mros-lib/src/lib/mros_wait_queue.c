@@ -11,13 +11,11 @@ void mros_client_wait_entry_init(mRosWaitListEntryType *wait_entry, void *reqp)
 	return;
 }
 
-void mros_client_wait(mRosExclusiveObjectType *ex_obj, mRosWaitListEntryType *wait_entry)
+void mros_server_queue_init(mRosWaitQueueType *wait_queue)
 {
-	mros_sleep_task();
+	wait_queue->task_id = mros_get_taskid();
+	List_InitEmpty(&wait_queue->head, mRosWaitListEntryType);
 
-	//TODO 起床した時にスリープ時点のタスクプライオリティかどうか不明なので要調査
-	mros_change_taskpri(ex_obj->priority);
-	ex_obj->task_priority = wait_entry->data.task_priority;
 	return;
 }
 
@@ -27,21 +25,21 @@ void mros_client_wakeup(mRosWaitListEntryType *wait_entry)
 	return;
 }
 
-void mros_server_queue_init(mRosWaitQueueType *wait_queue)
-{
-	wait_queue->task_id = mros_get_taskid();
-	wait_queue->task_priority = mros_get_taskpri();
-	List_InitEmpty(&wait_queue->head, mRosWaitListEntryType);
-	return;
-}
 
-void mros_server_queue_put(mRosWaitQueueType *wait_queue, mRosWaitListEntryType *wait_entry)
+void mros_client_put_request(mRosWaitQueueType *wait_queue, mRosWaitListEntryType *wait_entry)
 {
 	ListEntry_AddEntry(&wait_queue->head, wait_entry);
+	mros_wakeup_task(wait_queue->task_id);
 	return;
 }
 
-mRosWaitListEntryType *mros_server_queue_get(mRosWaitQueueType *wait_queue)
+void mros_client_wait_for_request_done(mRosWaitQueueType *wait_queue, mRosWaitListEntryType *wait_entry)
+{
+	mros_client_put_request(wait_queue, wait_entry);
+	mros_sleep_task();
+	return;
+}
+static mRosWaitListEntryType *mros_server_queue_get(mRosWaitQueueType *wait_queue)
 {
 	mRosTaskPriorityType min_priority = 0;
 	mRosWaitListEntryType *entry;
@@ -58,18 +56,13 @@ mRosWaitListEntryType *mros_server_queue_get(mRosWaitQueueType *wait_queue)
 	}
 	return target;
 }
-void mros_server_queue_wait(mRosExclusiveObjectType *ex_obj, mRosWaitQueueType *wait_queue)
+
+mRosWaitListEntryType *mros_server_queue_wait(mRosWaitQueueType *wait_queue)
 {
 	mros_sleep_task();
 
-	//TODO 起床した時にスリープ時点のタスクプライオリティかどうか不明なので要調査
-	mros_change_taskpri(ex_obj->priority);
-	ex_obj->task_priority = wait_queue->task_priority;
-	return;
-}
-
-void mros_server_queue_wakeup(mRosWaitQueueType *wait_queue)
-{
-	mros_wakeup_task(wait_queue->task_id);
-	return;
+	if (wait_queue->head.entry_num > 0) {
+		return mros_server_queue_get(wait_queue);
+	}
+	return NULL;
 }
