@@ -51,7 +51,7 @@
  */
 #define MROS_MASTER_IPADDR						"0.0.0.0"
 
-#define MROS_NODE_IPADDR						"0.0.0.0"
+#define MROS_NODE_IPADDR						"127.0.0.1"
 
 /*
  * portno of slave
@@ -63,8 +63,7 @@
  */
 #define MROS_PUBLISHER_PORT_NO					11511
 
-#define MROS_IPADDR								"0.0.0.0"
-#define MROS_URI_SLAVE							"http://0.0.0.0/1141"
+#define MROS_URI_SLAVE							"http://127.0.0.1:11411"
 
 
 #define MROS_TOPIC_TCP_CLIENT_MAX_NUM			10

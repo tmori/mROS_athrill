@@ -13,7 +13,6 @@ static mRosReturnType mros_rpc_sendreply_xmlpacket(mRosEncodeArgType *arg, mRosC
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-
 	ret = mros_comm_tcp_client_send_all(client, req->data, req->data_size, &rlen);
 	if (ret != MROS_E_OK) {
 		return ret;

@@ -91,7 +91,7 @@ void mros_protocol_subscribe_run(void)
 	while (MROS_TRUE) {
 		mRosWaitListEntryType *wait_entry = mros_server_queue_wait(&mros_subscribe_wait_queue);
 		if (wait_entry == NULL) {
-			mros_topic_data_subscriber_run();
+			//mros_topic_data_subscriber_run();
 			continue;
 		}
 		client_req = (mRosCommTcpClientListReqEntryType*)wait_entry->data.reqp;

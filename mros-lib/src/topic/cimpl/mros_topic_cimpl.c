@@ -139,7 +139,7 @@ const char *mros_topic_get_topic_typename(mRosTopicIdType id)
 	if (id > topic_manager.max_topic) {
 		return NULL;
 	}
-	return TOPIC_OBJ(id).data.topic_name;
+	return TOPIC_OBJ(id).data.topic_typename;
 }
 
 mRosReturnType mros_topic_remove_byname(const char *topic_name)

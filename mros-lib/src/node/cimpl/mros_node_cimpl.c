@@ -25,7 +25,7 @@ mRosReturnType mros_node_init(void)
 		for (j = 0; j < MROS_NODE_MAX_NUM; j++) {
 			mRosNodeListEntryType *entry = &(node_manager[i].node_entries[j]);
 			MROS_TOPIC_NODE_ENTRY_INIT(entry);
-			entry->data.node_id = MROS_ID(i) + (((mRosNodeIdType)i) * MROS_NODE_MAX_NUM);
+			entry->data.node_id = MROS_ID(j) + (((mRosNodeIdType)i) * MROS_NODE_MAX_NUM);
 		}
 		List_Init(&node_manager[i].head, mRosNodeListEntryType, MROS_NODE_MAX_NUM, node_manager[i].node_entries);
 		node_manager[i].max_node = MROS_NODE_MAX_NUM;

@@ -21,20 +21,14 @@ extern "C" {
 		"<methodName>%s</methodName>\n"		\
 		"<params>\n"						\
 			"<param>\n"						\
-				"<value>%s</value>\n"		\
+				"<value>/%s</value>\n"		\
 			"</param>\n"					\
-		"</params>"							\
-		"<params>\n"						\
+			"<param>\n"						\
+				"<value>/%s</value>\n"		\
+			"</param>\n"					\
 			"<param>\n"						\
 				"<value>%s</value>\n"		\
 			"</param>\n"					\
-		"</params>"							\
-		"<params>\n"						\
-			"<param>\n"						\
-				"<value>%s</value>\n"		\
-			"</param>\n"					\
-		"</params>"							\
-		"<params>\n"						\
 			"<param>\n"						\
 				"<value>%s</value>\n"		\
 			"</param>\n"					\
@@ -53,15 +47,11 @@ extern "C" {
 		"<methodName>%s</methodName>\n"						\
 		"<params>\n"										\
 			"<param>\n"										\
-				"<value>%s</value>\n"						\
+				"<value>/%s</value>\n"						\
 			"</param>\n"									\
-		"</params>"											\
-		"<params>\n"										\
 			"<param>\n"										\
-				"<value>%s</value>\n"						\
+				"<value>/%s</value>\n"						\
 			"</param>\n"									\
-		"</params>"											\
-		"<params>\n"										\
 			"<param>\n"										\
 				"<value>"									\
 					"<array>\n"								\
