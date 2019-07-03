@@ -6,6 +6,7 @@
 #include "mros_packet_encoder_cimpl.h"
 #include "mros_packet_decoder_cimpl.h"
 #include "mros_node_cimpl.h"
+#include "mros_protocol_operation_cimpl.h"
 #include <string.h>
 
 static mRosPacketDecodedRequestType mros_proc_slave_decoded_requst;
@@ -171,7 +172,9 @@ static mRosReturnType mros_proc_add_outersub_connector(mRosCommTcpClientType *cl
 	if (client_entry == NULL) {
 		return MROS_E_NOENT;
 	}
-
+	client_entry->data.op.free = mros_protocol_client_obj_free;
+	client_entry->data.op.topic_data_receive = mros_protocol_topic_data_receive;
+	client_entry->data.op.topic_data_send = mros_protocol_topic_data_send;
 	ret = mros_topic_connector_set_connection(cobj, client_entry);
 	if (ret != MROS_E_OK) {
 		//TODO ERR LOG

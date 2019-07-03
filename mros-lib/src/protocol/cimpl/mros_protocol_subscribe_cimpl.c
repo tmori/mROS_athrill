@@ -41,15 +41,15 @@ static mRosSubscribePacketTcpRosBufferType mros_subscribe_packet_tcpros_buffer;
 //おそらく想定するデータ型と想定コネクション数から本コンフィグを自動生成すべきと考える．
 
 #define ROS_OUTER_TOPIC_PUBLISHER_CONFIG_NUM			3U
-#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL1_SIZE		4U
+#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL1_SIZE		16U
 #define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL1_QUELEN		1U
 MROS_MEMORY_CONFIG_DECLARE_ENTRY(ros_outer_topic_publisher_mempool1, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL1_QUELEN, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL1_SIZE);
 
-#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL2_SIZE		8U
+#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL2_SIZE		32U
 #define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL2_QUELEN		1U
 MROS_MEMORY_CONFIG_DECLARE_ENTRY(ros_outer_topic_publisher_mempool2, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL2_QUELEN, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL2_SIZE);
 
-#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL3_SIZE		16U
+#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL3_SIZE		64U
 #define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL3_QUELEN		1U
 MROS_MEMORY_CONFIG_DECLARE_ENTRY(ros_outer_topic_publisher_mempool3, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL3_QUELEN, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL3_SIZE);
 
@@ -91,7 +91,7 @@ void mros_protocol_subscribe_run(void)
 	while (MROS_TRUE) {
 		mRosWaitListEntryType *wait_entry = mros_server_queue_wait(&mros_subscribe_wait_queue);
 		if (wait_entry == NULL) {
-			//mros_topic_data_subscriber_run();
+			mros_topic_data_subscriber_run();
 			continue;
 		}
 		client_req = (mRosCommTcpClientListReqEntryType*)wait_entry->data.reqp;

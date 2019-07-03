@@ -139,7 +139,7 @@ void main_task()
 
 
 	act_tsk(PUB_TASK);
-	//act_tsk(SUB_TASK);
+	act_tsk(SUB_TASK);
 	act_tsk(XML_SLV_TASK);
 	act_tsk(XML_MAS_TASK);
 	act_tsk(USR_TASK1);
@@ -185,7 +185,7 @@ void xml_mas_task()
 
 void cyclic_handler(intptr_t exinf)
 {
-	//TODO iwup_tsk(SUB_TASK);
+	iwup_tsk(SUB_TASK);
 	return;
 }
 #include "mros_protocol_client_rpc_cimpl.h"

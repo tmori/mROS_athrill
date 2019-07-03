@@ -36,6 +36,7 @@ void usr_task1(void)
 	while(1){
 		wait_ms(1000);
 		sprintf(buf, "publish test data(%u)", i++);
+		syslog(LOG_NOTICE,"Data Publish %s", buf);
 		str.data = buf;
 		chatter_pub.publish(str);
 		//loop_rate.sleep();

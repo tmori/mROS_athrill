@@ -26,12 +26,12 @@ static void mros_topic_publish(mRosTopicConnectorManagerType *mgrp, mRosNodeEnum
 	while (obj != MROS_COBJ_NULL) {
 		topic_data = mros_topic_connector_receive_data(obj);
 		if (topic_data == NULL) {
+			obj = mros_topic_connector_get_next(mgrp, topic_obj, obj);
 			continue;
 		}
 		ret = mros_topic_add_data(topic_id, topic_data);
 		if (ret != MROS_E_OK) {
 			(void)mros_mem_free(topic_data->data.mgrp, topic_data);
-			continue;
 		}
 		obj = mros_topic_connector_get_next(mgrp, topic_obj, obj);
 	}

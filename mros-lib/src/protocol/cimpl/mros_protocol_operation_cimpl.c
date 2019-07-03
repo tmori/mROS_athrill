@@ -17,6 +17,7 @@ mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, cons
 	packet.data_size = 0;
 
 	packet.data = rawdata;
+	arg.type = MROS_PACKET_DATA_TOPIC;
 	arg.args_int = 1;
 	arg.argi[0] = datalen;
 	arg.args_char = 0;

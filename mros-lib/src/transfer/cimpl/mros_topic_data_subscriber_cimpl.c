@@ -33,7 +33,6 @@ static void mros_topic_subscribe(mRosTopicConnectorManagerType *mgrp, mRosNodeEn
 		ret = mros_topic_connector_send_data(obj, topic_data->data.memp, topic_data->data.size);
 		if (ret != MROS_E_OK) {
 			//TOODO ERROR LOG
-			continue;
 		}
 		obj = mros_topic_connector_get_next(mgrp, topic_obj, obj);
 	}
