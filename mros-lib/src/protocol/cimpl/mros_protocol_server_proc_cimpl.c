@@ -100,7 +100,7 @@ static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *clien
 		return MROS_E_INVAL;
 	}
 	mros_proc_slave_decoded_requst.request.topic.topic_name.res.head[mros_proc_slave_decoded_requst.request.topic.topic_name.res.len] = '\0';
-	ret = mros_topic_get((const char*)&mros_proc_slave_decoded_requst.request.topic.topic_name.res.head[1], &topic_id);//TODO /を外すのが正しいのかよくわからない．．
+	ret = mros_topic_get((const char*)&mros_proc_slave_decoded_requst.request.topic.topic_name.res.head[0], &topic_id);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
@@ -192,7 +192,7 @@ mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketTyp
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-	ret = mros_topic_get((const char*)&tcpros_packet.topic[1], &topic_id);//TODO
+	ret = mros_topic_get((const char*)&tcpros_packet.topic[0], &topic_id);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}

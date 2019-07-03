@@ -1,6 +1,7 @@
 #include "mros_node_cimpl.h"
 #include "mros_os.h"
 #include "mros_config.h"
+#include "mros_name.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -111,7 +112,7 @@ static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType tas
 
 	if (node_name != NULL) {
 		len = strlen(node_name);
-		if (len >= MROS_NODE_NAME_MAXLEN) {
+		if (len >= (MROS_NODE_NAME_MAXLEN + 1)) { /* for add slash on top */
 			//TODO ERRLOG
 			return MROS_E_NOMEM;
 		}
@@ -129,10 +130,13 @@ static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType tas
 		return MROS_E_NOMEM;
 	}
 	*id = p->data.node_id;
-	p->data.namelen = len;
 	p->data.task_id = task_id;
-	memcpy(p->data.node_name, node_name, len);
-	p->data.node_name[len] = '\0';
+	if (node_name != NULL) {
+		mros_name_formalize(node_name, len, p->data.node_name, &p->data.namelen);
+	}
+	else {
+		p->data.namelen = 0;
+	}
 	ListEntry_AddEntry(&node_manager[type].head, p);
 	return MROS_E_OK;
 }

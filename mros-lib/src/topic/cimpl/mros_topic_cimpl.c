@@ -1,4 +1,5 @@
 #include "mros_topic_cimpl.h"
+#include "mros_name.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -85,7 +86,7 @@ mRosReturnType mros_topic_create(const char *topic_name, const char *topic_typen
 	if (ret == MROS_E_OK) {
 		return MROS_E_OK;
 	}
-	if (len >= MROS_TOPIC_NAME_MAXLEN) {
+	if (len >= (MROS_TOPIC_NAME_MAXLEN + 1)) { /* for add slash on top */
 		return MROS_E_NOMEM;
 	}
 	if (typelen >= MROS_TOPIC_NAME_MAXLEN) {
@@ -97,9 +98,7 @@ mRosReturnType mros_topic_create(const char *topic_name, const char *topic_typen
 		return MROS_E_NOMEM;
 	}
 	*id = p->data.topic_id;
-	p->data.namelen = len;
-	memcpy(p->data.topic_name, topic_name, len);
-	p->data.topic_name[len] = '\0';
+	mros_name_formalize(topic_name, len, p->data.topic_name, &p->data.namelen);
 	p->data.typenamelen = typelen;
 	memcpy(p->data.topic_typename, topic_typename, typelen);
 	p->data.topic_typename[typelen] = '\0';

@@ -78,6 +78,7 @@ CXX_OBJ += mros_topic_data_subscriber_cimpl.o
 CXX_OBJ += mros_topic_cimpl.o
 CXX_OBJ += mros_topic_connector_cimpl.o
 CXX_OBJ += mros_topic_connector_factory_cimpl.o
+CXX_OBJ += mros_name.o
 
 OBJS	:= $(C_OBJ) $(CXX_OBJ)
 

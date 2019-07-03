@@ -21,10 +21,10 @@ extern "C" {
 		"<methodName>%s</methodName>\n"		\
 		"<params>\n"						\
 			"<param>\n"						\
-				"<value>/%s</value>\n"		\
+				"<value>%s</value>\n"		\
 			"</param>\n"					\
 			"<param>\n"						\
-				"<value>/%s</value>\n"		\
+				"<value>%s</value>\n"		\
 			"</param>\n"					\
 			"<param>\n"						\
 				"<value>%s</value>\n"		\
@@ -47,10 +47,10 @@ extern "C" {
 		"<methodName>%s</methodName>\n"						\
 		"<params>\n"										\
 			"<param>\n"										\
-				"<value>/%s</value>\n"						\
+				"<value>%s</value>\n"						\
 			"</param>\n"									\
 			"<param>\n"										\
-				"<value>/%s</value>\n"						\
+				"<value>%s</value>\n"						\
 			"</param>\n"									\
 			"<param>\n"										\
 				"<value>"									\
