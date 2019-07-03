@@ -62,6 +62,7 @@ mRosReturnType mros_proc_tcpros_receive(mRosCommTcpClientType *client, mRosPacke
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
+	packet->data_size = res;
 	return ret;
 }
 
@@ -191,7 +192,7 @@ mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketTyp
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-	ret = mros_topic_get((const char*)tcpros_packet.topic, &topic_id);
+	ret = mros_topic_get((const char*)&tcpros_packet.topic[1], &topic_id);//TODO
 	if (ret != MROS_E_OK) {
 		return ret;
 	}

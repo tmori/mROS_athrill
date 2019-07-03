@@ -24,7 +24,6 @@ extern "C" {
  * ARG1: xml size
  */
 #define MROS_PACKET_FMT_HTTP_OK		\
-		"%u\n\n"					\
 		"HTTP/1.1 200 OK\n"			\
 		"Host: \n"					\
 		"Accept-Encoding: \n"		\

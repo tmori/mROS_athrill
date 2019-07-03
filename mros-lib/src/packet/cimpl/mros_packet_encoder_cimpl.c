@@ -232,7 +232,7 @@ mRosReturnType encode_request_topic_res(mRosEncodeArgType *arg, mRosPacketType *
 			arg->argi[0]);
 
 	packet->data_size = snprintf(&packet->data[off], packet->total_size,
-			MROS_PACKET_FMT_HTTP_POST MROS_PACKET_FMT_XML_REQUEST_TOPIC_RES,
+			MROS_PACKET_FMT_HTTP_OK MROS_PACKET_FMT_XML_REQUEST_TOPIC_RES,
 			xml_len,
 			arg->argv[0],
 			arg->argv[1],
