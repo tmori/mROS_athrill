@@ -22,7 +22,7 @@ typedef struct {
 } mRosWaitQueueType;
 
 extern void mros_client_wait_entry_init(mRosWaitListEntryType *wait_entry, void *reqp);
-extern void mros_server_queue_init(mRosWaitQueueType *wait_queue);
+extern void mros_server_queue_init(mRosWaitQueueType *wait_queue, mRosTaskIdType task_id);
 
 extern void mros_client_wakeup(mRosWaitListEntryType *wait_entry);
 extern void mros_client_put_request(mRosWaitQueueType *wait_queue, mRosWaitListEntryType *wait_entry);

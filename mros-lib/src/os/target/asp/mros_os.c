@@ -14,6 +14,7 @@
 #include "mros_topic_cimpl.h"
 #include "mros_topic_data_publisher_cimpl.h"
 #include "mros_topic_data_subscriber_cimpl.h"
+#include "mros_topic_connector_factory_cimpl.h"
 
 #include "kernel_cfg.h"
 
@@ -62,7 +63,7 @@ void main_task()
 	mRosReturnType ret;
 	syslog(LOG_NOTICE, "**********mROS main task start**********");
 	mros_comm_init();
-	mros_exclusive_area_init();
+	mros_exclusive_area_init(XML_MAS_TASK, SUB_TASK);
 
 	ret = mros_comm_tcp_client_factory_init();
 	if (ret != MROS_E_OK) {
@@ -77,6 +78,16 @@ void main_task()
 	ret = mros_topic_init();
 	if (ret != MROS_E_OK) {
 		syslog(LOG_ERROR, "mros_topic_init()=%d", ret);
+		return;
+	}
+	mRosTopicConnectorManagerType *mgrp = mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_PUB);
+	if (mgrp == NULL) {
+		syslog(LOG_ERROR, "mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_PUB)=%d", ret);
+		return;
+	}
+	mgrp = mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_SUB);
+	if (mgrp == NULL) {
+		syslog(LOG_ERROR, "mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_SUB)=%d", ret);
 		return;
 	}
 	ret = mros_packet_decoder_init();
@@ -104,7 +115,7 @@ void main_task()
 		syslog(LOG_ERROR, "mros_topic_data_subscriber_init()=%d", ret);
 		return;
 	}
-#if 0
+#if 1
 	ret = mros_protocol_subscribe_init();
 	if (ret != MROS_E_OK) {
 		syslog(LOG_ERROR, "mros_protocol_subscribe_init()=%d", ret);
@@ -128,16 +139,17 @@ void main_task()
 
 
 	act_tsk(PUB_TASK);
-	act_tsk(SUB_TASK);
+	//act_tsk(SUB_TASK);
 	act_tsk(XML_SLV_TASK);
 	act_tsk(XML_MAS_TASK);
+	act_tsk(USR_TASK1);
 
 #else
 	//do_test_register_publisher();
 	//do_test_register_subscriber();
 	//do_test_request_topic();
 	//do_test_tcpros_topic();
-	do_test_server();
+	//do_test_server();
 #endif
 	syslog(LOG_NOTICE,"**********mROS Main task finish**********");
 	return;
@@ -246,6 +258,7 @@ static void do_test_register_publisher(void)
 		syslog(LOG_NOTICE, "mros_rpc_register_publisher()=%d", ret);
 		return;
 	}
+	mros_comm_tcp_client_close(&client);
 	syslog(LOG_NOTICE, "data_size=%d", packet.data_size);
 	syslog(LOG_NOTICE, "packet=%s", packet.data);
 	syslog(LOG_NOTICE, "END: TEST REGISTER PUBLISHER");

@@ -11,9 +11,9 @@ void mros_client_wait_entry_init(mRosWaitListEntryType *wait_entry, void *reqp)
 	return;
 }
 
-void mros_server_queue_init(mRosWaitQueueType *wait_queue)
+void mros_server_queue_init(mRosWaitQueueType *wait_queue, mRosTaskIdType task_id)
 {
-	wait_queue->task_id = mros_get_taskid();
+	wait_queue->task_id = task_id;
 	List_InitEmpty(&wait_queue->head, mRosWaitListEntryType);
 
 	return;
@@ -59,10 +59,11 @@ static mRosWaitListEntryType *mros_server_queue_get(mRosWaitQueueType *wait_queu
 
 mRosWaitListEntryType *mros_server_queue_wait(mRosWaitQueueType *wait_queue)
 {
-	mros_sleep_task();
-
 	if (wait_queue->head.entry_num > 0) {
 		return mros_server_queue_get(wait_queue);
+	}
+	else {
+		mros_sleep_task();
 	}
 	return NULL;
 }

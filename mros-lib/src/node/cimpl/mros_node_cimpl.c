@@ -72,7 +72,7 @@ mRosReturnType mros_node_get_bytid(mRosNodeIdType *id)
 
 	*id = MROS_ID_NONE;
 	ListEntry_Foreach(&node_manager[MROS_NODE_TYPE_INNER].head, p) {
-		if (task_id == p->data.node_id) {
+		if (task_id == p->data.task_id) {
 			*id = p->data.node_id;
 			break;
 		}
@@ -130,6 +130,7 @@ static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType tas
 	}
 	*id = p->data.node_id;
 	p->data.namelen = len;
+	p->data.task_id = task_id;
 	memcpy(p->data.node_name, node_name, len);
 	p->data.node_name[len] = '\0';
 	ListEntry_AddEntry(&node_manager[type].head, p);

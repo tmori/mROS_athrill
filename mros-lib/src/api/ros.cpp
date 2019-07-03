@@ -91,7 +91,7 @@ ros::Subscriber ros::NodeHandle::subscriber(std::string topic, int queue_size, v
 		return sub;
 	}
 
-	ret = mros_topic_create(topic.c_str(), "TODO:typename", &connector.topic_id);//TODO typename
+	ret = mros_topic_create(topic.c_str(), "std_msgs/String", &connector.topic_id);//TODO typename
 	if (ret != MROS_E_OK) {
 		//TODO ERROR LOG
 		mros_exclusive_unlock(&unlck_obj);
@@ -151,7 +151,7 @@ ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 		return pub;
 	}
 
-	ret = mros_topic_create(topic.c_str(), "TODO:typename", &connector.topic_id);//TODO typename
+	ret = mros_topic_create(topic.c_str(), "std_msgs/String", &connector.topic_id);//TODO typename
 	if (ret != MROS_E_OK) {
 		//TODO ERROR LOG
 		mros_exclusive_unlock(&unlck_obj);
