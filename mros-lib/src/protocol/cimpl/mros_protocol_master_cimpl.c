@@ -112,7 +112,7 @@ static mRosReturnType mros_protocol_master_register(mRosProtocolMasterRequestTyp
 	return ret;
 }
 
-static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterRequestType *req, mRosRequestTopicResType *rpc_response)
+static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *client, mRosProtocolMasterRequestType *req, mRosRequestTopicResType *rpc_response)
 {
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;
@@ -136,7 +136,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosProtocolMasterReque
 	rpc_request.node_name = mros_node_name(connector.node_id);
 	rpc_request.req_packet = &mros_protocol_master.reqtopic_packet;
 	rpc_request.topic_name = mros_topic_get_topic_name(connector.topic_id);
-	ret = mros_rpc_request_topic(&mros_protocol_master.master_comm, &rpc_request, rpc_response);
+	ret = mros_rpc_request_topic(client, &rpc_request, rpc_response);
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
@@ -225,7 +225,6 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 	}
 
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_REQUESTING_TOPIC;
-
 	//TODO まだ出版ノードが存在しない場合は，非同期でマスタから情報をもらう
 	ptr = mros_xmlpacket_subres_get_first_uri(rpc_regc_res.reply_packet, &ipaddr, &port);
 	while (ptr != NULL) {
@@ -239,7 +238,7 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 		if (ret != MROS_E_OK) {
 			goto done;
 		}
-		ret = mros_protocol_master_request_topic(sub_req, &rpc_topic_res);
+		ret = mros_protocol_master_request_topic(&client, sub_req, &rpc_topic_res);
 		mros_comm_tcp_client_close(&client);
 		if (ret != MROS_E_OK) {
 			goto done;
@@ -248,6 +247,7 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 	}
 
 done:
+	mros_comm_tcp_client_close(&mros_protocol_master.master_comm);
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
 
 	return ret;

@@ -94,7 +94,7 @@ static mRosReturnType mros_xmlpacket_result(mRosPacketType *packet)
 	//                V
 	//    HTTP/1.1 200 OK
 	const char* tail = strstr(head, " ");
-	mros_uint32 len = (tail - head) + 1;
+	mros_uint32 len = (tail - head);
 	if (len != MROS_PACKET_HTT_OK_CODE_LEN) {
 		return MROS_E_INVAL;
 	}

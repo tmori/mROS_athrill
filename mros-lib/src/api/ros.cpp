@@ -203,7 +203,7 @@ void ros::Publisher::publish(std_msgs::String& data)
 {
 	mRosReturnType ret;
 	const char *snd_data = data.data.c_str();
-	mRosSizeType len = strlen(snd_data) + 1U;
+	mRosSizeType len = strlen(snd_data);
 	mROsExclusiveUnlockObjType unlck_obj;
 
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
