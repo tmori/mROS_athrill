@@ -59,11 +59,8 @@ static mRosWaitListEntryType *mros_server_queue_get(mRosWaitQueueType *wait_queu
 
 mRosWaitListEntryType *mros_server_queue_wait(mRosWaitQueueType *wait_queue)
 {
-	if (wait_queue->head.entry_num > 0) {
-		return mros_server_queue_get(wait_queue);
-	}
-	else {
+	if (wait_queue->head.entry_num == 0) {
 		mros_sleep_task();
 	}
-	return NULL;
+	return mros_server_queue_get(wait_queue);
 }
