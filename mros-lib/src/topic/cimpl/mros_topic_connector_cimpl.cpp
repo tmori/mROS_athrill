@@ -147,8 +147,8 @@ mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRo
 		topic_p = org_topic_p;
 	}
 	if (topic_p == NULL) {
-		ret = MROS_E_NOMEM;
-		goto errdone;
+		(void)mros_topic_connector_remove(mgrp, connector);
+		return MROS_E_NOMEM;
 	}
 
 	entry = mros_topic_connector_get_node(topic_p, connector->node_id);
@@ -166,16 +166,12 @@ mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRo
 			List_InitEmpty(&entry->data.queue_head, mRosMemoryListEntryType);
 		}
 		else {
-			ret = MROS_E_NOMEM;
-			goto errdone;
+			(void)mros_topic_connector_remove(mgrp, connector);
+			return MROS_E_NOMEM;
 		}
 	}
 	return MROS_E_OK;
-
-errdone:
-	(void)mros_topic_connector_remove(mgrp, connector);
-
-	return ret;}
+}
 
 mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector)
 {
@@ -291,6 +287,9 @@ mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const cha
 	return MROS_E_OK;
 }
 
+//TODO
+extern void mros_topic_callback(mRosFuncIdType func_id, const char *data);
+
 mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const char* data, mRosSizeType len)
 {
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
@@ -298,7 +297,7 @@ mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const ch
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
 	if (type == MROS_NODE_TYPE_INNER) {
 		//TOPIC ==> inner node callback
-		//mros_topic_callback(data);//TODO no need to change raw data to C++ type based data??
+		mros_topic_callback(entry->data.value.func_id, data);
 		return MROS_E_OK;
 	}
 	//TOPIC ==> outer node

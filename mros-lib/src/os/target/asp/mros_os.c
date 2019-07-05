@@ -142,7 +142,7 @@ void main_task()
 	act_tsk(SUB_TASK);
 	act_tsk(XML_SLV_TASK);
 	act_tsk(XML_MAS_TASK);
-	//act_tsk(USR_TASK1);
+	act_tsk(USR_TASK1);
 	act_tsk(USR_TASK2);
 
 #else
