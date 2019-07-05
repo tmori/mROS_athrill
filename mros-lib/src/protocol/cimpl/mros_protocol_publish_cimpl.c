@@ -55,7 +55,7 @@ void mros_protocol_publish_run(void)
 		ret = mros_comm_tcp_server_accept(&mros_protocol_publish.server_comm, &mros_protocol_publish.client_comm);
 		if (ret != MROS_E_OK) {
 			mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
-			mros_topic_data_publisher_run();
+			mros_topic_data_subscriber_run();
 			mros_exclusive_unlock(&unlck_obj);
 			continue;
 		}

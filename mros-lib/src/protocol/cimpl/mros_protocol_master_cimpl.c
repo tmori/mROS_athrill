@@ -82,13 +82,8 @@ static mRosReturnType mros_protocol_master_register(mRosProtocolMasterRequestTyp
 {
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;
-	mRosTopicConnectorManagerType *mgrp;
 	mRosRegisterTopicReqType rpc_request;
 
-	mgrp = mros_topic_connector_factory_get(type);
-	if (mgrp == NULL) {
-		return MROS_E_INVAL;
-	}
 	ret = mros_topic_connector_get(req->connector_obj,  &connector);
 	if (ret != MROS_E_OK) {
 		return MROS_E_INVAL;
@@ -116,16 +111,11 @@ static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *
 {
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;
-	mRosTopicConnectorManagerType *mgrp;
 	mRosRequestTopicReqType rpc_request;
 	mros_uint32 ipaddr;
 	mros_int32 port;
 	mRosPtrType ptr;
 
-	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_SUB);
-	if (mgrp == NULL) {
-		return MROS_E_INVAL;
-	}
 	ret = mros_topic_connector_get(req->connector_obj,  &connector);
 	if (ret != MROS_E_OK) {
 		return MROS_E_INVAL;

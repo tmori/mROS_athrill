@@ -133,7 +133,6 @@ static mRosTopicConnectorListEntryType *mros_topic_connector_get_node(mRosTopicC
 
 mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector, mRosSizeType queue_length, mRosMemoryManagerType *mempool)
 {
-	mRosReturnType ret;
 	mRosTopicConnectorListEntryRootType *topic_p;
 	mRosTopicConnectorListEntryRootType *org_topic_p;
 	mRosTopicConnectorListEntryType *entry;
