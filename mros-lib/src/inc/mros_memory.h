@@ -90,8 +90,8 @@ extern mRosReturnType mros_mem_free(mRosMemoryManagerType *mgrp, mRosMemoryListE
  * Memory Config APIs
  */
 #define MROS_MEMORY_CONFIG_DECLARE_ENTRY(entry_name, max_memory_num, memsize)	\
-	static mRosMemoryListEntryType entry_name##_entries [(max_memory_num)];	\
-	static char entry_name##_memory [(max_memory_num) * (memsize)];	\
+	static mRosMemoryListEntryType entry_name##_entries [(max_memory_num)] MROS_MATTR_BSS_NOCLR;	\
+	static char entry_name##_memory [(max_memory_num) * (memsize)] MROS_MATTR_BSS_NOCLR;	\
 	static mRosMemoryConfigType entry_name##_config = {	\
 			(max_memory_num), \
 			(memsize), \
@@ -100,7 +100,7 @@ extern mRosReturnType mros_mem_free(mRosMemoryManagerType *mgrp, mRosMemoryListE
 	};
 
 #define MROS_MEMORY_CONFIG_DECLARE_MANAGER(mem_manager_name, config_num)	\
-	static mRosMemoryHeaderType mem_manager_name##_head_array [(config_num)];	\
+	static mRosMemoryHeaderType mem_manager_name##_head_array [(config_num)] MROS_MATTR_BSS_NOCLR;	\
 	static mRosMemoryManagerType mem_manager_name = {	\
 		(config_num),	\
 		mem_manager_name##_head_array,	\

@@ -18,8 +18,8 @@
 #include "mros_comm_tcp_client_factory_cimpl.h"
 
 
-static mRosCommTcpClientEntryHeadType mros_comm_tcp_client_factory;
-static mRosCommTcpClientListReqEntryType mros_comm_tcp_client_entries[MROS_TOPIC_TCP_CLIENT_MAX_NUM];
+static mRosCommTcpClientEntryHeadType mros_comm_tcp_client_factory MROS_MATTR_BSS_NOCLR;
+static mRosCommTcpClientListReqEntryType mros_comm_tcp_client_entries[MROS_TOPIC_TCP_CLIENT_MAX_NUM] MROS_MATTR_BSS_NOCLR;
 
 mRosReturnType mros_comm_tcp_client_factory_init(void)
 {

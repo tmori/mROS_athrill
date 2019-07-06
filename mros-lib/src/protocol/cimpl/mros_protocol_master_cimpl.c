@@ -32,7 +32,7 @@ typedef struct {
 	mRosCommTcpClientType				master_comm;
 } mRosProtocolMasterType;
 
-static mRosProtocolMasterType mros_protocol_master;
+static mRosProtocolMasterType mros_protocol_master MROS_MATTR_BSS_NOCLR;
 static mRosReturnType mros_protocol_master_register_publisher(mRosProtocolMasterRequestType *pub_req);
 static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMasterRequestType *sub_req);
 

@@ -4,11 +4,11 @@
 #include "mros_name.h"
 #include <string.h>
 
-static mRosNodeManagerType node_manager[MROS_NODE_TYPE_NUM];
+static mRosNodeManagerType node_manager[MROS_NODE_TYPE_NUM] MROS_MATTR_BSS_NOCLR;
 #define NODE_OBJ(type, id)		node_manager[(type)].node_entries[MROS_INDEX((id))]
 #define NODE_TYPE(id)	( (id <= node_manager[MROS_NODE_TYPE_INNER].max_node) ? MROS_NODE_TYPE_INNER : MROS_NODE_TYPE_OUTER )
 
-static mRosNodeListEntryType node_entries[MROS_NODE_TYPE_NUM][MROS_NODE_MAX_NUM];
+static mRosNodeListEntryType node_entries[MROS_NODE_TYPE_NUM][MROS_NODE_MAX_NUM] MROS_MATTR_BSS_NOCLR;
 
 #define NODE_MAX_ID(type)	( \
 	(type == MROS_NODE_TYPE_INNER) ? \

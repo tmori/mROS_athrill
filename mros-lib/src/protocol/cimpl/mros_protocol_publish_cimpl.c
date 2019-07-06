@@ -13,7 +13,7 @@ typedef union {
 	char buffer1[MROS_PACKET_MAXSIZE_REQ_TCPROS];
 	char buffer2[MROS_PACKET_MAXSIZE_RES_TCPROS];
 } mRosPublishPacketBufferType;
-static mRosPublishPacketBufferType mros_publish_packet_buffer;
+static mRosPublishPacketBufferType mros_publish_packet_buffer MROS_MATTR_BSS_NOCLR;
 
 typedef struct {
 	mRosProtocolPublishStateEnumType 	state;
@@ -23,7 +23,7 @@ typedef struct {
 	mRosCommTcpClientType				client_comm;
 } mRosProtocolPublishType;
 
-static mRosProtocolPublishType mros_protocol_publish;
+static mRosProtocolPublishType mros_protocol_publish MROS_MATTR_BSS_NOCLR;
 
 mRosReturnType mros_protocol_publish_init(void)
 {

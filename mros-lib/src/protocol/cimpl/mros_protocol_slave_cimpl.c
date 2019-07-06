@@ -12,7 +12,7 @@ typedef union {
 	char buffer1[MROS_PACKET_MAXSIZE_REQ_REQUEST_TOPIC];
 	char buffer2[MROS_PACKET_MAXSIZE_RES_REQUEST_TOPIC];
 } mRosSlavePacketBufferType;
-static mRosSlavePacketBufferType mros_slave_packet_buffer;
+static mRosSlavePacketBufferType mros_slave_packet_buffer MROS_MATTR_BSS_NOCLR;
 
 typedef struct {
 	mRosProtocolSlaveStateEnumType 		state;
@@ -22,7 +22,7 @@ typedef struct {
 	mRosCommTcpClientType				client_comm;
 } mRosProtocolSlaveType;
 
-static mRosProtocolSlaveType mros_protocol_slave;
+static mRosProtocolSlaveType mros_protocol_slave MROS_MATTR_BSS_NOCLR;
 
 mRosReturnType mros_protocol_slave_init(void)
 {

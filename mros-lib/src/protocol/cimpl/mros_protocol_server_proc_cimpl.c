@@ -9,7 +9,7 @@
 #include "mros_protocol_operation_cimpl.h"
 #include <string.h>
 
-static mRosPacketDecodedRequestType mros_proc_slave_decoded_requst;
+static mRosPacketDecodedRequestType mros_proc_slave_decoded_requst MROS_MATTR_BSS_NOCLR;
 
 mRosReturnType mros_proc_init(void)
 {

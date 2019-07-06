@@ -87,9 +87,9 @@ extern mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerO
  * topic connector Config APIs
  */
 #define MROS_TOPIC_CONNECTOR_CONFIG_DECLARE_MANAGER(manager_name, conn_entry_num)	\
-	static mRosTopicConnectorListEntryType manager_name##_conn_array [(conn_entry_num)];	\
-	static mRosTopicConnectorListEntryRootType manager_name##_topic_array [MROS_TOPIC_MAX_NUM];	\
-	static mRosTopicConnectorManagerType manager_name;	\
+	static mRosTopicConnectorListEntryType manager_name##_conn_array [(conn_entry_num)] MROS_MATTR_BSS_NOCLR;	\
+	static mRosTopicConnectorListEntryRootType manager_name##_topic_array [MROS_TOPIC_MAX_NUM] MROS_MATTR_BSS_NOCLR;	\
+	static mRosTopicConnectorManagerType manager_name MROS_MATTR_BSS_NOCLR;	\
 	static mRosTopicConnectorConfigType manager_name##_config = {	\
 		(conn_entry_num),	\
 		manager_name##_conn_array,	\

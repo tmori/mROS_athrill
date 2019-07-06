@@ -53,6 +53,8 @@ typedef mros_int32 mRosReturnType;
 #define MROS_TASKID_NONE	0U
 
 
+#define MROS_MATTR_BSS_NOCLR __attribute__((section(".bss_noclr")))
+
 /*
  * Comm dependent data types
  */

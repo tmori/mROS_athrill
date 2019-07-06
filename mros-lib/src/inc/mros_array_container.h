@@ -10,7 +10,7 @@ typedef struct {
 } mRosArrayContainerType;
 
 #define MROS_ARRAY_CONTAINER_CONFIG_DECLARE_MANAGER(manager_name, array_num)	\
-	static mRosContainerObjType manager_name##_array [(array_num)];	\
+	static mRosContainerObjType manager_name##_array [(array_num)] MROS_MATTR_BSS_NOCLR;	\
 	static mRosArrayContainerType manager_name = {	\
 		(0),	\
 		(array_num),	\

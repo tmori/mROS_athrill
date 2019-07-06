@@ -5,7 +5,7 @@
 static mRosTopicManagerType 	topic_manager;
 #define TOPIC_OBJ(id)		topic_manager.topic_entries[MROS_INDEX((id))]
 
-static mRosTopicListEntryType topic_entries[MROS_TOPIC_MAX_NUM];
+static mRosTopicListEntryType topic_entries[MROS_TOPIC_MAX_NUM] MROS_MATTR_BSS_NOCLR;
 
 mRosReturnType mros_topic_init(void)
 {

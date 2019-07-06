@@ -27,8 +27,8 @@ typedef struct {
 	mRosTopicConnectorManagerType 		*pub_mgrp;// for outer
 } mRosProtocolSubscribeType;
 
-static mRosProtocolSubscribeType mros_protocol_subscribe;
-static mRosSubscribePacketTcpRosBufferType mros_subscribe_packet_tcpros_buffer;
+static mRosProtocolSubscribeType mros_protocol_subscribe MROS_MATTR_BSS_NOCLR;
+static mRosSubscribePacketTcpRosBufferType mros_subscribe_packet_tcpros_buffer MROS_MATTR_BSS_NOCLR;
 
 
 /*******************************************************

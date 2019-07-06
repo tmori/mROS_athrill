@@ -30,11 +30,11 @@ typedef struct {
 } mRosFmtType;
 
 
-static mRosFmtType mros_xml_fmt_table[MROS_PACKET_DATA_NUM];
-static mRosFmtType mros_http_post_fmt;
-static mRosFmtType mros_http_ok_fmt;
-static mRosFmtType mros_tcpros_topic_req_fmt;
-static mRosFmtType mros_tcpros_topic_res_fmt;
+static mRosFmtType mros_xml_fmt_table[MROS_PACKET_DATA_NUM] MROS_MATTR_BSS_NOCLR;
+static mRosFmtType mros_http_post_fmt MROS_MATTR_BSS_NOCLR;
+static mRosFmtType mros_http_ok_fmt MROS_MATTR_BSS_NOCLR;
+static mRosFmtType mros_tcpros_topic_req_fmt MROS_MATTR_BSS_NOCLR;
+static mRosFmtType mros_tcpros_topic_res_fmt MROS_MATTR_BSS_NOCLR;
 
 mRosReturnType mros_packet_encoder_init(void)
 {
