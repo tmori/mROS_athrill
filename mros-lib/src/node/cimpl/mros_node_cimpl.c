@@ -112,7 +112,7 @@ static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType tas
 	if (node_name != MROS_NULL) {
 		len = strlen(node_name);
 		if (len >= (MROS_NODE_NAME_MAXLEN + 1)) { /* for add slash on top */
-			//TODO ERRLOG
+			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
 			return MROS_E_NOMEM;
 		}
 		ret = mros_node_get_byname(node_name, id);
@@ -126,6 +126,7 @@ static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType tas
 
 	ListEntry_Alloc(&node_manager[type].head, mRosNodeListEntryType, &p);
 	if (p == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_E_NOMEM;
 	}
 	*id = p->data.node_id;
@@ -156,6 +157,7 @@ mRosReturnType mros_node_remove(mRosNodeIdType id)
 {
 	mRosNodeEnumType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_RANGE);
 		return MROS_E_RANGE;
 	}
 

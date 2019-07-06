@@ -40,6 +40,7 @@ mRosReturnType mros_protocol_master_init(void)
 {
 	mRosReturnType ret = mros_comm_tcp_client_init(&mros_protocol_master.master_comm, MROS_MASTER_IPADDR, MROS_MASTER_PORT_NO);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	mros_protocol_master.register_packet.total_size = sizeof(mros_master_packet_buffer);
@@ -84,6 +85,7 @@ static mRosReturnType mros_protocol_master_register(mRosProtocolMasterRequestTyp
 
 	ret = mros_topic_connector_get(req->connector_obj,  &connector);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 
@@ -100,6 +102,7 @@ static mRosReturnType mros_protocol_master_register(mRosProtocolMasterRequestTyp
 		ret = mros_rpc_register_subscriber(&mros_protocol_master.master_comm, &rpc_request, rpc_response);
 	}
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	return ret;
@@ -116,6 +119,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *
 
 	ret = mros_topic_connector_get(req->connector_obj,  &connector);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 
@@ -126,6 +130,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *
 	rpc_request.topic_name = mros_topic_get_topic_name(connector.topic_id);
 	ret = mros_rpc_request_topic(client, &rpc_request, rpc_response);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 
@@ -135,7 +140,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *
 		mRosCommTcpClientListReqEntryType *req = mros_comm_tcp_clientc_alloc();
 		if (req == MROS_NULL) {
 			ret = MROS_E_NOMEM;
-			//TODO ERR LOG
+			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 			goto done;
 		}
 		req->data.reqobj.ipaddr = ipaddr;
@@ -164,17 +169,17 @@ static mRosReturnType mros_protocol_master_register_publisher(mRosProtocolMaster
 
 	ret = mros_comm_tcp_client_connect(&mros_protocol_master.master_comm);
 	if (ret != MROS_E_OK) {
-		//TODO ERRLOG
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		goto done;
 	}
 	ret = mros_protocol_master_register(pub_req, MROS_TOPIC_CONNECTOR_PUB, &rpc_response);
 	if (ret != MROS_E_OK) {
-		//TODO ERRLOG
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		goto done;
 	}
 	ret = mros_xmlpacket_pubres_result(rpc_response.reply_packet);
 	if (ret != MROS_E_OK) {
-		//TODO ERRLOG
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		goto done;
 	}
 
@@ -199,16 +204,19 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 
 	ret = mros_comm_tcp_client_connect(&mros_protocol_master.master_comm);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		goto done;
 	}
 
 	ret = mros_protocol_master_register(sub_req, MROS_TOPIC_CONNECTOR_SUB, &rpc_regc_res);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		goto done;
 	}
 	mros_comm_tcp_client_close(&mros_protocol_master.master_comm);
 	ret = mros_xmlpacket_subres_result(rpc_regc_res.reply_packet);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		goto done;
 	}
 
@@ -220,15 +228,18 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 
 		ret = mros_comm_tcp_client_ip32_init(&client, ipaddr, port);
 		if (ret != MROS_E_OK) {
+			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 			goto done;
 		}
 		ret = mros_comm_tcp_client_connect(&client);
 		if (ret != MROS_E_OK) {
+			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 			goto done;
 		}
 		ret = mros_protocol_master_request_topic(&client, sub_req, &rpc_topic_res);
 		mros_comm_tcp_client_close(&client);
 		if (ret != MROS_E_OK) {
+			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 			goto done;
 		}
 		ptr = mros_xmlpacket_subres_get_next_uri(ptr, rpc_regc_res.reply_packet, &ipaddr, &port);

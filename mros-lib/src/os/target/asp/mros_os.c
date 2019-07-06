@@ -61,79 +61,79 @@ static void do_test_server(void);
 void main_task()
 {
 	mRosReturnType ret;
-	syslog(LOG_NOTICE, "**********mROS main task start**********");
+	ROS_INFO("**********mROS main task start**********");
 	mros_comm_init();
 	mros_exclusive_area_init(XML_MAS_TASK, SUB_TASK);
 
 	ret = mros_comm_tcp_client_factory_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_comm_tcp_client_factory_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_node_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_node_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_topic_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_topic_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	mRosTopicConnectorManagerType *mgrp = mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_PUB);
 	if (mgrp == MROS_NULL) {
-		syslog(LOG_ERROR, "mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_PUB)=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return;
 	}
 	mgrp = mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_SUB);
 	if (mgrp == MROS_NULL) {
-		syslog(LOG_ERROR, "mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_SUB)=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return;
 	}
 	ret = mros_packet_decoder_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_packet_decoder_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_packet_encoder_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_packet_encoder_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_proc_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_proc_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_topic_data_publisher_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_topic_data_publisher_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_topic_data_subscriber_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_topic_data_subscriber_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 #if 1
 	ret = mros_protocol_subscribe_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_protocol_subscribe_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_protocol_publish_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_protocol_publish_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_protocol_slave_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_protocol_slave_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_protocol_master_init();
 	if (ret != MROS_E_OK) {
-		syslog(LOG_ERROR, "mros_protocol_master_init()=%d", ret);
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return;
 	}
 
@@ -152,34 +152,34 @@ void main_task()
 	//do_test_tcpros_topic();
 	//do_test_server();
 #endif
-	syslog(LOG_NOTICE,"**********mROS Main task finish**********");
+	ROS_INFO("**********mROS Main task finish**********");
 	return;
 }
 
 void sub_task()
 {
-	syslog(LOG_NOTICE, "**********mROS sub task start**********");
+	ROS_INFO("**********mROS sub task start**********");
 	mros_protocol_subscribe_run();
 	return;
 }
 
 void pub_task()
 {
-	syslog(LOG_NOTICE, "**********mROS pub task start**********");
+	ROS_INFO("**********mROS pub task start**********");
 	mros_protocol_publish_run();
 	return;
 }
 
 void xml_slv_task()
 {
-	syslog(LOG_NOTICE, "**********mROS slv task start**********");
+	ROS_INFO("**********mROS slv task start**********");
 	mros_protocol_slave_run();
 	return;
 }
 
 void xml_mas_task()
 {
-	syslog(LOG_NOTICE, "**********mROS mas task start**********");
+	ROS_INFO("**********mROS mas task start**********");
 	mros_protocol_master_run();
 	return;
 }

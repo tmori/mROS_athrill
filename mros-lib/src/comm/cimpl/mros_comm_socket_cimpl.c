@@ -28,10 +28,12 @@ mRosReturnType mros_comm_socket_init(mRosCommSocketType *socket, mRosCommSocketE
 		socket->comm_type = MROS_SOCK_DGRAM;
 		break;
 	default:
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 	socket->sock_fd = mros_comm_socket(MROS_SOCK_AF_INET, socket->comm_type, 0);
 	if (socket->sock_fd < 0) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 
@@ -44,6 +46,7 @@ mRosReturnType mros_comm_socket_open(mRosCommSocketType *socket)
 {
 	socket->sock_fd = mros_comm_socket(MROS_SOCK_AF_INET, socket->comm_type, 0);
     if (socket->sock_fd < 0) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
     	return MROS_E_INVAL;
     }
 	return MROS_E_OK;
@@ -76,10 +79,11 @@ static mRosReturnType mros_comm_secket_select(mRosCommSocketType *socket, mros_u
     mros_comm_set_timeval(timeout, &tmo);
     mRosReturnType ret = mros_comm_select(MROS_FD_SETSIZE, r_set, w_set, MROS_NULL, &tmo);
     if (ret < 0) {
-    	//TODO ERRLOG
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
     	return MROS_E_SYSERR;
     }
     if ((ret == 0 || !MROS_FD_ISSET(socket->sock_fd, &fd_set))) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
     	return MROS_E_NOENT;
     }
     return MROS_E_OK;

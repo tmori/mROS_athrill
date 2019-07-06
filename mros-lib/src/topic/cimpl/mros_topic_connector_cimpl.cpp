@@ -136,7 +136,6 @@ mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRo
 	mRosTopicConnectorListEntryRootType *org_topic_p;
 	mRosTopicConnectorListEntryType *entry;
 
-	/* TODO LOCK */
 	org_topic_p = mros_topic_connector_get_topic_head(mgrp, connector->topic_id);
 	if (org_topic_p == MROS_NULL) {
 		topic_p = mros_topic_connector_create_topic_head(mgrp, connector->topic_id);

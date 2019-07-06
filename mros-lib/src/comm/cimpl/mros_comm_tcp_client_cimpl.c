@@ -42,17 +42,20 @@ mRosReturnType mros_comm_tcp_client_connect(mRosCommTcpClientType *client)
 	mRosReturnType ret;
 
 	if (client->connected == MROS_TRUE) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 	if (client->socket.sock_fd < 0) {
 		ret = mros_comm_socket_init(&client->socket, MROS_COMM_SOCKET_TYPE_TCP);
 		if (ret != MROS_E_OK) {
+			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 			return ret;
 		}
 	}
 
 	ret = mros_comm_connect(client->socket.sock_fd, (const mRosSockAddrType *)&client->remote, sizeof(mRosSockAddrInType));
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return MROS_E_NOTCONN;
 	}
 	client->connected = MROS_TRUE;
@@ -71,12 +74,14 @@ mRosReturnType mros_comm_tcp_client_send(mRosCommTcpClientType *client, const ch
 	mros_int32 snd_size;
 
     if ((client->socket.sock_fd < 0) || (client->connected == MROS_FALSE)) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
         return MROS_E_INVAL;
     }
 
     if (client->socket.blocking == MROS_FALSE) {
     	ret = mros_comm_socket_wait_writable(&client->socket, client->socket.timeout);
     	if (ret != MROS_E_OK) {
+    		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
     		return ret;
     	}
     }
@@ -93,6 +98,7 @@ mRosReturnType mros_comm_tcp_client_send_all(mRosCommTcpClientType *client, cons
     mros_int32 writtenLen = 0;
 
     if ((client->socket.sock_fd < 0) || (client->connected == MROS_FALSE)) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
         return MROS_E_INVAL;
     }
 
@@ -100,6 +106,7 @@ mRosReturnType mros_comm_tcp_client_send_all(mRosCommTcpClientType *client, cons
         if (client->socket.blocking == MROS_FALSE) {
         	ret = mros_comm_socket_wait_writable(&client->socket, client->socket.timeout);
         	if (ret != MROS_E_OK) {
+        		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
         		return ret;
         	}
         }
@@ -111,9 +118,11 @@ mRosReturnType mros_comm_tcp_client_send_all(mRosCommTcpClientType *client, cons
         } else if (retlen == 0) {
     		client->connected = MROS_FALSE;
             *res = writtenLen;
+    		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_SYSERR);
             return MROS_E_SYSERR;
         } else {
             *res = writtenLen;
+    		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_SYSERR);
             return MROS_E_SYSERR;
         }
     }
@@ -126,11 +135,13 @@ mRosReturnType mros_comm_tcp_client_receive(mRosCommTcpClientType *client, char*
 	mros_int32 rcv_size;
 
     if ((client->socket.sock_fd < 0) || (client->connected == MROS_FALSE)) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
         return MROS_E_INVAL;
     }
     if (client->socket.blocking == MROS_FALSE) {
     	ret = mros_comm_socket_wait_readable(&client->socket, client->socket.timeout);
     	if (ret != MROS_E_OK) {
+    		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
     		return ret;
     	}
     }
@@ -149,6 +160,7 @@ mRosReturnType mros_comm_tcp_client_receive_all(mRosCommTcpClientType *client, c
     mros_int32 readLen = 0;
 
     if ((client->socket.sock_fd < 0) || (client->connected == MROS_FALSE)) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
         return MROS_E_INVAL;
     }
 
@@ -156,6 +168,7 @@ mRosReturnType mros_comm_tcp_client_receive_all(mRosCommTcpClientType *client, c
         if (client->socket.blocking == MROS_FALSE) {
         	ret = mros_comm_socket_wait_writable(&client->socket, client->socket.timeout);
         	if (ret != MROS_E_OK) {
+        		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
         		return ret;
         	}
         }
@@ -166,9 +179,11 @@ mRosReturnType mros_comm_tcp_client_receive_all(mRosCommTcpClientType *client, c
         } else if (retlen == 0) {
     		client->connected = MROS_FALSE;
             *res = readLen;
+    		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_SYSERR);
             return MROS_E_SYSERR;
         } else {
             *res = readLen;
+    		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_SYSERR);
             return MROS_E_SYSERR;
         }
     }

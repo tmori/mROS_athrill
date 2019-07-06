@@ -78,6 +78,7 @@ static mRosReturnType mros_xmlpacket_result(mRosPacketType *packet)
 	//    HTTP/1.1 200 OK
 	const char* head = find_string_after((const char *)&packet->data[0], "HTTP/");
 	if (head == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 	//    search HERE
@@ -86,6 +87,7 @@ static mRosReturnType mros_xmlpacket_result(mRosPacketType *packet)
 	//    HTTP/1.1 200 OK
 	head = find_string_after(head, " ");
 	if (head == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 	//        search HERE
@@ -95,9 +97,11 @@ static mRosReturnType mros_xmlpacket_result(mRosPacketType *packet)
 	const char* tail = strstr(head, " ");
 	mros_uint32 len = (tail - head);
 	if (len != MROS_PACKET_HTT_OK_CODE_LEN) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 	if (strncmp(head, MROS_PACKET_HTT_OK_CODE, MROS_PACKET_HTT_OK_CODE_LEN) != 0) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 	return MROS_E_OK;
@@ -127,6 +131,7 @@ mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uin
 	//"http://xxx.xxx.xx:8080/"
 	char* head = find_string_after((const char *)&packet->data[0], "http://");
 	if (head == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
 	}
 
@@ -136,12 +141,14 @@ mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uin
 	//"http://xxx.xxx.xx:8080/"
 	char *tail = find_string_after(head, ":");
 	if (tail == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
 	}
 	mros_uint32 len = (tail - head);
 	head[len - 1] = '\0';
 	mRosReturnType ret = mros_comm_inet_get_ipaddr((const char *)head, ipaddr);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return MROS_NULL;
 	}
 
@@ -153,6 +160,7 @@ mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uin
 	tail = strstr(head, "/");
 	len = (tail - head) + 1;
 	if (len > PORT_MAX_STR_LEN) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
 	}
 	head[len - 1] = '\0';
@@ -172,11 +180,13 @@ static mRosReturnType mros_xmlpacket_get_member_info(const char*p, mRosPacketMem
 {
 	infop->res.head = find_string_after(p, infop->req.start_key);
 	if (infop->res.head == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 
 	infop->res.tail = strstr(infop->res.head, "<");
 	if (infop->res.tail == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 	infop->res.len = (infop->res.tail - infop->res.head);
@@ -198,15 +208,18 @@ static mRosPacketDataEnumType mros_xmlpacket_slave_request_get_method(mRosPacket
 
 	ret = mros_xmlpacket_get_member_info(packet->data, minfop);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_PACKET_DATA_INVALID;
 	}
 	if (len != minfop->res.len) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_PACKET_DATA_INVALID;
 	}
 	if (strncmp(minfop->res.head, "requestTopic", len) == 0) {
 		return MROS_PACKET_DATA_REQUEST_TOPIC_REQ;
 	}
 
+	ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 	return MROS_PACKET_DATA_INVALID;
 }
 #ifdef ROS_INDIGO
@@ -226,6 +239,7 @@ static mRosReturnType mros_xmlpacket_request_topic_req_decode(mRosPacketType *pa
 	decoded_infop->request.topic.node_name.req.end_key = "<";
 	ret = mros_xmlpacket_get_member_info(decoded_infop->method.res.tail, &decoded_infop->request.topic.node_name);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 	node_name_tail = decoded_infop->request.topic.node_name.res.tail;
@@ -233,6 +247,7 @@ static mRosReturnType mros_xmlpacket_request_topic_req_decode(mRosPacketType *pa
 	decoded_infop->request.topic.topic_name.req.end_key = "<";
 	ret = mros_xmlpacket_get_member_info(node_name_tail, &decoded_infop->request.topic.topic_name);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 
@@ -251,6 +266,7 @@ mRosPacketDataEnumType mros_xmlpacket_slave_request_decode(mRosPacketType *packe
 		break;
 	}
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_PACKET_DATA_INVALID;
 	}
 	return decoded_infop->packet_type;
@@ -297,6 +313,7 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	//"<value><array><data>"
 	char* head = find_string_after((const char *)&packet->data[0], "<array>");
 	if (head == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
 	}
 
@@ -306,6 +323,7 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	//"<value><array><data>"
 	head = find_string_after(head, "<array>");
 	if (head == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
 	}
 	//                             search HERE
@@ -314,6 +332,7 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	//<value><string>TCPROS</string></value>
 	head = find_string_after(head, "</value>");
 	if (head == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
 	}
 	//      search HERE
@@ -322,6 +341,7 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	//<value><string>Chagall</string></value>
 	head = find_string_after(head, "<value><string>");
 	if (head == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
 	}
 
@@ -334,6 +354,7 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	head[len - 1] = '\0';
 	ret = mros_comm_inet_get_ipaddr((const char *)head, ipaddr);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
 	}
 
@@ -343,6 +364,7 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	//<value><int>54894</int></value>
 	head = find_string_after(tail, "<value><int>");
 	if (head == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
 	}
 
@@ -353,6 +375,7 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	tail = strstr(head, "<");
 	len = (tail - head) + 1;
 	if (len > PORT_MAX_STR_LEN) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
 	}
 	head[len - 1] = '\0';

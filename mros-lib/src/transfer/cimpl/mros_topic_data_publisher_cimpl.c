@@ -30,6 +30,7 @@ static void mros_topic_publish(mRosTopicConnectorManagerType *mgrp, mRosNodeEnum
 		}
 		ret = mros_topic_add_data(topic_id, topic_data);
 		if (ret != MROS_E_OK) {
+			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 			(void)mros_mem_free(topic_data->data.mgrp, topic_data);
 		}
 		obj = mros_topic_connector_get_next(mgrp, topic_obj, obj);

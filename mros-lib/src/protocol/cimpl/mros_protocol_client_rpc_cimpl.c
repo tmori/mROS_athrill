@@ -11,10 +11,12 @@ static mRosReturnType mros_rpc_sendreply_xmlpacket(mRosEncodeArgType *arg, mRosC
 
 	ret = mros_packet_encode(arg, req);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	ret = mros_comm_tcp_client_send_all(client, req->data, req->data_size, &rlen);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	res->data_size = 0;
@@ -25,6 +27,7 @@ static mRosReturnType mros_rpc_sendreply_xmlpacket(mRosEncodeArgType *arg, mRosC
 		}
 		res->data_size += rlen;
 		if (res->data_size >= res->total_size) {
+			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
 			return MROS_E_NOMEM;
 		}
 		is_end = mros_xmlpacket_has_response_end(res);
@@ -87,16 +90,19 @@ static mRosReturnType mros_rpc_sendreply_tcpros(mRosEncodeArgType *arg, mRosComm
 
 	ret = mros_packet_encode(arg, req->req_packet);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 
 	ret = mros_comm_tcp_client_send_all(client, req->req_packet->data, req->req_packet->data_size, &rlen);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 
 	ret = mros_comm_tcp_client_receive_all(client, rawdata, MROS_TCPROS_RAWDATA_HEADER_SIZE, &rlen);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	packet.total_size = MROS_TCPROS_RAWDATA_HEADER_SIZE;
@@ -104,10 +110,12 @@ static mRosReturnType mros_rpc_sendreply_tcpros(mRosEncodeArgType *arg, mRosComm
 	packet.data = rawdata;
 	ret = mros_tcprospacket_get_body_size(&packet, &len);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	ret = mros_comm_tcp_client_receive_all(client, res->reply_packet->data, len, &rlen);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	res->reply_packet->data_size = len;

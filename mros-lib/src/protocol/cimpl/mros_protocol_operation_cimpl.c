@@ -23,11 +23,13 @@ mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, cons
 	arg.args_char = 0;
 	ret = mros_packet_encode(&arg, &packet);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	//send header
 	ret = mros_comm_tcp_client_send_all(client, (const char*)packet.data, packet.data_size, &res);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 
@@ -46,11 +48,13 @@ mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType 
 
 	ret = mros_comm_socket_wait_readable(&client->socket, 0);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return MROS_NULL;
 	}
 	//receive header
 	ret = mros_comm_tcp_client_receive_all(client, rawdata, MROS_TOPIC_RAWDATA_HEADER_SIZE, &res);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return MROS_NULL;
 	}
 	//decode header
@@ -59,11 +63,13 @@ mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType 
 	packet.data = rawdata;
 	ret = mros_topicpacket_get_body_size(&packet, &len);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return MROS_NULL;
 	}
 	//receive body
 	ret = mros_mem_alloc(mempool, len, &mem_entryp);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return MROS_NULL;
 	}
 	packet.total_size = len;
@@ -72,6 +78,7 @@ mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType 
 
 	ret = mros_comm_tcp_client_receive_all(client, packet.data, len, &res);
 	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
 		return MROS_NULL;
 	}
 	return mem_entryp;

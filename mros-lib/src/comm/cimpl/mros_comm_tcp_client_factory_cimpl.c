@@ -33,6 +33,7 @@ mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc(void)
 	mRosCommTcpClientListReqEntryType *p;
 	ListEntry_Alloc(&mros_comm_tcp_client_factory, mRosCommTcpClientListReqEntryType, &p);
 	if (p == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_NULL;
 	}
 	ListEntry_AddEntry(&mros_comm_tcp_client_factory, p);
@@ -44,6 +45,7 @@ mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc_copy(mRosCommTcpC
 
 	p = mros_comm_tcp_clientc_alloc();
 	if (p == MROS_NULL) {
+		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_NULL;
 	}
 	p->data.client = *client;
