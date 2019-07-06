@@ -17,7 +17,6 @@
  */
 #include "mros_comm_socket_cimpl.h"
 #include "mros_comm_cimpl.h"
-#include <stdlib.h>
 
 mRosReturnType mros_comm_socket_init(mRosCommSocketType *socket, mRosCommSocketEnumType type)
 {
@@ -65,8 +64,8 @@ static mRosReturnType mros_comm_secket_select(mRosCommSocketType *socket, mros_u
 	MROS_FD_ZERO(&fd_set);
     MROS_FD_SET(socket->sock_fd, &fd_set);
 
-    mRosFdSetType* r_set = NULL;
-    mRosFdSetType* w_set = NULL;
+    mRosFdSetType* r_set = MROS_NULL;
+    mRosFdSetType* w_set = MROS_NULL;
 
     if (read == MROS_TRUE) {
     	r_set = &fd_set;
@@ -75,7 +74,7 @@ static mRosReturnType mros_comm_secket_select(mRosCommSocketType *socket, mros_u
     	w_set = &fd_set;
     }
     mros_comm_set_timeval(timeout, &tmo);
-    mRosReturnType ret = mros_comm_select(MROS_FD_SETSIZE, r_set, w_set, NULL, &tmo);
+    mRosReturnType ret = mros_comm_select(MROS_FD_SETSIZE, r_set, w_set, MROS_NULL, &tmo);
     if (ret < 0) {
     	//TODO ERRLOG
     	return MROS_E_SYSERR;

@@ -1,6 +1,5 @@
 #include "mros_topic_connector_factory_cimpl.h"
 #include "mros_config.h"
-#include <stdlib.h>
 
 static mros_boolean mros_topic_connector_is_inialized[MROS_TOPIC_CONNECTOR_NUM] = {
 	MROS_FALSE,
@@ -12,8 +11,8 @@ MROS_TOPIC_CONNECTOR_CONFIG_DECLARE_MANAGER(sub_connector_mgr, (MROS_SUB_TOPIC_C
 
 mRosTopicConnectorManagerType *mros_topic_connector_factory_create(mRosTopicConnectorEnumType type)
 {
-	mRosTopicConnectorManagerType *mgrp = NULL;
-	mRosTopicConnectorConfigType *cfgp = NULL;
+	mRosTopicConnectorManagerType *mgrp = MROS_NULL;
+	mRosTopicConnectorConfigType *cfgp = MROS_NULL;
 	mRosReturnType ret;
 
 	switch (type) {
@@ -28,15 +27,15 @@ mRosTopicConnectorManagerType *mros_topic_connector_factory_create(mRosTopicConn
 	default:
 		break;
 	}
-	if (mgrp == NULL) {
-		return NULL;
+	if (mgrp == MROS_NULL) {
+		return MROS_NULL;
 	}
 	if (mros_topic_connector_is_inialized[type] == MROS_TRUE) {
 		return mgrp;
 	}
 	ret = mros_topic_connector_init(cfgp, mgrp);
 	if (ret != MROS_E_OK) {
-		return NULL;
+		return MROS_NULL;
 	}
 	mros_topic_connector_is_inialized[type] = MROS_TRUE;
 	return mgrp;
@@ -44,7 +43,7 @@ mRosTopicConnectorManagerType *mros_topic_connector_factory_create(mRosTopicConn
 
 mRosTopicConnectorManagerType *mros_topic_connector_factory_get(mRosTopicConnectorEnumType type)
 {
-	mRosTopicConnectorManagerType *mgrp = NULL;
+	mRosTopicConnectorManagerType *mgrp = MROS_NULL;
 
 	switch (type) {
 	case MROS_TOPIC_CONNECTOR_PUB:
@@ -56,11 +55,11 @@ mRosTopicConnectorManagerType *mros_topic_connector_factory_get(mRosTopicConnect
 	default:
 		break;
 	}
-	if (mgrp == NULL) {
-		return NULL;
+	if (mgrp == MROS_NULL) {
+		return MROS_NULL;
 	}
 	if (mros_topic_connector_is_inialized[type] == MROS_FALSE) {
-		return NULL;
+		return MROS_NULL;
 	}
 	return mgrp;
 }

@@ -12,8 +12,6 @@
 #include "mros_packet_decoder_cimpl.h"
 #include "mros_protocol_operation_cimpl.h"
 
-#include <stdlib.h>
-
 typedef union {
 	char buffer;
 	char buffer1[MROS_PACKET_MAXSIZE_REQ_REGISTER_PUBLISHER];
@@ -58,7 +56,7 @@ void mros_protocol_master_run(void)
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 	while (MROS_TRUE) {
 		mRosWaitListEntryType *wait_entry = mros_server_queue_wait(&mros_master_wait_queue);
-		if (wait_entry == NULL) {
+		if (wait_entry == MROS_NULL) {
 			continue;
 		}
 		mRosProtocolMasterRequestType *req = (mRosProtocolMasterRequestType*)wait_entry->data.reqp;
@@ -133,9 +131,9 @@ static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *
 
 	//TODO まだ出版ノードが存在しない場合は，非同期でマスタから情報をもらう
 	ptr = mros_xmlpacket_reqtopicres_get_first_uri(rpc_response->reply_packet, &ipaddr, &port);
-	while (ptr != NULL) {
+	while (ptr != MROS_NULL) {
 		mRosCommTcpClientListReqEntryType *req = mros_comm_tcp_clientc_alloc();
-		if (req == NULL) {
+		if (req == MROS_NULL) {
 			ret = MROS_E_NOMEM;
 			//TODO ERR LOG
 			goto done;
@@ -217,7 +215,7 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_REQUESTING_TOPIC;
 	//TODO まだ出版ノードが存在しない場合は，非同期でマスタから情報をもらう
 	ptr = mros_xmlpacket_subres_get_first_uri(rpc_regc_res.reply_packet, &ipaddr, &port);
-	while (ptr != NULL) {
+	while (ptr != MROS_NULL) {
 		mRosCommTcpClientType client;
 
 		ret = mros_comm_tcp_client_ip32_init(&client, ipaddr, port);

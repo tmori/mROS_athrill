@@ -18,7 +18,7 @@ do { \
 
 #define ListEntry_InsertHead(first, elm) \
 do { \
-	if ((first) != NULL) {	\
+	if ((first) != MROS_NULL) {	\
 		(elm)->next = (first);	\
 		(elm)->prev = (first)->prev;	\
 		(first)->prev->next = (elm); \
@@ -32,10 +32,10 @@ do { \
 
 #define ListEntry_Remove(first, elm)	\
 do { \
-	if ((first) != NULL) { \
+	if ((first) != MROS_NULL) { \
 		if ((first) == (elm)) { \
 			if (List_IsEmpty(first)) {	\
-				(first) = NULL;	\
+				(first) = MROS_NULL;	\
 			}	\
 			else { \
 				(first) = (elm)->next; \
@@ -72,8 +72,8 @@ do {	\
 	mros_uint32 _i;\
 	(headp)->entry_size = sizeof(entry_type);	\
 	(headp)->entry_num = 0;	\
-	(headp)->entries = NULL;	\
-	(headp)->free = NULL;	\
+	(headp)->entries = MROS_NULL;	\
+	(headp)->free = MROS_NULL;	\
 	(headp)->free_num = (prealloc_size);	\
 	for (_i = 0; _i < (prealloc_size); _i++) { \
 		entry_type *_tmp = &(((entry_type*)(memp))[_i]); \
@@ -84,7 +84,7 @@ do {	\
 
 #define List_InitEmpty(headp, entry_type)	\
 do { 	\
-	List_Init(headp, entry_type, 0, NULL);	\
+	List_Init(headp, entry_type, 0, MROS_NULL);	\
 } while (0)
 
 #define ListEntry_Alloc(headp, entry_type, new_entrypp) \
@@ -97,7 +97,7 @@ do { \
 		*(new_entrypp) = _tmp;	\
 	} \
 	else { \
-		*(new_entrypp) = NULL;	\
+		*(new_entrypp) = MROS_NULL;	\
 	} \
 } while (0)
 

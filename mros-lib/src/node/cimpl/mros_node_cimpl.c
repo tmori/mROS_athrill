@@ -3,7 +3,6 @@
 #include "mros_config.h"
 #include "mros_name.h"
 #include <string.h>
-#include <stdlib.h>
 
 static mRosNodeManagerType node_manager[MROS_NODE_TYPE_NUM];
 #define NODE_OBJ(type, id)		node_manager[(type)].node_entries[MROS_INDEX((id))]
@@ -96,7 +95,7 @@ const char* mros_node_name(mRosNodeIdType id)
 {
 	mRosNodeEnumType type = NODE_TYPE(id);
 	if (type != MROS_NODE_TYPE_INNER) {
-		return NULL;
+		return MROS_NULL;
 	}
 	return NODE_OBJ(type, id).data.node_name;
 }
@@ -110,7 +109,7 @@ static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType tas
 		return MROS_E_RANGE;
 	}
 
-	if (node_name != NULL) {
+	if (node_name != MROS_NULL) {
 		len = strlen(node_name);
 		if (len >= (MROS_NODE_NAME_MAXLEN + 1)) { /* for add slash on top */
 			//TODO ERRLOG
@@ -126,12 +125,12 @@ static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType tas
 	}
 
 	ListEntry_Alloc(&node_manager[type].head, mRosNodeListEntryType, &p);
-	if (p == NULL) {
+	if (p == MROS_NULL) {
 		return MROS_E_NOMEM;
 	}
 	*id = p->data.node_id;
 	p->data.task_id = task_id;
-	if (node_name != NULL) {
+	if (node_name != MROS_NULL) {
 		mros_name_formalize(node_name, len, p->data.node_name, &p->data.namelen);
 	}
 	else {
@@ -150,7 +149,7 @@ mRosReturnType mros_node_create_inner(const char *node_name, mRosNodeIdType *id)
 
 mRosReturnType mros_node_create_outer(mRosNodeIdType *id)
 {
-	return mros_node_create(NULL, MROS_TASKID_NONE, MROS_NODE_TYPE_OUTER, id);
+	return mros_node_create(MROS_NULL, MROS_TASKID_NONE, MROS_NODE_TYPE_OUTER, id);
 }
 
 mRosReturnType mros_node_remove(mRosNodeIdType id)

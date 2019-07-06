@@ -5,7 +5,7 @@ void mros_name_formalize(const char *src_name, mros_uint32 src_namelen, char *ds
 {
 	mros_uint32 i;
 	mros_uint32 slash_count = 0;
-	const char* src_copy_head = NULL;
+	const char* src_copy_head = MROS_NULL;
 	mros_uint32 src_copy_len;
 
 	for (i = 0; i < src_namelen; i++) {

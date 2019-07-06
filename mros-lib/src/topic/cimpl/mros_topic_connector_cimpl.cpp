@@ -1,7 +1,6 @@
 #include "mros_topic_connector_cimpl.h"
 #include "mros_config.h"
 #include "mros_node_cimpl.h"
-#include <stdlib.h>
 #include <string.h>
 
 mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, mRosTopicConnectorManagerType *mgrp)
@@ -19,8 +18,8 @@ mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, m
 	for (i = 0; i < MROS_TOPIC_MAX_NUM; i++) {
 		mRosTopicConnectorListEntryRootType *topic_entry = &(mgrp->topic_entries[i]);
 		topic_entry->data.topic_id = MROS_ID_NONE;
-		List_Init(&topic_entry->data.head[MROS_NODE_TYPE_INNER], mRosTopicConnectorListEntryType, 0, NULL);
-		List_Init(&topic_entry->data.head[MROS_NODE_TYPE_OUTER], mRosTopicConnectorListEntryType, 0, NULL);
+		List_Init(&topic_entry->data.head[MROS_NODE_TYPE_INNER], mRosTopicConnectorListEntryType, 0, MROS_NULL);
+		List_Init(&topic_entry->data.head[MROS_NODE_TYPE_OUTER], mRosTopicConnectorListEntryType, 0, MROS_NULL);
 	}
 
 	List_Init(&mgrp->topic_head, mRosTopicConnectorListEntryRootType, MROS_TOPIC_MAX_NUM, mgrp->topic_entries);
@@ -43,7 +42,7 @@ mRosContainerObjType mros_topic_connector_get_topic_next(mRosTopicConnectorManag
 	mRosTopicConnectorListEntryRootType *first;
 	mRosTopicConnectorListEntryRootType *entry = (mRosTopicConnectorListEntryRootType*)obj;
 	ListEntry_GetFirst(&mgrp->topic_head, &first);
-	if (first == NULL) {
+	if (first == MROS_NULL) {
 		return MROS_COBJ_NULL;
 	}
 	if (entry->next == first) {
@@ -74,7 +73,7 @@ mRosContainerObjType mros_topic_connector_get_next(mRosTopicConnectorManagerType
 
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
 	ListEntry_GetFirst(&topic_entry->data.head[type], &first);
-	if (first == NULL) {
+	if (first == MROS_NULL) {
 		return MROS_COBJ_NULL;
 	}
 	if (entry->next == first) {
@@ -92,12 +91,12 @@ static mRosTopicConnectorListEntryRootType *mros_topic_connector_get_topic_head(
 			return topic_p;
 		}
 	}
-	return NULL;
+	return MROS_NULL;
 }
 mRosContainerObjType mros_topic_connector_get_topic_obj(mRosTopicConnectorManagerType *mgrp, mRosTopicIdType topic_id)
 {
 	mRosTopicConnectorListEntryRootType *root = mros_topic_connector_get_topic_head(mgrp, topic_id);
-	if (root == NULL) {
+	if (root == MROS_NULL) {
 		return MROS_COBJ_NULL;
 	}
 	return (mRosContainerObjType)root;
@@ -108,8 +107,8 @@ static mRosTopicConnectorListEntryRootType *mros_topic_connector_create_topic_he
 	mRosTopicConnectorListEntryRootType *topic_p;
 
 	ListEntry_Alloc(&mgrp->topic_head, mRosTopicConnectorListEntryRootType, &topic_p);
-	if (topic_p == NULL) {
-		return NULL;
+	if (topic_p == MROS_NULL) {
+		return MROS_NULL;
 	}
 	topic_p->data.topic_id = topic_id;
 	List_InitEmpty(&topic_p->data.head[MROS_NODE_TYPE_INNER], mRosTopicConnectorListEntryType);
@@ -128,7 +127,7 @@ static mRosTopicConnectorListEntryType *mros_topic_connector_get_node(mRosTopicC
 			return entry;
 		}
 	}
-	return NULL;
+	return MROS_NULL;
 }
 
 mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector, mRosSizeType queue_length, mRosMemoryManagerType *mempool)
@@ -139,28 +138,28 @@ mRosReturnType mros_topic_connector_add(mRosTopicConnectorManagerType *mgrp, mRo
 
 	/* TODO LOCK */
 	org_topic_p = mros_topic_connector_get_topic_head(mgrp, connector->topic_id);
-	if (org_topic_p == NULL) {
+	if (org_topic_p == MROS_NULL) {
 		topic_p = mros_topic_connector_create_topic_head(mgrp, connector->topic_id);
 	}
 	else {
 		topic_p = org_topic_p;
 	}
-	if (topic_p == NULL) {
+	if (topic_p == MROS_NULL) {
 		(void)mros_topic_connector_remove(mgrp, connector);
 		return MROS_E_NOMEM;
 	}
 
 	entry = mros_topic_connector_get_node(topic_p, connector->node_id);
 	mRosNodeEnumType type = mros_node_type(connector->node_id);
-	if (entry == NULL) {
+	if (entry == MROS_NULL) {
 		ListEntry_Alloc(&mgrp->conn_head, mRosTopicConnectorListEntryType, &entry);
-		if (entry != NULL) {
+		if (entry != MROS_NULL) {
 			entry->data.value.topic_id = connector->topic_id;
 			entry->data.value.node_id = connector->node_id;
 			entry->data.value.func_id = connector->func_id;
 			entry->data.queue_maxsize = queue_length;
 			entry->data.mempool = mempool;
-			entry->data.commp = NULL;
+			entry->data.commp = MROS_NULL;
 			ListEntry_AddEntry(&topic_p->data.head[type], entry);
 			List_InitEmpty(&entry->data.queue_head, mRosMemoryListEntryType);
 		}
@@ -178,11 +177,11 @@ mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, 
 	mRosTopicConnectorListEntryType *entryp;
 
 	topic_entryp = mros_topic_connector_get_topic_head(mgrp, connector->topic_id);
-	if (topic_entryp == NULL) {
+	if (topic_entryp == MROS_NULL) {
 		return MROS_E_NOENT;
 	}
 	entryp = mros_topic_connector_get_node(topic_entryp, connector->node_id);
-	if (entryp == NULL) {
+	if (entryp == MROS_NULL) {
 		return MROS_E_NOENT;
 	}
 	mRosNodeEnumType type = mros_node_type(connector->node_id);
@@ -192,9 +191,9 @@ mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, 
 			ListEntry_RemoveEntry(&mgrp->topic_head, topic_entryp);
 		}
 	}
-	if (entryp->data.commp != NULL) {
+	if (entryp->data.commp != MROS_NULL) {
 		entryp->data.commp->data.op.free(entryp->data.commp);
-		entryp->data.commp = NULL;
+		entryp->data.commp = MROS_NULL;
 	}
 	return MROS_E_OK;
 }
@@ -224,9 +223,9 @@ mRosReturnType mros_topic_connector_set_connection(mRosContainerObjType obj, mRo
 mRosContainerObjType mros_topic_connector_get_obj(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorType *connector)
 {
 	mRosTopicConnectorListEntryRootType *tp;
-	mRosTopicConnectorListEntryRootType *topic_p = NULL;
+	mRosTopicConnectorListEntryRootType *topic_p = MROS_NULL;
 	mRosTopicConnectorListEntryType *p;
-	mRosTopicConnectorListEntryType *entry = NULL;
+	mRosTopicConnectorListEntryType *entry = MROS_NULL;
 
 	{
 		ListEntry_Foreach(&mgrp->topic_head, tp) {
@@ -235,7 +234,7 @@ mRosContainerObjType mros_topic_connector_get_obj(mRosTopicConnectorManagerType 
 				break;
 			}
 		}
-		if (tp == NULL) {
+		if (tp == MROS_NULL) {
 			return MROS_COBJ_NULL;
 		}
 
@@ -249,7 +248,7 @@ mRosContainerObjType mros_topic_connector_get_obj(mRosTopicConnectorManagerType 
 			}
 		}
 	}
-	if (entry == NULL) {
+	if (entry == MROS_NULL) {
 		return MROS_COBJ_NULL;
 	}
 	return (mRosContainerObjType)entry;
@@ -300,7 +299,7 @@ mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const ch
 		return MROS_E_OK;
 	}
 	//TOPIC ==> outer node
-	if (entry->data.commp == NULL) {
+	if (entry->data.commp == MROS_NULL) {
 		return MROS_E_NOTCONN;
 	}
 	return entry->data.commp->data.op.topic_data_send(&entry->data.commp->data.client, data, len);
@@ -314,15 +313,15 @@ mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerObjType 
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
 	if (type == MROS_NODE_TYPE_INNER) {
 		if (entry->data.queue_head.entry_num == 0) {
-			return NULL;
+			return MROS_NULL;
 		}
 		ListEntry_GetFirst(&entry->data.queue_head, &data);
 		ListEntry_RemoveEntry(&entry->data.queue_head, data);
 		return data;
 	}
 	//outer node
-	if (entry->data.commp == NULL) {
-		return NULL;
+	if (entry->data.commp == MROS_NULL) {
+		return MROS_NULL;
 	}
 	return entry->data.commp->data.op.topic_data_receive(&entry->data.commp->data.client, entry->data.mempool);
 }

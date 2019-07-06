@@ -12,7 +12,6 @@
 #include "mros_topic_cimpl.h"
 #include "mros_node_cimpl.h"
 #include "mros_topic_runner_cimpl.h"
-#include <stdlib.h>
 
 typedef union {
 	char buffer;
@@ -90,7 +89,7 @@ void mros_protocol_subscribe_run(void)
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 	while (MROS_TRUE) {
 		mRosWaitListEntryType *wait_entry = mros_server_queue_wait(&mros_subscribe_wait_queue);
-		if (wait_entry == NULL) {
+		if (wait_entry == MROS_NULL) {
 			mros_topic_data_publisher_run();
 			continue;
 		}

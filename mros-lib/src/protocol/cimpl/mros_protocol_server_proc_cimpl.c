@@ -75,7 +75,7 @@ static mRosNodeIdType mros_publisher_is_exist(mRosTopicIdType topic_id)
 	mRosTopicConnectorManagerType *mgrp;
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_PUB);
-	if (mgrp == NULL) {
+	if (mgrp == MROS_NULL) {
 		return MROS_ID_NONE;
 	}
 	topic_obj = mros_topic_connector_get_topic_obj(mgrp, topic_id);
@@ -151,7 +151,7 @@ static mRosReturnType mros_proc_add_outersub_connector(mRosCommTcpClientType *cl
 	mRosTopicConnectorType connector;
 	mRosContainerObjType cobj;
 	mRosTopicConnectorManagerType *sub_mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_SUB);
-	if (sub_mgrp == NULL) {
+	if (sub_mgrp == MROS_NULL) {
 		return MROS_E_INVAL;
 	}
 	connector.topic_id = topic_id;
@@ -161,7 +161,7 @@ static mRosReturnType mros_proc_add_outersub_connector(mRosCommTcpClientType *cl
 		//TODO ERR LOG
 		return MROS_E_NOENT;
 	}
-	ret = mros_topic_connector_add(sub_mgrp, &connector, MROS_OUTER_CONNECTOR_QUEUE_MAXLEN, NULL);
+	ret = mros_topic_connector_add(sub_mgrp, &connector, MROS_OUTER_CONNECTOR_QUEUE_MAXLEN, MROS_NULL);
 	if (ret != MROS_E_OK) {
 		//TODO ERR LOG
 		return ret;
@@ -169,7 +169,7 @@ static mRosReturnType mros_proc_add_outersub_connector(mRosCommTcpClientType *cl
 	cobj = mros_topic_connector_get_obj(sub_mgrp, &connector);
 
 	mRosCommTcpClientListReqEntryType *client_entry = mros_comm_tcp_clientc_alloc_copy(client);
-	if (client_entry == NULL) {
+	if (client_entry == MROS_NULL) {
 		return MROS_E_NOENT;
 	}
 	client_entry->data.op.free = mros_protocol_client_obj_free;

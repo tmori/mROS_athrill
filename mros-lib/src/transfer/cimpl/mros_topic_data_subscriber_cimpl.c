@@ -3,7 +3,6 @@
 #include "mros_topic_cimpl.h"
 #include "mros_array_container.h"
 #include "mros_config.h"
-#include <stdlib.h>
 
 MROS_ARRAY_CONTAINER_CONFIG_DECLARE_MANAGER(mros_topic_sub_mgr, MROS_TOPIC_MAX_NUM);
 
@@ -52,7 +51,7 @@ void mros_topic_data_subscriber_run(void)
 	mRosTopicConnectorManagerType *mgrp;
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_SUB);
-	if (mgrp == NULL) {
+	if (mgrp == MROS_NULL) {
 		return;
 	}
 	mros_topic_sub_mgr.count = 0;

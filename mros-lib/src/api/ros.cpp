@@ -99,14 +99,14 @@ ros::Subscriber ros::NodeHandle::subscriber(std::string topic, int queue_size, v
 	}
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_SUB);
-	if (mgrp == NULL) {
+	if (mgrp == MROS_NULL) {
 		//TODO ERROR LOG
 		mros_exclusive_unlock(&unlck_obj);
 		return sub;
 	}
 	connector.func_id = (mRosFuncIdType)fp;
 
-	ret = mros_topic_connector_add(mgrp, &connector, queue_size, NULL);
+	ret = mros_topic_connector_add(mgrp, &connector, queue_size, MROS_NULL);
 	if (ret != MROS_E_OK) {
 		//TODO ERROR LOG
 		mros_exclusive_unlock(&unlck_obj);
@@ -159,7 +159,7 @@ ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 	}
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_PUB);
-	if (mgrp == NULL) {
+	if (mgrp == MROS_NULL) {
 		//TODO ERROR LOG
 		mros_exclusive_unlock(&unlck_obj);
 		return pub;

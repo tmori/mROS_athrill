@@ -1,5 +1,4 @@
 #include "mros_memory.h"
-#include <stdlib.h>
 
 
 #define MEMORY_ID(index)		((index) + 1U)
@@ -36,7 +35,7 @@ mRosReturnType mros_mem_init(mRosSizeType config_num, mRosMemoryConfigType **con
 mRosReturnType mros_mem_alloc(mRosMemoryManagerType *mgrp, mRosSizeType size, mRosMemoryListEntryType **memory)
 {
 	mros_uint32 i;
-	if (memory == NULL) {
+	if (memory == MROS_NULL) {
 		return MROS_E_INVAL;
 	}
 	for (i = 0; i < mgrp->header_num; i++) {
@@ -55,7 +54,7 @@ mRosReturnType mros_mem_alloc(mRosMemoryManagerType *mgrp, mRosSizeType size, mR
 
 mRosReturnType mros_mem_free(mRosMemoryManagerType *mgrp, mRosMemoryListEntryType *memory)
 {
-	if (memory == NULL) {
+	if (memory == MROS_NULL) {
 		return MROS_E_OK;
 	}
 	if (memory->data.header_id >= mgrp->header_num) {

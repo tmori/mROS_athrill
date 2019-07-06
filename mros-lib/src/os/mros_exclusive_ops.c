@@ -1,6 +1,5 @@
 #include "mros_os.h"
 #include "mros_exclusive_ops.h"
-#include <stdlib.h>
 
 void mros_exclusive_init(mRosExclusiveObjectType *exobj, mRosTaskPriorityType priority)
 {

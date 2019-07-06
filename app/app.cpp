@@ -26,12 +26,12 @@ void usr_task1(void)
 	int i = 0;
 	ros::init(argc, argv, "mros_node");
 	ros::NodeHandle n;
-	ros::Publisher chatter_pub = n.advertise("mros_msg", 1);
+	ros::Publisher chatter_pub;
 	//ros::Rate loop_rate(5);
 	char buf[128];
-
 	std_msgs::String str;
 
+	chatter_pub = n.advertise("mros_msg", 1);
 	syslog(LOG_NOTICE,"Data Publish Start");
 	while(1){
 		wait_ms(1000);

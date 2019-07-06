@@ -29,7 +29,8 @@ typedef mros_int8* mRosPtrType;
 //typedef void (*mros_topic_callback)(void *);
 
 typedef mros_uint32* mRosContainerObjType;
-#define MROS_COBJ_NULL	((mRosContainerObjType)NULL)
+#define MROS_NULL (0)
+#define MROS_COBJ_NULL	((mRosContainerObjType)MROS_NULL)
 
 typedef mros_uint32 mRosSizeType;
 

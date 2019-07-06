@@ -3,7 +3,6 @@
 #include "mros_packet_fmt_http.h"
 #include "mros_comm_cimpl.h"
 #include <string.h>
-#include <stdlib.h>
 
 static mros_int32 mros_packet_xmlrpc_req_end_str_len = 0;
 static mros_int32 mros_packet_xmlrpc_res_end_str_len = 0;
@@ -19,8 +18,8 @@ mRosReturnType mros_packet_decoder_init(void)
 static char *find_string_after(const char* string1, const char* string2)
 {
 	char* str = strstr(string1, string2);
-	if (str == NULL) {
-		return NULL;
+	if (str == MROS_NULL) {
+		return MROS_NULL;
 	}
 	str += strlen(string2);
 	return str;
@@ -78,7 +77,7 @@ static mRosReturnType mros_xmlpacket_result(mRosPacketType *packet)
 	//        V
 	//    HTTP/1.1 200 OK
 	const char* head = find_string_after((const char *)&packet->data[0], "HTTP/");
-	if (head == NULL) {
+	if (head == MROS_NULL) {
 		return MROS_E_INVAL;
 	}
 	//    search HERE
@@ -86,7 +85,7 @@ static mRosReturnType mros_xmlpacket_result(mRosPacketType *packet)
 	//            V
 	//    HTTP/1.1 200 OK
 	head = find_string_after(head, " ");
-	if (head == NULL) {
+	if (head == MROS_NULL) {
 		return MROS_E_INVAL;
 	}
 	//        search HERE
@@ -127,8 +126,8 @@ mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uin
 	//        V
 	//"http://xxx.xxx.xx:8080/"
 	char* head = find_string_after((const char *)&packet->data[0], "http://");
-	if (head == NULL) {
-		return NULL;
+	if (head == MROS_NULL) {
+		return MROS_NULL;
 	}
 
 	//           search HERE
@@ -136,14 +135,14 @@ mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uin
 	//                   V
 	//"http://xxx.xxx.xx:8080/"
 	char *tail = find_string_after(head, ":");
-	if (tail == NULL) {
-		return NULL;
+	if (tail == MROS_NULL) {
+		return MROS_NULL;
 	}
 	mros_uint32 len = (tail - head);
 	head[len - 1] = '\0';
 	mRosReturnType ret = mros_comm_inet_get_ipaddr((const char *)head, ipaddr);
 	if (ret != MROS_E_OK) {
-		return NULL;
+		return MROS_NULL;
 	}
 
 	//               search HERE
@@ -154,30 +153,30 @@ mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uin
 	tail = strstr(head, "/");
 	len = (tail - head) + 1;
 	if (len > PORT_MAX_STR_LEN) {
-		return NULL;
+		return MROS_NULL;
 	}
 	head[len - 1] = '\0';
 
-	*port = strtol(head, NULL, 10);
+	*port = strtol(head, MROS_NULL, 10);
 	return (mRosPtrType)tail;
 }
 
 mRosPtrType mros_xmlpacket_subres_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
 {
 	//TODO
-	return NULL;
+	return MROS_NULL;
 }
 
 
 static mRosReturnType mros_xmlpacket_get_member_info(const char*p, mRosPacketMemberInfoType *infop)
 {
 	infop->res.head = find_string_after(p, infop->req.start_key);
-	if (infop->res.head == NULL) {
+	if (infop->res.head == MROS_NULL) {
 		return MROS_E_INVAL;
 	}
 
 	infop->res.tail = strstr(infop->res.head, "<");
-	if (infop->res.tail == NULL) {
+	if (infop->res.tail == MROS_NULL) {
 		return MROS_E_INVAL;
 	}
 	infop->res.len = (infop->res.tail - infop->res.head);
@@ -297,8 +296,8 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	//             V
 	//"<value><array><data>"
 	char* head = find_string_after((const char *)&packet->data[0], "<array>");
-	if (head == NULL) {
-		return NULL;
+	if (head == MROS_NULL) {
+		return MROS_NULL;
 	}
 
 	//      search HERE
@@ -306,24 +305,24 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	//              V
 	//"<value><array><data>"
 	head = find_string_after(head, "<array>");
-	if (head == NULL) {
-		return NULL;
+	if (head == MROS_NULL) {
+		return MROS_NULL;
 	}
 	//                             search HERE
 	//                                     |
 	//                                     V
 	//<value><string>TCPROS</string></value>
 	head = find_string_after(head, "</value>");
-	if (head == NULL) {
-		return NULL;
+	if (head == MROS_NULL) {
+		return MROS_NULL;
 	}
 	//      search HERE
 	//              |
 	//              V
 	//<value><string>Chagall</string></value>
 	head = find_string_after(head, "<value><string>");
-	if (head == NULL) {
-		return NULL;
+	if (head == MROS_NULL) {
+		return MROS_NULL;
 	}
 
 	//             search HERE
@@ -335,7 +334,7 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	head[len - 1] = '\0';
 	ret = mros_comm_inet_get_ipaddr((const char *)head, ipaddr);
 	if (ret != MROS_E_OK) {
-		return NULL;
+		return MROS_NULL;
 	}
 
 	//   search HERE
@@ -343,8 +342,8 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	//           V
 	//<value><int>54894</int></value>
 	head = find_string_after(tail, "<value><int>");
-	if (head == NULL) {
-		return NULL;
+	if (head == MROS_NULL) {
+		return MROS_NULL;
 	}
 
 	//         search HERE
@@ -354,17 +353,17 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 	tail = strstr(head, "<");
 	len = (tail - head) + 1;
 	if (len > PORT_MAX_STR_LEN) {
-		return NULL;
+		return MROS_NULL;
 	}
 	head[len - 1] = '\0';
-	*port = strtol(head, NULL, 10);
+	*port = strtol(head, MROS_NULL, 10);
 	return (mRosPtrType)tail;
 }
 
 mRosPtrType mros_xmlpacket_reqtopicres_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
 {
 	//TODO
-	return NULL;
+	return MROS_NULL;
 }
 
 
@@ -386,11 +385,11 @@ mRosReturnType mros_tcprospacket_decode(mRosPacketType *packet, mRosTcpRosPacket
 
 	len = packet->data_size;
 
-	decoded_packet->callerid = NULL;
-	decoded_packet->md5sum = NULL;
-	decoded_packet->tcp_nodely = NULL;
-	decoded_packet->topic = NULL;
-	decoded_packet->type = NULL;
+	decoded_packet->callerid = MROS_NULL;
+	decoded_packet->md5sum = MROS_NULL;
+	decoded_packet->tcp_nodely = MROS_NULL;
+	decoded_packet->topic = MROS_NULL;
+	decoded_packet->type = MROS_NULL;
 
 
 	while (off < len) {
@@ -427,19 +426,19 @@ mRosReturnType mros_tcprospacket_decode(mRosPacketType *packet, mRosTcpRosPacket
 		}
 		off += entrylen;
 	}
-	if (decoded_packet->callerid != NULL) {
+	if (decoded_packet->callerid != MROS_NULL) {
 		decoded_packet->callerid[decoded_packet->callerid_len] = '\0';
 	}
-	if (decoded_packet->md5sum != NULL) {
+	if (decoded_packet->md5sum != MROS_NULL) {
 		decoded_packet->md5sum[decoded_packet->md5sum_len] = '\0';
 	}
-	if (decoded_packet->tcp_nodely != NULL) {
+	if (decoded_packet->tcp_nodely != MROS_NULL) {
 		decoded_packet->tcp_nodely[decoded_packet->tcp_nodelay_len] = '\0';
 	}
-	if (decoded_packet->topic != NULL) {
+	if (decoded_packet->topic != MROS_NULL) {
 		decoded_packet->topic[decoded_packet->topic_len] = '\0';
 	}
-	if (decoded_packet->type != NULL) {
+	if (decoded_packet->type != MROS_NULL) {
 		decoded_packet->type[decoded_packet->type_len] = '\0';
 	}
 

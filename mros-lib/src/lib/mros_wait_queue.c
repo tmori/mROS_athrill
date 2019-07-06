@@ -1,7 +1,6 @@
 #include "mros_wait_queue.h"
 #include "mros_os.h"
 #include "mros_list.h"
-#include <stdlib.h>
 
 void mros_client_wait_entry_init(mRosWaitListEntryType *wait_entry, void *reqp)
 {
@@ -43,7 +42,7 @@ static mRosWaitListEntryType *mros_server_queue_get(mRosWaitQueueType *wait_queu
 {
 	mRosTaskPriorityType min_priority = 0;
 	mRosWaitListEntryType *entry;
-	mRosWaitListEntryType *target = NULL;
+	mRosWaitListEntryType *target = MROS_NULL;
 
 	ListEntry_Foreach(&wait_queue->head, entry) {
 		if (entry->data.task_priority > min_priority) {
@@ -51,7 +50,7 @@ static mRosWaitListEntryType *mros_server_queue_get(mRosWaitQueueType *wait_queu
 			target = entry;
 		}
 	}
-	if (target != NULL) {
+	if (target != MROS_NULL) {
 		ListEntry_RemoveEntry(&wait_queue->head, target);
 	}
 	return target;

@@ -81,12 +81,12 @@ void main_task()
 		return;
 	}
 	mRosTopicConnectorManagerType *mgrp = mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_PUB);
-	if (mgrp == NULL) {
+	if (mgrp == MROS_NULL) {
 		syslog(LOG_ERROR, "mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_PUB)=%d", ret);
 		return;
 	}
 	mgrp = mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_SUB);
-	if (mgrp == NULL) {
+	if (mgrp == MROS_NULL) {
 		syslog(LOG_ERROR, "mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_SUB)=%d", ret);
 		return;
 	}
@@ -361,7 +361,7 @@ static void do_test_request_topic(void)
 	mros_int32 port = -1;
 	mRosPtrType ptr = mros_xmlpacket_subres_get_first_uri(res.reply_packet, &ipaddr, &port);
 	syslog(LOG_NOTICE, "ptr=0x%x ipaddr=0x%x port=%d", ptr, ipaddr, port);
-	if (ptr == NULL) {
+	if (ptr == MROS_NULL) {
 		syslog(LOG_NOTICE, "no publisher");
 		return;
 	}
@@ -371,7 +371,7 @@ static void do_test_request_topic(void)
 	topic_req.req_packet = &packet;
 	topic_req.topic_name = "/test_string";
 	topic_res.reply_packet = &packet;
-	if (ptr != NULL) {
+	if (ptr != MROS_NULL) {
 		ret = mros_comm_tcp_client_ip32_init(&client, ipaddr, port);
 		if (ret != MROS_E_OK) {
 			syslog(LOG_NOTICE, "mros_comm_tcp_client_connect()=%d", ret);

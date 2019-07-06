@@ -47,13 +47,13 @@ mRosReturnType mros_packet_encoder_init(void)
 	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_REQ].fmt = MROS_PACKET_FMT_XML_REQUEST_TOPIC_REQ;
 	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_REQ].len = strlen(MROS_PACKET_FMT_XML_REQUEST_TOPIC_REQ) + 1;
 
-	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_RES].fmt = NULL;
+	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_RES].fmt = MROS_NULL;
 	mros_xml_fmt_table[MROS_PACKET_DATA_REQUEST_TOPIC_RES].len = 0;
 
-	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_TOPIC_REQ].fmt = NULL;
+	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_TOPIC_REQ].fmt = MROS_NULL;
 	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_TOPIC_REQ].len = 0;
 
-	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_TOPIC_RES].fmt = NULL;
+	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_TOPIC_RES].fmt = MROS_NULL;
 	mros_xml_fmt_table[MROS_PACKET_DATA_TCPROS_TOPIC_RES].len = 0;
 
 	mros_http_post_fmt.fmt = MROS_PACKET_FMT_HTTP_POST;
@@ -110,7 +110,7 @@ mRosReturnType mros_packet_encode(mRosEncodeArgType *arg, mRosPacketType *packet
 	if (arg->type >= MROS_PACKET_DATA_NUM) {
 		return MROS_E_RANGE;
 	}
-	if (encode_table[arg->type] == NULL) {
+	if (encode_table[arg->type] == MROS_NULL) {
 		return MROS_E_INVAL;
 	}
 	return encode_table[arg->type](arg, packet);

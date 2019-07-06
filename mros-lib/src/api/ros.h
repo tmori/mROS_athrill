@@ -2,7 +2,6 @@
 #define _ROS_H_
 
 #include <string>
-#include <stdlib.h>
 
 namespace std_msgs{
 class String{

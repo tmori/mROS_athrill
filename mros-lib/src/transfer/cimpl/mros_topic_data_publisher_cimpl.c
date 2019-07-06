@@ -3,7 +3,6 @@
 #include "mros_topic_cimpl.h"
 #include "mros_array_container.h"
 #include "mros_config.h"
-#include <stdlib.h>
 
 MROS_ARRAY_CONTAINER_CONFIG_DECLARE_MANAGER(mros_topic_pub_mgr, MROS_TOPIC_MAX_NUM);
 
@@ -25,7 +24,7 @@ static void mros_topic_publish(mRosTopicConnectorManagerType *mgrp, mRosNodeEnum
 	}
 	while (obj != MROS_COBJ_NULL) {
 		topic_data = mros_topic_connector_receive_data(obj);
-		if (topic_data == NULL) {
+		if (topic_data == MROS_NULL) {
 			obj = mros_topic_connector_get_next(mgrp, topic_obj, obj);
 			continue;
 		}
@@ -50,7 +49,7 @@ void mros_topic_data_publisher_run(void)
 	mRosTopicConnectorManagerType *mgrp;
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_PUB);
-	if (mgrp == NULL) {
+	if (mgrp == MROS_NULL) {
 		return;
 	}
 	mros_topic_pub_mgr.count = 0;

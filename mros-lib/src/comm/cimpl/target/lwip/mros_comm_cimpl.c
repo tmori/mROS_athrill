@@ -44,7 +44,7 @@ mRosReturnType mros_comm_inet_get_ipaddr(const char *hostname, mros_uint32 *ipad
 
     if (result != 4) {
     	mRosHostEntType *host_address = mros_comm_gethostbyname(hostname);
-        if (host_address == NULL) {
+        if (host_address == MROS_NULL) {
         	//TODO ERRLOG
         	return MROS_E_INVAL;
         }
@@ -71,7 +71,7 @@ void mros_comm_inet_remote_sockaddr_init(mRosSockAddrInType *addr, mros_int32 po
 
     if (result != 4) {
     	mRosHostEntType *host_address = mros_comm_gethostbyname(ipaddrp);
-        if (host_address == NULL) {
+        if (host_address == MROS_NULL) {
         	//TODO ERRLOG
         	return;
         }
