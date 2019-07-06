@@ -55,6 +55,7 @@ void mros_protocol_publish_run(void)
 	mROsExclusiveUnlockObjType unlck_obj;
 
 	while (MROS_TRUE) {
+		mros_protocol_publish.state = MROS_PROTOCOL_PUBLISH_STATE_WAITING;
 		ret = mros_comm_tcp_server_accept(&mros_protocol_publish.server_comm, &mros_protocol_publish.client_comm);
 		if (ret != MROS_E_OK) {
 			mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
@@ -62,6 +63,7 @@ void mros_protocol_publish_run(void)
 			mros_exclusive_unlock(&unlck_obj);
 			continue;
 		}
+		mros_protocol_publish.state = MROS_PROTOCOL_PUBLISH_STATE_STARTING_PUBLISH_TOPIC;
 		ret = mros_proc_tcpros_receive(&mros_protocol_publish.client_comm, &mros_protocol_publish.packet);
 		if (ret != MROS_E_OK) {
 			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);

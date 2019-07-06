@@ -54,10 +54,12 @@ void mros_protocol_slave_run(void)
 	mROsExclusiveUnlockObjType unlck_obj;
 
 	while (MROS_TRUE) {
+		mros_protocol_slave.state = MROS_PROTOCOL_SLAVE_STATE_WAITING;
 		ret = mros_comm_tcp_server_accept(&mros_protocol_slave.server_comm, &mros_protocol_slave.client_comm);
 		if (ret != MROS_E_OK) {
 			continue;
 		}
+		mros_protocol_slave.state = MROS_PROTOCOL_SLAVE_STATE_REPLYING_REQUEST_TOPIC;
 		ret = mros_proc_receive(&mros_protocol_slave.client_comm, &mros_protocol_slave.packet);
 		if (ret != MROS_E_OK) {
 			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);

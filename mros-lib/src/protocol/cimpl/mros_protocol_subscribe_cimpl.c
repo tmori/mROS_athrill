@@ -88,11 +88,13 @@ void mros_protocol_subscribe_run(void)
 
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 	while (MROS_TRUE) {
+		mros_protocol_subscribe.state = MROS_PROTOCOL_SUBSCRIBE_STATE_WAITING;
 		mRosWaitListEntryType *wait_entry = mros_server_queue_wait(&mros_subscribe_wait_queue);
 		if (wait_entry == MROS_NULL) {
 			mros_topic_data_publisher_run();
 			continue;
 		}
+		mros_protocol_subscribe.state = MROS_PROTOCOL_SUBSCRIBE_STATE_PUB_CONNECTING;
 		client_req = (mRosCommTcpClientListReqEntryType*)wait_entry->data.reqp;
 		connector.topic_id = client_req->data.reqobj.topic_id;
 		connector.func_id = (mRosFuncIdType)MROS_ID_NONE;
@@ -118,6 +120,7 @@ void mros_protocol_subscribe_run(void)
 			continue;
 		}
 
+		mros_protocol_subscribe.state = MROS_PROTOCOL_SUBSCRIBE_STATE_PUB_REQUESTING;
 		req.node_name = mros_node_name(connector.node_id);
 		req.topic_name = mros_topic_get_topic_name(connector.topic_id);
 		req.topic_typename = mros_topic_get_topic_typename(connector.topic_id);
