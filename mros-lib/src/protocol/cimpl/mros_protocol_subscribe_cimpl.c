@@ -30,47 +30,13 @@ typedef struct {
 static mRosProtocolSubscribeType mros_protocol_subscribe MROS_MATTR_BSS_NOCLR;
 static mRosSubscribePacketTcpRosBufferType mros_subscribe_packet_tcpros_buffer MROS_MATTR_BSS_NOCLR;
 
-
-/*******************************************************
- * START: Publish Config
- *******************************************************/
-//TODO 要検討
-//本メモリプールは，コネクションごとに作成する必要がある
-//コネクションと本メモリプールをどうやって結び付けるかは要検討
-//おそらく想定するデータ型と想定コネクション数から本コンフィグを自動生成すべきと考える．
-
-#define ROS_OUTER_TOPIC_PUBLISHER_CONFIG_NUM			3U
-#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL1_SIZE		16U
-#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL1_QUELEN		1U
-MROS_MEMORY_CONFIG_DECLARE_ENTRY(ros_outer_topic_publisher_mempool1, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL1_QUELEN, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL1_SIZE);
-
-#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL2_SIZE		32U
-#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL2_QUELEN		1U
-MROS_MEMORY_CONFIG_DECLARE_ENTRY(ros_outer_topic_publisher_mempool2, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL2_QUELEN, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL2_SIZE);
-
-#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL3_SIZE		64U
-#define ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL3_QUELEN		1U
-MROS_MEMORY_CONFIG_DECLARE_ENTRY(ros_outer_topic_publisher_mempool3, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL3_QUELEN, ROS_OUTER_TOPIC_PUBLISHER_MEMPOOL3_SIZE);
-
-static mRosMemoryConfigType *ros_outer_topic_publisher_config[ROS_OUTER_TOPIC_PUBLISHER_CONFIG_NUM] = {
-		&ros_outer_topic_publisher_mempool1_config,
-		&ros_outer_topic_publisher_mempool2_config,
-		&ros_outer_topic_publisher_mempool3_config,
-};
-MROS_MEMORY_CONFIG_DECLARE_MANAGER(ros_outer_topic_publisher_mempool, ROS_OUTER_TOPIC_PUBLISHER_CONFIG_NUM);
-/*******************************************************
- * END
- *******************************************************/
-
 mRosReturnType mros_protocol_subscribe_init(void)
 {
-	mRosReturnType ret;
 	mros_protocol_subscribe.tcpros_packet.total_size = sizeof(mRosSubscribePacketTcpRosBufferType);
 	mros_protocol_subscribe.tcpros_packet.data = &mros_subscribe_packet_tcpros_buffer.buffer;
 	mros_protocol_subscribe.state = MROS_PROTOCOL_SUBSCRIBE_STATE_WAITING;
 	mros_protocol_subscribe.pub_mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_PUB);
-	ret = mros_mem_init(ROS_OUTER_TOPIC_PUBLISHER_CONFIG_NUM, ros_outer_topic_publisher_config, &ros_outer_topic_publisher_mempool);
-	return ret;
+	return MROS_E_OK;
 }
 
 void mros_protocol_subscribe_run(void)

@@ -101,7 +101,7 @@ extern mRosReturnType mros_mem_free(mRosMemoryManagerType *mgrp, mRosMemoryListE
 
 #define MROS_MEMORY_CONFIG_DECLARE_MANAGER(mem_manager_name, config_num)	\
 	static mRosMemoryHeaderType mem_manager_name##_head_array [(config_num)] MROS_MATTR_BSS_NOCLR;	\
-	static mRosMemoryManagerType mem_manager_name = {	\
+	mRosMemoryManagerType mem_manager_name = {	\
 		(config_num),	\
 		mem_manager_name##_head_array,	\
 	};

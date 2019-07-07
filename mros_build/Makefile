@@ -80,6 +80,7 @@ CXX_OBJ += mros_topic_cimpl.o
 CXX_OBJ += mros_topic_connector_cimpl.o
 CXX_OBJ += mros_topic_connector_factory_cimpl.o
 CXX_OBJ += mros_name.o
+CXX_OBJ += mros_config.o
 CXX_OBJ += mros_integration.o
 
 OBJS	:= $(C_OBJ) $(CXX_OBJ)
@@ -96,6 +97,7 @@ VPATH	+= $(SRC_ROOT)/packet/cimpl/version/$(ROS_VERSION)
 VPATH	+= $(SRC_ROOT)/protocol/cimpl
 VPATH	+= $(SRC_ROOT)/topic/cimpl
 VPATH	+= $(SRC_ROOT)/transfer/cimpl
+VPATH	+= $(SRC_ROOT)/config
 VPATH	+= $(PRJROOT_MROS)
 
 %.o: %.S

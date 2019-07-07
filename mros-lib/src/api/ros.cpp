@@ -8,37 +8,6 @@
 #include <string.h>
 
 
-/*******************************************************
- * START: Publish Config
- *******************************************************/
-//TODO 要検討
-//本メモリプールは，コネクションごとに作成する必要がある
-//コネクションと本メモリプールをどうやって結び付けるかは要検討
-//おそらく想定するデータ型と想定コネクション数から本コンフィグを自動生成すべきと考える．
-
-#define ROS_TOPIC_PUBLISHER_CONFIG_NUM			3U
-#define ROS_TOPIC_PUBLISHER_MEMPOOL1_SIZE		16U
-#define ROS_TOPIC_PUBLISHER_MEMPOOL1_QUELEN		1U
-MROS_MEMORY_CONFIG_DECLARE_ENTRY(ros_topic_publisher_mempool1, ROS_TOPIC_PUBLISHER_MEMPOOL1_QUELEN, ROS_TOPIC_PUBLISHER_MEMPOOL1_SIZE);
-
-#define ROS_TOPIC_PUBLISHER_MEMPOOL2_SIZE		32U
-#define ROS_TOPIC_PUBLISHER_MEMPOOL2_QUELEN		1U
-MROS_MEMORY_CONFIG_DECLARE_ENTRY(ros_topic_publisher_mempool2, ROS_TOPIC_PUBLISHER_MEMPOOL2_QUELEN, ROS_TOPIC_PUBLISHER_MEMPOOL2_SIZE);
-
-#define ROS_TOPIC_PUBLISHER_MEMPOOL3_SIZE		64U
-#define ROS_TOPIC_PUBLISHER_MEMPOOL3_QUELEN		1U
-MROS_MEMORY_CONFIG_DECLARE_ENTRY(ros_topic_publisher_mempool3, ROS_TOPIC_PUBLISHER_MEMPOOL3_QUELEN, ROS_TOPIC_PUBLISHER_MEMPOOL3_SIZE);
-
-static mRosMemoryConfigType *ros_topic_publisher_config[ROS_TOPIC_PUBLISHER_CONFIG_NUM] = {
-		&ros_topic_publisher_mempool1_config,
-		&ros_topic_publisher_mempool2_config,
-		&ros_topic_publisher_mempool3_config,
-};
-MROS_MEMORY_CONFIG_DECLARE_MANAGER(ros_topic_publisher_mempool, ROS_TOPIC_PUBLISHER_CONFIG_NUM);
-/*******************************************************
- * END
- *******************************************************/
-
 void ros::init(int argc, char *argv, std::string node_name)
 {
 	mRosNodeIdType id;
@@ -67,19 +36,6 @@ ros::Subscriber ros::NodeHandle::subscriber(std::string topic, int queue_size, v
 	mros_client_wait_entry_init(&client_wait, &req);
 
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
-
-	/*
-	 * TODO 要検討
-	 *
-	 * 本実装では，購読のキュー長は設定しない．
-	 * 理由はメモリコピーおよびメモリ使用量を抑止するためである．
-	 *
-	 * INNERノードであれば，直接コールバック関数を呼び出す方針とし，キューイングしない．
-	 * OUTERノードであれば，直接通信APIを呼び出す方針として，キューイングしない．
-	 *
-	 * 本方針により，subscriberの処理オーバーヘッドが高くなり，非同期通信すべきと
-	 * 判断した場合は，上記方針を撤回し，キューイング実装を行うものとする．
-	 */
 
 	sub.set(MROS_COBJ_NULL);
 
@@ -165,15 +121,7 @@ ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 	}
 	connector.func_id = (mRosFuncIdType)MROS_ID_NONE;
 
-	//TODO 初期化場所はここではない．
-	ret = mros_mem_init(ROS_TOPIC_PUBLISHER_CONFIG_NUM, ros_topic_publisher_config, &ros_topic_publisher_mempool);
-	if (ret != MROS_E_OK) {
-		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return pub;
-	}
-
-	ret = mros_topic_connector_add(mgrp, &connector, queue_size, &ros_topic_publisher_mempool);
+	ret = mros_topic_connector_add(mgrp, &connector, queue_size, &ros_inner_topic_publisher_mempool);
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);

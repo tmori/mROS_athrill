@@ -101,6 +101,11 @@
 #define MROS_SLAVE_TIMEOUT			100
 #define MROS_PUBLISH_TIMEOUT		10
 
+#include "mros_memory.h"
+extern mRosMemoryManagerType ros_inner_topic_publisher_mempool;
+extern mRosMemoryManagerType ros_outer_topic_publisher_mempool;
+
+extern void mros_config_init(void);
 
 //TODO
 #define MODE1
