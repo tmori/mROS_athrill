@@ -214,3 +214,14 @@ void ros::Publisher::publish(std_msgs::String& data)
 	return;
 }
 
+
+void ros::Rate::sleep(void)
+{
+	mros_sleep_task_msec(ROS_RATE_RATE_SEC_UNIT/this->rate);
+	return;
+}
+
+void ros::spin(void){
+	slp_tsk();
+	return;
+}

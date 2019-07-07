@@ -44,11 +44,19 @@ void mros_change_taskpri(mRosTaskPriorityType priority)
 void mros_sleep_task(void)
 {
 	(void)slp_tsk();
+	return;
+}
+
+void mros_sleep_task_msec(mRosTaskSleepIntervalType msec)
+{
+	(void)dly_tsk(msec);
+	return;
 }
 
 void mros_wakeup_task(mRosTaskIdType task_id)
 {
 	(void)wup_tsk(task_id);
+	return;
 }
 
 void main_task()

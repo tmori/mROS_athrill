@@ -52,6 +52,20 @@ public:
 	Publisher advertise(std::string topic, int queue_size);
 };
 
+#define ROS_RATE_RATE_SEC_UNIT	1000
+class Rate{
+public:
+	Rate(int rate)
+	{
+		this->rate = rate;
+	};
+	void sleep(void);
+private:
+	int rate;
+};
+
+void spin(void);
+
 }
 
 

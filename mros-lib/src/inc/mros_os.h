@@ -11,6 +11,7 @@ extern mRosTaskIdType mros_get_taskid(void);
 extern mRosTaskPriorityType mros_get_taskpri(void);
 extern void mros_change_taskpri(mRosTaskPriorityType priority);
 extern void mros_sleep_task(void);
+extern void mros_sleep_task_msec(mRosTaskSleepIntervalType msec);
 extern void mros_wakeup_task(mRosTaskIdType task_id);
 
 #ifdef __cplusplus

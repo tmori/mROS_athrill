@@ -11,6 +11,7 @@ extern "C" {
 
 typedef ID	mRosTaskIdType;
 typedef PRI	mRosTaskPriorityType;
+typedef mros_uint32 mRosTaskSleepIntervalType;
 
 #define MROS_TASK_MAX_PRIORITY 	TMAX_TPRI
 
