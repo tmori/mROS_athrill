@@ -12,9 +12,6 @@ extern void sub_task(void);
 extern void pub_task(void);
 extern void xml_slv_task(void);
 extern void xml_mas_task(void);
-extern void usr_task1(void);
-extern void usr_task2(void);
-
 extern void cyclic_handler(intptr_t exinf);
 
 #ifdef __cplusplus

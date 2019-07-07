@@ -1,6 +1,10 @@
 #ifndef _MROS_CONFIG_H_
 #define _MROS_CONFIG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**************************************
  * TOPIC
  **************************************/
@@ -88,7 +92,6 @@
 #define MROS_TOPIC_RAWDATA_HEADER_SIZE					8
 #define MROS_TCPROS_RAWDATA_HEADER_SIZE					4
 
-#endif /* _MROS_CONFIG_H_ */
 
 
 /*****************************************
@@ -101,22 +104,13 @@
 #define MROS_SLAVE_TIMEOUT			100
 #define MROS_PUBLISH_TIMEOUT		10
 
-#include "mros_memory.h"
-extern mRosMemoryManagerType ros_inner_topic_publisher_mempool;
-extern mRosMemoryManagerType ros_outer_topic_publisher_mempool;
-
-extern void mros_config_init(void);
-
-//TODO
-#define MODE1
-#define MODE2
-#define MODE3
-#define MODE4
-
+/****************************************
+ * kernel cfg
+ ****************************************/
 #ifndef MROS_USR_TASK_PRI
-#define MAIN_TASK_PRI 7
-#define MROS_USR_TASK_PRI  8
-#define MROS_TASK_PRI  6
+#define MAIN_TASK_PRI 			7
+#define MROS_USR_TASK_PRI  		8
+#define MROS_TASK_PRI  			6
 #endif /* ROS_USR_TASK_PRI */
 
 #ifndef TASK_PORTID
@@ -124,30 +118,23 @@ extern void mros_config_init(void);
 #endif /* TASK_PORTID */
 
 #ifndef MROS_TASK_STACK_SIZE
-#define MROS_SUB_STACK_SIZE 1024 * 512		//for subscribe/user task
+#define MROS_SUB_STACK_SIZE 1024 * 512	//for subscribe/user task
 #define MROS_PUB_STACK_SIZE 1024 * 600	//for publish/user task
 #define MROS_TASK_STACK_SIZE 1024 * 8	//for mros task
 #endif	/*MROS_TASK_STACK_SIZE*/
-
-#ifndef KMM_SIZE
-#define	KMM_SIZE	(MROS_TASK_STACK_SIZE * 16)	/* kernel assign */
-#endif /* KMM_SIZE */						/* size of memory */
-
-#ifndef LOOP_REF
-#define LOOP_REF		ULONG_C(1000000)	/* number of loops to evaluate speed */
-#endif /* LOOP_REF */
-
 
 #ifndef CYC
 #define MROS_LOOP_RATE 100
 #define CYC
 #endif	/*CYC*/
 
-#ifndef MEM_ADD				/* base address of shared memory in mROS */
-#define MEM_ADD
-#define PUB_ADDR (0)
-#define PUB_ADDR2 (1024*512)
-#define SUB_ADDR (1024*1024)
-#define XML_ADDR (1024*1024 + 1024*2)
-#define INT_ADDR (1024*1024 + 1024*4)
-#endif	/*MEM_ADD*/
+#ifndef LOOP_REF
+#define LOOP_REF		ULONG_C(1000000)	/* number of loops to evaluate speed */
+#endif /* LOOP_REF */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _MROS_CONFIG_H_ */
+

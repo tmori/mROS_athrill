@@ -13,6 +13,8 @@ using namespace std;
 unsigned int athrill_device_func_call __attribute__ ((section(".athrill_device_section")));
 
 /*****mROS user task code*******/
+static char str_buf[1024];
+
 void usr_task1(void)
 {
 	syslog(LOG_NOTICE,"========Activate user task1========");
@@ -23,15 +25,14 @@ void usr_task1(void)
 	ros::NodeHandle n;
 	ros::Publisher chatter_pub = n.advertise("mros_msg", 1);
 	ros::Rate loop_rate(5);
-	char buf[128];
 
 	std_msgs::String str;
 
 	syslog(LOG_NOTICE,"Data Publish Start");
 	while(1){
 		wait_ms(1000);
-		sprintf(buf, "publish test data(%u)", i++);
-		str.data = string(buf);
+		sprintf(str_buf, "publish test data(%u)", i++);
+		str.data = string(str_buf);
 		chatter_pub.publish(str);
 		loop_rate.sleep();
 	}

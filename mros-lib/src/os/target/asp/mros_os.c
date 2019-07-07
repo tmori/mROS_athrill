@@ -16,6 +16,7 @@
 #include "mros_topic_data_subscriber_cimpl.h"
 #include "mros_topic_connector_factory_cimpl.h"
 #include "kernel_cfg.h"
+#include "mros_integration.h"
 
 mRosTaskIdType mros_get_taskid(void)
 {
@@ -63,6 +64,8 @@ void main_task()
 {
 	mRosReturnType ret;
 	ROS_INFO("**********mROS main task start**********");
+
+	mros_config_init();
 	mros_comm_init();
 	mros_exclusive_area_init(XML_MAS_TASK, SUB_TASK);
 
@@ -142,8 +145,7 @@ void main_task()
 	act_tsk(SUB_TASK);
 	act_tsk(XML_SLV_TASK);
 	act_tsk(XML_MAS_TASK);
-	act_tsk(USR_TASK1);
-	act_tsk(USR_TASK2);
+	usr_task_activation();
 
 	ROS_INFO("**********mROS Main task finish**********");
 	return;

@@ -12,6 +12,7 @@
 #include "mros_topic_cimpl.h"
 #include "mros_node_cimpl.h"
 #include "mros_topic_runner_cimpl.h"
+#include "mros_integration.h"
 
 typedef union {
 	char buffer;
