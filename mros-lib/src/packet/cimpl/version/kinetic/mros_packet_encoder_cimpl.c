@@ -74,11 +74,10 @@ mRosReturnType mros_packet_encoder_init(void)
 
 static void add_len(unsigned char *buf, mros_uint32 len)
 {
-	//TODO shift?
-    buf[0] = len - 0;
-    buf[1] = (len/256) - 0;
-    buf[2] = (len/65536) - 0;
-    buf[3] = (len/16777216) - 0;
+    buf[0] = (unsigned char) (len);
+    buf[1] = (unsigned char) (len >> 8);
+    buf[2] = (unsigned char) (len >> 16);
+    buf[3] = (unsigned char) (len >> 24);
 }
 static mros_uint32 get_digit(mros_uint32 value)
 {
@@ -366,7 +365,6 @@ static mRosReturnType encode_topic_data(mRosEncodeArgType *arg, mRosPacketType *
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_E_NOMEM;
 	}
-	//TODO INDIGO
     add_len((unsigned char*)&packet->data[0], arg->argi[0] + 4);
     add_len((unsigned char*)&packet->data[4], arg->argi[0]);
     packet->data_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;

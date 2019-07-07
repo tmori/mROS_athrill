@@ -1,7 +1,7 @@
 #include "mros_protocol_client_rpc_cimpl.h"
 #include "mros_comm_tcp_server_cimpl.h"
 
-static void do_test_server(void)
+void do_test_server(void)
 {
 	mRosCommTcpServerType server;
 	mRosCommTcpClientType client;
@@ -33,7 +33,7 @@ static void do_test_server(void)
 	}
 }
 
-static void do_test_register_publisher(void)
+void do_test_register_publisher(void)
 {
 	mRosPacketType packet;
 	mRosReturnType ret;
@@ -76,7 +76,7 @@ static void do_test_register_publisher(void)
 	return;
 }
 
-static void do_test_register_subscriber(void)
+void do_test_register_subscriber(void)
 {
 	mRosPacketType packet;
 	mRosReturnType ret;
@@ -129,7 +129,7 @@ static void do_test_register_subscriber(void)
 static mros_uint32 test_request_topic_ipaddr;
 static mros_int32 test_request_topic_port;
 
-static void do_test_request_topic(void)
+void do_test_request_topic(void)
 {
 	mRosPacketType packet;
 	mRosReturnType ret;
@@ -210,7 +210,7 @@ static void do_test_request_topic(void)
 	return;
 }
 
-static void do_test_tcpros_topic(void)
+void do_test_tcpros_topic(void)
 {
 	mRosPacketType packet;
 	mRosReturnType ret;

@@ -7,6 +7,8 @@ PRJROOT_MROS=$(MROS_LIB_DIR)/mros-lib
 PRJROOT_ASP=../../../../mros/asp-athrill-mbed/asp-athrill
 SRC_ROOT=$(MROS_LIB_DIR)/mros-lib/src
 
+ROS_VERSION	:= kinetic
+
 INCLUDE_PATHS += \
   		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip \
   		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip-sys \
@@ -47,7 +49,7 @@ IFLAGS	+= -I$(SRC_ROOT)/os/target/asp
 IFLAGS	+= -I$(SRC_ROOT)/comm/cimpl/target/lwip
 IFLAGS	+= -I$(SRC_ROOT)/comm/cimpl
 IFLAGS	+= -I$(SRC_ROOT)/packet/cimpl
-IFLAGS	+= -I$(SRC_ROOT)/packet/template
+IFLAGS	+= -I$(SRC_ROOT)/packet/template/version/$(ROS_VERSION)
 IFLAGS	+= -I$(SRC_ROOT)/protocol/cimpl
 IFLAGS	+= -I$(SRC_ROOT)/transfer/cimpl
 
@@ -63,7 +65,6 @@ CXX_OBJ += mros_node_cimpl.o
 CXX_OBJ += mros_exclusive_area.o
 CXX_OBJ += mros_exclusive_ops.o
 CXX_OBJ += mros_os.o
-CXX_OBJ += mros_packet_cimpl.o
 CXX_OBJ += mros_packet_decoder_cimpl.o
 CXX_OBJ += mros_packet_encoder_cimpl.o
 CXX_OBJ += mros_protocol_client_rpc_cimpl.o
@@ -91,7 +92,7 @@ VPATH	+= $(SRC_ROOT)/node/cimpl
 VPATH	+= $(SRC_ROOT)/lib
 VPATH	+= $(SRC_ROOT)/os
 VPATH	+= $(SRC_ROOT)/os/target/asp
-VPATH	+= $(SRC_ROOT)/packet/cimpl
+VPATH	+= $(SRC_ROOT)/packet/cimpl/version/$(ROS_VERSION)
 VPATH	+= $(SRC_ROOT)/protocol/cimpl
 VPATH	+= $(SRC_ROOT)/topic/cimpl
 VPATH	+= $(SRC_ROOT)/transfer/cimpl
