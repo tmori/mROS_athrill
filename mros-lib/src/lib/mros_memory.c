@@ -49,7 +49,7 @@ mRosReturnType mros_mem_alloc(mRosMemoryManagerType *mgrp, mRosSizeType size, mR
 		(*memory)->data.size = size;
 		return MROS_E_OK;
 	}
-	ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
+	ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 	return MROS_E_NOMEM;
 }
 
@@ -59,11 +59,11 @@ mRosReturnType mros_mem_free(mRosMemoryManagerType *mgrp, mRosMemoryListEntryTyp
 		return MROS_E_OK;
 	}
 	if (memory->data.header_id >= mgrp->header_num) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_E_INVAL;
 	}
 	if (memory->data.memory_id > mgrp->header_array[memory->data.header_id].max_memory_num) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_RANGE);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_RANGE);
 		return MROS_E_RANGE;
 	}
 	memory->data.size = 0;

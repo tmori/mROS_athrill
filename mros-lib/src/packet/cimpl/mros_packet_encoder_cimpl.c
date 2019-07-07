@@ -128,7 +128,7 @@ static mRosReturnType encode_register_publisher_req(mRosEncodeArgType *arg, mRos
 	len += mros_xml_fmt_table[arg->type].len;
 
 	if (len > packet->total_size) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_E_NOMEM;
 	}
 	xml_len = snprintf(&packet->data[off], packet->total_size,
@@ -162,7 +162,7 @@ static mRosReturnType encode_register_subscriber_req(mRosEncodeArgType *arg, mRo
 	len += mros_xml_fmt_table[arg->type].len;
 
 	if (len > packet->total_size) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_E_NOMEM;
 	}
 	xml_len = snprintf(&packet->data[off], packet->total_size,
@@ -195,7 +195,7 @@ static mRosReturnType encode_request_topic_req(mRosEncodeArgType *arg, mRosPacke
 	len += mros_xml_fmt_table[arg->type].len;
 
 	if (len > packet->total_size) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_E_NOMEM;
 	}
 	xml_len = snprintf(&packet->data[off], packet->total_size,
@@ -226,7 +226,7 @@ mRosReturnType encode_request_topic_res(mRosEncodeArgType *arg, mRosPacketType *
 	len += mros_xml_fmt_table[arg->type].len;
 
 	if (len > packet->total_size) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_E_NOMEM;
 	}
 	xml_len = snprintf(&packet->data[off], packet->total_size,
@@ -259,7 +259,7 @@ static mRosReturnType encode_tcpros_topic_req(mRosEncodeArgType *arg, mRosPacket
 	len += mros_tcpros_topic_req_fmt.len;
 
 	if (len > packet->total_size) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_E_NOMEM;
 	}
 
@@ -319,7 +319,7 @@ static mRosReturnType encode_tcpros_topic_res(mRosEncodeArgType *arg, mRosPacket
 	len += mros_tcpros_topic_res_fmt.len;
 
 	if (len > packet->total_size) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_E_NOMEM;
 	}
 
@@ -363,7 +363,7 @@ static mRosReturnType encode_tcpros_topic_res(mRosEncodeArgType *arg, mRosPacket
 static mRosReturnType encode_topic_data(mRosEncodeArgType *arg, mRosPacketType *packet)
 {
 	if (packet->total_size < MROS_TOPIC_RAWDATA_HEADER_SIZE) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_E_NOMEM;
 	}
 	//TODO INDIGO

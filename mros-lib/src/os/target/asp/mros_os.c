@@ -58,6 +58,7 @@ static void do_test_request_topic(void);
 static void do_test_tcpros_topic(void);
 static void do_test_server(void);
 
+
 void main_task()
 {
 	mRosReturnType ret;
@@ -67,73 +68,73 @@ void main_task()
 
 	ret = mros_comm_tcp_client_factory_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_node_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_topic_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	mRosTopicConnectorManagerType *mgrp = mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_PUB);
 	if (mgrp == MROS_NULL) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return;
 	}
 	mgrp = mros_topic_connector_factory_create(MROS_TOPIC_CONNECTOR_SUB);
 	if (mgrp == MROS_NULL) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_INVAL);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return;
 	}
 	ret = mros_packet_decoder_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_packet_encoder_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_proc_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_topic_data_publisher_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_topic_data_subscriber_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 #if 1
 	ret = mros_protocol_subscribe_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_protocol_publish_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_protocol_slave_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 	ret = mros_protocol_master_init();
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return;
 	}
 

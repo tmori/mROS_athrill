@@ -1,6 +1,7 @@
 #include "mros_topic_connector_cimpl.h"
 #include "mros_config.h"
 #include "mros_node_cimpl.h"
+#include "mros_integration.h"
 #include <string.h>
 
 mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, mRosTopicConnectorManagerType *mgrp)
@@ -21,7 +22,6 @@ mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, m
 		List_Init(&topic_entry->data.head[MROS_NODE_TYPE_INNER], mRosTopicConnectorListEntryType, 0, MROS_NULL);
 		List_Init(&topic_entry->data.head[MROS_NODE_TYPE_OUTER], mRosTopicConnectorListEntryType, 0, MROS_NULL);
 	}
-
 	List_Init(&mgrp->topic_head, mRosTopicConnectorListEntryRootType, MROS_TOPIC_MAX_NUM, mgrp->topic_entries);
 	List_Init(&mgrp->conn_head, mRosTopicConnectorListEntryType, mgrp->max_connector, mgrp->conn_entries);
 	return MROS_E_OK;
@@ -271,7 +271,11 @@ mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const cha
 		return MROS_E_INVAL;
 	}
 	if (entry->data.queue_head.entry_num >= entry->data.queue_maxsize) {
-		return MROS_E_LIMIT;
+		ROS_WARN("%s %s() %u :WARNING: Removed topic data for queufull(%u).", __FILE__, __FUNCTION__, __LINE__, entry->data.queue_maxsize);
+		ListEntry_GetFirst(&entry->data.queue_head, &mem_entryp);
+		ListEntry_RemoveEntry(&entry->data.queue_head, mem_entryp);
+		(void)mros_mem_free(entry->data.mempool, mem_entryp);
+
 	}
 	ret = mros_mem_alloc(entry->data.mempool, len, &mem_entryp);
 	if (ret != MROS_E_OK) {
@@ -284,8 +288,6 @@ mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const cha
 	return MROS_E_OK;
 }
 
-//TODO
-extern void mros_topic_callback(mRosFuncIdType func_id, const char *data);
 
 mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const char* data, mRosSizeType len)
 {

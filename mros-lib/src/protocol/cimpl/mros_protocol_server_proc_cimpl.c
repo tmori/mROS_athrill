@@ -26,13 +26,13 @@ mRosReturnType mros_proc_receive(mRosCommTcpClientType *client, mRosPacketType *
 	do {
 		ret = mros_comm_tcp_client_receive(client, &packet->data[packet->data_size], (packet->total_size - packet->data_size),  &res);
 		if (ret != MROS_E_OK) {
-			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 			break;
 		}
 		packet->data_size += res;
 		if (packet->data_size >= packet->total_size) {
 			ret = MROS_E_NOMEM;
-			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 			break;
 		}
 		is_end = mros_xmlpacket_has_request_end(packet);
@@ -49,7 +49,7 @@ mRosReturnType mros_proc_tcpros_receive(mRosCommTcpClientType *client, mRosPacke
 
 	ret = mros_comm_tcp_client_receive_all(client, rawdata, MROS_TCPROS_RAWDATA_HEADER_SIZE, &res);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 
@@ -58,14 +58,14 @@ mRosReturnType mros_proc_tcpros_receive(mRosCommTcpClientType *client, mRosPacke
 	header_packet.data = rawdata;
 	ret = mros_tcprospacket_get_body_size(&header_packet, &res);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	packet->data_size = 0;
 	packet->total_size = res;
 	ret = mros_comm_tcp_client_receive_all(client, packet->data, packet->total_size, &res);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	packet->data_size = res;
@@ -108,7 +108,7 @@ static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *clien
 	mros_proc_slave_decoded_requst.request.topic.topic_name.res.head[mros_proc_slave_decoded_requst.request.topic.topic_name.res.len] = '\0';
 	ret = mros_topic_get((const char*)&mros_proc_slave_decoded_requst.request.topic.topic_name.res.head[0], &topic_id);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	mRosNodeIdType node_id = mros_publisher_is_exist(topic_id);
@@ -126,7 +126,7 @@ static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *clien
 		arg.argv[1] = MROS_NODE_IPADDR;
 		ret = mros_packet_encode(&arg, packet);
 		if (ret != MROS_E_OK) {
-			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 			return ret;
 		}
 		ret = mros_comm_tcp_client_send_all(client, packet->data, packet->data_size, &res);
@@ -145,7 +145,7 @@ mRosReturnType mros_proc_slave(mRosCommTcpClientType *client, mRosPacketType *pa
 		ret = mros_proc_slave_request_topic(client, packet);
 		break;
 	default:
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		break;
 	}
 
@@ -159,26 +159,26 @@ static mRosReturnType mros_proc_add_outersub_connector(mRosCommTcpClientType *cl
 	mRosContainerObjType cobj;
 	mRosTopicConnectorManagerType *sub_mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_SUB);
 	if (sub_mgrp == MROS_NULL) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	connector.topic_id = topic_id;
 	connector.func_id = (mRosFuncIdType)MROS_ID_NONE;
 	ret = mros_node_create_outer(&connector.node_id);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return MROS_E_NOENT;
 	}
 	ret = mros_topic_connector_add(sub_mgrp, &connector, MROS_OUTER_CONNECTOR_QUEUE_MAXLEN, MROS_NULL);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	cobj = mros_topic_connector_get_obj(sub_mgrp, &connector);
 
 	mRosCommTcpClientListReqEntryType *client_entry = mros_comm_tcp_clientc_alloc_copy(client);
 	if (client_entry == MROS_NULL) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOENT);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOENT);
 		return MROS_E_NOENT;
 	}
 	client_entry->data.op.free = mros_protocol_client_obj_free;
@@ -186,7 +186,7 @@ static mRosReturnType mros_proc_add_outersub_connector(mRosCommTcpClientType *cl
 	client_entry->data.op.topic_data_send = mros_protocol_topic_data_send;
 	ret = mros_topic_connector_set_connection(cobj, client_entry);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	return MROS_E_OK;
@@ -202,12 +202,12 @@ mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketTyp
 
 	ret = mros_tcprospacket_decode(packet, &tcpros_packet);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	ret = mros_topic_get((const char*)&tcpros_packet.topic[0], &topic_id);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
 	mRosNodeIdType node_id = mros_publisher_is_exist(topic_id);
@@ -228,12 +228,12 @@ mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketTyp
 		arg.argv[3] = md5sum;
 		ret = mros_packet_encode(&arg, packet);
 		if (ret != MROS_E_OK) {
-			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 			return ret;
 		}
 		ret = mros_comm_tcp_client_send_all(client, packet->data, packet->data_size, &res);
 		if (ret != MROS_E_OK) {
-			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 			return ret;
 		}
 		(void)mros_proc_add_outersub_connector(client, topic_id);

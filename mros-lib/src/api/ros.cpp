@@ -39,7 +39,6 @@ MROS_MEMORY_CONFIG_DECLARE_MANAGER(ros_topic_publisher_mempool, ROS_TOPIC_PUBLIS
  * END
  *******************************************************/
 
-
 void ros::init(int argc, char *argv, std::string node_name)
 {
 	mRosNodeIdType id;
@@ -49,7 +48,7 @@ void ros::init(int argc, char *argv, std::string node_name)
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 	ret = mros_node_create_inner(node_name.c_str(), &id);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 	}
 	mros_exclusive_unlock(&unlck_obj);
 	return;
@@ -87,21 +86,21 @@ ros::Subscriber ros::NodeHandle::subscriber(std::string topic, int queue_size, v
 	ret = mros_node_get_bytid(&connector.node_id);
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return sub;
 	}
 
 	ret = mros_topic_create(topic.c_str(), "std_msgs/String", &connector.topic_id);//TODO typename
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return sub;
 	}
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_SUB);
 	if (mgrp == MROS_NULL) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return sub;
 	}
 	connector.func_id = (mRosFuncIdType)fp;
@@ -109,13 +108,13 @@ ros::Subscriber ros::NodeHandle::subscriber(std::string topic, int queue_size, v
 	ret = mros_topic_connector_add(mgrp, &connector, queue_size, MROS_NULL);
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return sub;
 	}
 	mRosContainerObjType obj = mros_topic_connector_get_obj(mgrp, &connector);
 	if (obj == MROS_COBJ_NULL) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return sub;
 	}
 	sub.set(obj);
@@ -147,21 +146,21 @@ ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 	ret = mros_node_get_bytid(&connector.node_id);
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return pub;
 	}
 
 	ret = mros_topic_create(topic.c_str(), "std_msgs/String", &connector.topic_id);//TODO typename
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return pub;
 	}
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_PUB);
 	if (mgrp == MROS_NULL) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return pub;
 	}
 	connector.func_id = (mRosFuncIdType)MROS_ID_NONE;
@@ -170,20 +169,20 @@ ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 	ret = mros_mem_init(ROS_TOPIC_PUBLISHER_CONFIG_NUM, ros_topic_publisher_config, &ros_topic_publisher_mempool);
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return pub;
 	}
 
 	ret = mros_topic_connector_add(mgrp, &connector, queue_size, &ros_topic_publisher_mempool);
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return pub;
 	}
 	mRosContainerObjType obj = mros_topic_connector_get_obj(mgrp, &connector);
 	if (obj == MROS_COBJ_NULL) {
 		mros_exclusive_unlock(&unlck_obj);
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return pub;
 	}
 
@@ -209,18 +208,9 @@ void ros::Publisher::publish(std_msgs::String& data)
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 	ret = mros_topic_connector_put_data((mRosContainerObjType)this->get(), snd_data, len);
 	if (ret != MROS_E_OK) {
-		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 	}
 	mros_exclusive_unlock(&unlck_obj);
 	return;
 }
 
-//TODO callback
-void mros_topic_callback(mRosFuncIdType func_id, const char *data)
-{
-	void (*fp)(std::string *ptr);
-	fp = (void (*)(std::string *))func_id;
-	std::string msg((const char*)data);
-	fp(&msg);
-	return;
-}

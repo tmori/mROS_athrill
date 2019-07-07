@@ -45,7 +45,7 @@ mRosReturnType mros_comm_inet_get_ipaddr(const char *hostname, mros_uint32 *ipad
     if (result != 4) {
     	mRosHostEntType *host_address = mros_comm_gethostbyname(hostname);
         if (host_address == MROS_NULL) {
-        	//TODO ERRLOG
+    		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
         	return MROS_E_INVAL;
         }
         paddr = (mros_uint8*)host_address->h_addr_list[0];
@@ -72,7 +72,7 @@ void mros_comm_inet_remote_sockaddr_init(mRosSockAddrInType *addr, mros_int32 po
     if (result != 4) {
     	mRosHostEntType *host_address = mros_comm_gethostbyname(ipaddrp);
         if (host_address == MROS_NULL) {
-        	//TODO ERRLOG
+    		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
         	return;
         }
         paddr = (mros_uint8*)host_address->h_addr_list[0];
