@@ -58,7 +58,7 @@ extern "C" {
  * TASK CYCLE
  *****************************************/
 #define MROS_SLAVE_TIMEOUT			100
-#define MROS_PUBLISH_TIMEOUT		10
+#define MROS_PUBLISH_TIMEOUT		50
 
 
 extern void mros_sys_config_init(void);
