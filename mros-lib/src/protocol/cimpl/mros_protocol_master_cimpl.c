@@ -169,6 +169,7 @@ static mRosReturnType mros_protocol_master_register_publisher(mRosProtocolMaster
 	ret = mros_comm_tcp_client_connect(&mros_protocol_master.master_comm);
 	if (ret != MROS_E_OK) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("ERROR: Unable to communicate with master!");
 		goto done;
 	}
 	ret = mros_protocol_master_register(pub_req, MROS_TOPIC_CONNECTOR_PUB, &rpc_response);
@@ -204,6 +205,7 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 	ret = mros_comm_tcp_client_connect(&mros_protocol_master.master_comm);
 	if (ret != MROS_E_OK) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		ROS_ERROR("ERROR: Unable to communicate with master!");
 		goto done;
 	}
 
@@ -222,6 +224,11 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_REQUESTING_TOPIC;
 	//TODO まだ出版ノードが存在しない場合は，非同期でマスタから情報をもらう
 	ptr = mros_xmlpacket_subres_get_first_uri(rpc_regc_res.reply_packet, &ipaddr, &port);
+	if (ptr == MROS_NULL) {
+		mRosTopicConnectorType connector;
+		(void)mros_topic_connector_get(sub_req->connector_obj,  &connector);
+		ROS_WARN("WARNING: topic [%s] does not appear to be published yet", mros_topic_get_topic_name(connector.topic_id));
+	}
 	while (ptr != MROS_NULL) {
 		mRosCommTcpClientType client;
 
