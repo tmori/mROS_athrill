@@ -59,7 +59,7 @@ void mros_comm_socket_close(mRosCommSocketType *socket)
 	return;
 }
 
-static mRosReturnType mros_comm_secket_select(mRosCommSocketType *socket, mros_uint32 timeout, mros_boolean read, mros_boolean write) {
+static mRosReturnType mros_comm_socket_select(mRosCommSocketType *socket, mros_uint32 timeout, mros_boolean read, mros_boolean write) {
 
 	mRosFdSetType fd_set;
 	mRosTimeValType tmo;
@@ -99,10 +99,10 @@ mRosReturnType mros_comm_socket_set_blocking(mRosCommSocketType *socket, mros_bo
 
 mRosReturnType mros_comm_socket_wait_readable(mRosCommSocketType *socket, mros_uint32 timeout)
 {
-	return mros_comm_secket_select(socket, timeout, true, false);
+	return mros_comm_socket_select(socket, timeout, true, false);
 }
 
 mRosReturnType mros_comm_socket_wait_writable(mRosCommSocketType *socket, mros_uint32 timeout)
 {
-	return mros_comm_secket_select(socket, timeout, false, true);
+	return mros_comm_socket_select(socket, timeout, false, true);
 }
