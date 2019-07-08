@@ -281,7 +281,6 @@ mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const cha
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
-
 	mem_entryp->data.size = len;
 	memcpy(mem_entryp->data.memp, data, mem_entryp->data.size);
 	ListEntry_AddEntry(&entry->data.queue_head, mem_entryp);
