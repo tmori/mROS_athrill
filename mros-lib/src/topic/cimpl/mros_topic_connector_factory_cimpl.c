@@ -1,5 +1,5 @@
 #include "mros_topic_connector_factory_cimpl.h"
-#include "mros_config.h"
+#include "mros_sys_config.h"
 
 static mros_boolean mros_topic_connector_is_inialized[MROS_TOPIC_CONNECTOR_NUM] = {
 	MROS_FALSE,

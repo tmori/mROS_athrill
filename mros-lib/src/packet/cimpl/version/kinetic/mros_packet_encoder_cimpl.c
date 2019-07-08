@@ -2,6 +2,7 @@
 #include "mros_packet_fmt_xml.h"
 #include "mros_packet_fmt_http.h"
 #include "mros_packet_fmt_tcpros.h"
+#include "mros_packet_config.h"
 #include <string.h>
 #include <stdio.h>
 

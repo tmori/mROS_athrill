@@ -2,6 +2,7 @@
 #include "mros_packet_fmt_xml.h"
 #include "mros_packet_fmt_http.h"
 #include "mros_comm_cimpl.h"
+#include "mros_packet_config.h"
 #include <string.h>
 
 static mros_int32 mros_packet_xmlrpc_req_end_str_len = 0;

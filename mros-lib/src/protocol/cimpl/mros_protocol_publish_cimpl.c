@@ -6,7 +6,7 @@
 #include "mros_exclusive_area.h"
 #include "mros_topic_runner_cimpl.h"
 #include "mros_types.h"
-#include "mros_config.h"
+#include "mros_sys_config.h"
 
 typedef union {
 	char buffer;

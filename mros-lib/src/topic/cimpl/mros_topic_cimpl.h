@@ -7,7 +7,7 @@ extern "C" {
 
 #include "mros_memory.h"
 #include "mros_list.h"
-#include "mros_config.h"
+#include "mros_usr_config.h"
 
 typedef struct {
 	mRosTopicIdType				topic_id;

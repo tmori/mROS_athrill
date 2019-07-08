@@ -1,7 +1,6 @@
 #include "mros_topic_connector_cimpl.h"
-#include "mros_config.h"
+#include "mros_usr_config.h"
 #include "mros_node_cimpl.h"
-#include "mros_integration.h"
 #include <string.h>
 
 mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, mRosTopicConnectorManagerType *mgrp)

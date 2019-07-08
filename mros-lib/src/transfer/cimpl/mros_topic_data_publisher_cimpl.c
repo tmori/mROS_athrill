@@ -2,7 +2,7 @@
 #include "mros_topic_connector_factory_cimpl.h"
 #include "mros_topic_cimpl.h"
 #include "mros_array_container.h"
-#include "mros_config.h"
+#include "mros_usr_config.h"
 
 MROS_ARRAY_CONTAINER_CONFIG_DECLARE_MANAGER(mros_topic_pub_mgr, MROS_TOPIC_MAX_NUM);
 

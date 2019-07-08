@@ -14,7 +14,7 @@ INCLUDE_PATHS += \
   		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip-sys \
  		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip/include \
  		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip/include/ipv4 
-CDEFS += -DTARGET_ATHRILL
+CDEFS += -DTARGET_ATHRILL 
 CDEFS += -DLWIP_TRANSPORT_ETHERNET
 
 TARGET	:= libmros.a
@@ -41,6 +41,7 @@ IFLAGS	+= -I$(ATHRILL_ROOT)/trunk/apl/include
 
 IFLAGS	+= -I$(SRC_ROOT)/inc
 IFLAGS	+= -I$(SRC_ROOT)/config
+IFLAGS	+= -I$(SRC_ROOT)/config/os/target/asp
 IFLAGS	+= -I$(SRC_ROOT)/api
 IFLAGS	+= -I$(SRC_ROOT)/protocol/cimpl
 IFLAGS	+= -I$(SRC_ROOT)/node/cimpl
@@ -50,6 +51,7 @@ IFLAGS	+= -I$(SRC_ROOT)/comm/cimpl/target/lwip
 IFLAGS	+= -I$(SRC_ROOT)/comm/cimpl
 IFLAGS	+= -I$(SRC_ROOT)/packet/cimpl
 IFLAGS	+= -I$(SRC_ROOT)/packet/template/version/$(ROS_VERSION)
+IFLAGS	+= -I$(SRC_ROOT)/packet/cimpl/version/$(ROS_VERSION)
 IFLAGS	+= -I$(SRC_ROOT)/protocol/cimpl
 IFLAGS	+= -I$(SRC_ROOT)/transfer/cimpl
 
@@ -80,8 +82,10 @@ CXX_OBJ += mros_topic_cimpl.o
 CXX_OBJ += mros_topic_connector_cimpl.o
 CXX_OBJ += mros_topic_connector_factory_cimpl.o
 CXX_OBJ += mros_name.o
-CXX_OBJ += mros_config.o
-CXX_OBJ += mros_integration.o
+CXX_OBJ += mros_topic_callback.o
+CXX_OBJ += mros_os_config.o
+CXX_OBJ += mros_usr_config.o
+CXX_OBJ += mros_sys_config.o
 
 OBJS	:= $(C_OBJ) $(CXX_OBJ)
 
@@ -98,6 +102,7 @@ VPATH	+= $(SRC_ROOT)/protocol/cimpl
 VPATH	+= $(SRC_ROOT)/topic/cimpl
 VPATH	+= $(SRC_ROOT)/transfer/cimpl
 VPATH	+= $(SRC_ROOT)/config
+VPATH	+= $(SRC_ROOT)/config/os/target/asp
 VPATH	+= $(PRJROOT_MROS)
 
 %.o: %.S

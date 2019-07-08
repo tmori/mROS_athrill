@@ -5,7 +5,7 @@
 #include "mros_exclusive_area.h"
 #include "mros_wait_queue.h"
 #include "mros_protocol_master_cimpl.h"
-#include "mros_integration.h"
+#include "mros_usr_config.h"
 #include <string.h>
 
 

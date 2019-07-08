@@ -1,7 +1,7 @@
 #include "mros_protocol_client_rpc_cimpl.h"
 #include "mros_packet_encoder_cimpl.h"
 #include "mros_packet_decoder_cimpl.h"
-#include "mros_config.h"
+#include "mros_sys_config.h"
 
 static mRosReturnType mros_rpc_sendreply_xmlpacket(mRosEncodeArgType *arg, mRosCommTcpClientType *client, mRosPacketType *req, mRosPacketType *res)
 {

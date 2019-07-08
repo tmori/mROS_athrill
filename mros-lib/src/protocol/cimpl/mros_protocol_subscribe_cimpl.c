@@ -1,6 +1,5 @@
 #include "mros_protocol_subscribe_cimpl.h"
 #include "mros_types.h"
-#include "mros_config.h"
 #include "mros_exclusive_area.h"
 #include "mros_wait_queue.h"
 #include "mros_comm_tcp_client_factory_cimpl.h"
@@ -12,7 +11,8 @@
 #include "mros_topic_cimpl.h"
 #include "mros_node_cimpl.h"
 #include "mros_topic_runner_cimpl.h"
-#include "mros_integration.h"
+#include "mros_sys_config.h"
+#include "mros_packet_config.h"
 
 typedef union {
 	char buffer;

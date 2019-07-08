@@ -1,6 +1,6 @@
 #include "mros_exclusive_area.h"
 #include "mros_wait_queue.h"
-#include "mros_config.h"
+#include "mros_sys_config.h"
 
 mRosExclusiveObjectType mros_exclusive_area MROS_MATTR_BSS_NOCLR;
 mRosWaitQueueType mros_master_wait_queue MROS_MATTR_BSS_NOCLR;

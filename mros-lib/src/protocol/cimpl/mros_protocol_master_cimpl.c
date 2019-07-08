@@ -3,7 +3,6 @@
 #include "mros_protocol_client_rpc_cimpl.h"
 #include "mros_topic_cimpl.h"
 #include "mros_topic_connector_factory_cimpl.h"
-#include "mros_config.h"
 #include "mros_packet_encoder_cimpl.h"
 #include "mros_exclusive_area.h"
 #include "mros_node_cimpl.h"

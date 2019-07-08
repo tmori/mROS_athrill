@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 #include "mros_types.h"
-#include "mros_config.h"
 
 typedef enum {
 	MROS_PACKET_DATA_REGISTER_PUBLISHER_REQ = 0,

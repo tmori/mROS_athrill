@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include "mros_list.h"
-#include "mros_config.h"
+#include "mros_usr_config.h"
 
 typedef enum {
 	MROS_NODE_TYPE_INNER = 0,
