@@ -30,9 +30,15 @@ extern void cyclic_handler(intptr_t exinf);
 #endif /* TASK_PORTID */
 
 #ifndef MROS_TASK_STACK_SIZE
+#if 0
 #define MROS_SUB_STACK_SIZE 1024 * 512	//for subscribe/user task
 #define MROS_PUB_STACK_SIZE 1024 * 600	//for publish/user task
 #define MROS_TASK_STACK_SIZE 1024 * 8	//for mros task
+#else
+#define MROS_SUB_STACK_SIZE 1024 * 1	//for user task2
+#define MROS_PUB_STACK_SIZE 1024 * 1 	//for user task1
+#define MROS_TASK_STACK_SIZE 1024 * 2	//for mros task
+#endif
 #endif	/*MROS_TASK_STACK_SIZE*/
 
 #ifndef CYC
