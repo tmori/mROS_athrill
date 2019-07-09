@@ -29,6 +29,7 @@ typedef struct {
 	mRosPacketType						register_packet;
 	mRosPacketType						reqtopic_packet;
 	mRosCommTcpClientType				master_comm;
+	mRosWaitListEntryType				*api_reqp;
 } mRosProtocolMasterType;
 
 static mRosProtocolMasterType mros_protocol_master MROS_MATTR_BSS_NOCLR;
@@ -47,6 +48,7 @@ mRosReturnType mros_protocol_master_init(void)
 	mros_protocol_master.reqtopic_packet.total_size = sizeof(mros_master_packet_buffer);
 	mros_protocol_master.reqtopic_packet.data = &mros_master_packet_buffer.buffer;
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
+	mros_protocol_master.api_reqp = NULL;
 	return MROS_E_OK;
 }
 
@@ -55,22 +57,26 @@ void mros_protocol_master_run(void)
 	mROsExclusiveUnlockObjType unlck_obj;
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 	while (MROS_TRUE) {
+		mros_protocol_master.api_reqp = NULL;
 		mRosWaitListEntryType *wait_entry = mros_server_queue_wait(&mros_master_wait_queue);
 		if (wait_entry == MROS_NULL) {
 			continue;
 		}
+		mros_protocol_master.api_reqp = wait_entry;
 		mRosProtocolMasterRequestType *req = (mRosProtocolMasterRequestType*)wait_entry->data.reqp;
 		switch (req->req_type) {
 		case MROS_PROTOCOL_MASTER_REQ_REGISTER_PUBLISHER:
 			mros_protocol_master_register_publisher(req);
+			mros_client_wakeup(mros_protocol_master.api_reqp);
 			break;
 		case MROS_PROTOCOL_MASTER_REQ_REGISTER_SUBSCRIBER:
 			mros_protocol_master_register_subscriber(req);
+			//register subscriber api_reqp wakeup is done on subscriber_run.
 			break;
 		default:
+			mros_client_wakeup(mros_protocol_master.api_reqp);
 			break;
 		}
-		mros_client_wakeup(wait_entry);
 	}
 	mros_exclusive_unlock(&unlck_obj);
 	return;
@@ -154,6 +160,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *
 		req->data.op.topic_data_receive = mros_protocol_topic_data_receive;
 		req->data.op.topic_data_send = mros_protocol_topic_data_send;
 		mros_client_wait_entry_init(&req->data.reqobj.waitobj, req);
+		req->data.reqobj.api_reqp = (void*)mros_protocol_master.api_reqp;
 
 		mros_client_put_request(&mros_subscribe_wait_queue, &req->data.reqobj.waitobj);
 

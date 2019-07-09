@@ -36,7 +36,6 @@ void mros_topic_data_subscriber_run(void)
 	mRosTopicConnectorManagerType *mgrp;
 	mRosMemoryListEntryType *topic_data;
 	mRosTopicIdType topic_id;
-	mros_uint32 i;
 	mRosReturnType ret;
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_SUB);

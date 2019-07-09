@@ -109,6 +109,9 @@ void mros_protocol_subscribe_run(void)
 
 		cobj = mros_topic_connector_get_obj(mros_protocol_subscribe.pub_mgrp, &connector);
 		(void)mros_topic_connector_set_connection(cobj, client_req);
+		//wakeup api requester
+		mros_client_wakeup((mRosWaitListEntryType*)client_req->data.reqobj.api_reqp);
+		client_req->data.reqobj.api_reqp = NULL;
 	}
 	mros_exclusive_unlock(&unlck_obj);
 	return;

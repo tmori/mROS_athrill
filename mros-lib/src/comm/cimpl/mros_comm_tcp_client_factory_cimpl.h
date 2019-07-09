@@ -32,6 +32,7 @@ typedef struct {
 	mRosTopicIdType 		topic_id;
 	mros_uint32				ipaddr;
 	mros_int32				port;
+	void*					api_reqp;
 	mRosWaitListEntryType	waitobj;
 } mRosRquestObjectType;
 
