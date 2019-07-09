@@ -31,14 +31,14 @@ mRosReturnType mros_proc_receive(mRosCommTcpClientType *client, mRosPacketType *
 			break;
 		}
 		packet->data_size += res;
-		if (packet->data_size >= packet->total_size) {
+		if ((packet->data_size + 1) >= packet->total_size) {
 			ret = MROS_E_NOMEM;
 			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 			break;
 		}
 		is_end = mros_xmlpacket_has_request_end(packet);
 	} while (is_end == MROS_FALSE);
-
+	packet->data[packet->data_size] = '\0';
 	return ret;
 }
 mRosReturnType mros_proc_tcpros_receive(mRosCommTcpClientType *client, mRosPacketType *packet)

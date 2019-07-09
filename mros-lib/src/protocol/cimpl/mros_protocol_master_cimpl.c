@@ -132,6 +132,11 @@ static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
+	ret = mros_xmlpacket_reqtopicres_result(rpc_response->reply_packet);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		return ret;
+	}
 
 	//TODO まだ出版ノードが存在しない場合は，非同期でマスタから情報をもらう
 	ptr = mros_xmlpacket_reqtopicres_get_first_uri(rpc_response->reply_packet, &ipaddr, &port);

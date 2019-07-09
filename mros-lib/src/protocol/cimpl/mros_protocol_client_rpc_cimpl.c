@@ -26,12 +26,13 @@ static mRosReturnType mros_rpc_sendreply_xmlpacket(mRosEncodeArgType *arg, mRosC
 			return ret;
 		}
 		res->data_size += rlen;
-		if (res->data_size >= res->total_size) {
+		if ((res->data_size + 1) >= res->total_size) {
 			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 			return MROS_E_NOMEM;
 		}
 		is_end = mros_xmlpacket_has_response_end(res);
 	} while (is_end == MROS_FALSE);
+	res->data[res->data_size] = '\0';
 	return MROS_E_OK;
 }
 
