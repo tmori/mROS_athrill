@@ -64,27 +64,33 @@ void mros_protocol_subscribe_run(void)
 		}
 		mros_protocol_subscribe.state = MROS_PROTOCOL_SUBSCRIBE_STATE_PUB_CONNECTING;
 		client_req = (mRosCommTcpClientListReqEntryType*)wait_entry->data.reqp;
-		connector.topic_id = client_req->data.reqobj.topic_id;
-		connector.func_id = (mRosFuncIdType)MROS_ID_NONE;
-		ret = mros_node_create_outer(&connector.node_id);
-		if (ret != MROS_E_OK) {
-			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-			continue;
-		}
-		ret = mros_topic_connector_add(mros_protocol_subscribe.pub_mgrp, &connector, MROS_OUTER_CONNECTOR_QUEUE_MAXLEN, &ros_outer_topic_publisher_mempool);
-		if (ret != MROS_E_OK) {
-			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-			continue;
-		}
 
 		ret = mros_comm_tcp_client_ip32_init(&client_req->data.client, client_req->data.reqobj.ipaddr, client_req->data.reqobj.port);
 		if (ret != MROS_E_OK) {
 			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+			mros_comm_tcp_clientc_free(client_req);
 			continue;
 		}
 		ret = mros_comm_tcp_client_connect(&client_req->data.client);
 		if (ret != MROS_E_OK) {
 			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+			mros_comm_tcp_clientc_free(client_req);
+			continue;
+		}
+
+		connector.topic_id = client_req->data.reqobj.topic_id;
+		connector.func_id = (mRosFuncIdType)MROS_ID_NONE;
+		ret = mros_node_create_outer(&connector.node_id);
+		if (ret != MROS_E_OK) {
+			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+			mros_comm_tcp_clientc_free(client_req);
+			continue;
+		}
+		ret = mros_topic_connector_add(mros_protocol_subscribe.pub_mgrp, &connector, MROS_OUTER_CONNECTOR_QUEUE_MAXLEN, &ros_outer_topic_publisher_mempool);
+		if (ret != MROS_E_OK) {
+			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+			(void)mros_node_remove(connector.node_id);
+			mros_comm_tcp_clientc_free(client_req);
 			continue;
 		}
 
@@ -95,15 +101,14 @@ void mros_protocol_subscribe_run(void)
 		ret = mros_rpc_tcpros(&client_req->data.client, &req, &res);
 		if (ret != MROS_E_OK) {
 			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+			mros_topic_connector_remove(mros_protocol_subscribe.pub_mgrp, &connector);
+			(void)mros_node_remove(connector.node_id);
+			mros_comm_tcp_clientc_free(client_req);
 			continue;
 		}
 
 		cobj = mros_topic_connector_get_obj(mros_protocol_subscribe.pub_mgrp, &connector);
-		ret = mros_topic_connector_set_connection(cobj, client_req);
-		if (ret != MROS_E_OK) {
-			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-			continue;
-		}
+		(void)mros_topic_connector_set_connection(cobj, client_req);
 	}
 	mros_exclusive_unlock(&unlck_obj);
 	return;
