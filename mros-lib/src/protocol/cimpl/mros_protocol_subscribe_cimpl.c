@@ -59,6 +59,7 @@ void mros_protocol_subscribe_run(void)
 		mRosWaitListEntryType *wait_entry = mros_server_queue_wait(&mros_subscribe_wait_queue);
 		if (wait_entry == MROS_NULL) {
 			mros_topic_data_publisher_run();
+			mros_topic_data_subscriber_run();
 			continue;
 		}
 		mros_protocol_subscribe.state = MROS_PROTOCOL_SUBSCRIBE_STATE_PUB_CONNECTING;

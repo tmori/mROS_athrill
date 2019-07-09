@@ -32,7 +32,6 @@ mRosReturnType mros_protocol_publish_init(void)
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
-	(void)mros_comm_socket_set_blocking(&mros_protocol_publish.server_comm.socket, MROS_FALSE, MROS_PUBLISH_TIMEOUT);
 	mros_protocol_publish.packet.total_size = sizeof(mRosPublishPacketBufferType);
 	mros_protocol_publish.packet.data = &mros_publish_packet_buffer.buffer;
 	mros_protocol_publish.state = MROS_PROTOCOL_PUBLISH_STATE_WAITING;
@@ -58,9 +57,6 @@ void mros_protocol_publish_run(void)
 		mros_protocol_publish.state = MROS_PROTOCOL_PUBLISH_STATE_WAITING;
 		ret = mros_comm_tcp_server_accept(&mros_protocol_publish.server_comm, &mros_protocol_publish.client_comm);
 		if (ret != MROS_E_OK) {
-			mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
-			mros_topic_data_subscriber_run();
-			mros_exclusive_unlock(&unlck_obj);
 			continue;
 		}
 		mros_protocol_publish.state = MROS_PROTOCOL_PUBLISH_STATE_STARTING_PUBLISH_TOPIC;

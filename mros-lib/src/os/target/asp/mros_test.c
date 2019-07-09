@@ -1,6 +1,11 @@
 #include "mros_protocol_client_rpc_cimpl.h"
 #include "mros_comm_tcp_server_cimpl.h"
 
+/*****************************************
+ * TASK CYCLE
+ *****************************************/
+#define MROS_SLAVE_TIMEOUT			100
+
 void do_test_server(void)
 {
 	mRosCommTcpServerType server;

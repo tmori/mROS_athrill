@@ -43,7 +43,6 @@ void usr_task1(void)
 #include <string.h>
 static char callback_buffer[1024];
 void Callback(string *msg){
-	//syslog(LOG_NOTICE,"I heard [%s]",msg->c_str());
 	sprintf(callback_buffer, "I heard [%s]",msg->c_str());
 	syslog(LOG_NOTICE, "%s", callback_buffer);
 }

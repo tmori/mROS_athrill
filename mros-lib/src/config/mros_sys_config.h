@@ -54,13 +54,6 @@ extern "C" {
 #define MROS_GIANT_EXCLUSIVE_AREA_PRIORITY		MROS_USR_TASK_PRI
 
 
-/*****************************************
- * TASK CYCLE
- *****************************************/
-#define MROS_SLAVE_TIMEOUT			100
-#define MROS_PUBLISH_TIMEOUT		50
-
-
 extern void mros_sys_config_init(void);
 extern void usr_task_activation(void);
 
