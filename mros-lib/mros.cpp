@@ -90,15 +90,13 @@ void network_init(){
 
 void tcpros_decoder(char* buf,sensor_msgs::Image& msg_buf){
 	//TCPROSメッセージをデコードしてメッセージバッファに入れる
-/*
-	if(type == "std_msgs/String"){
+	/* if(type == "std_msgs/String"){
 		int l,p;
 		l = rbuf[p] + rbuf[p+1]*256 + rbuf[p+2]*65536;
 		p=p+4;
 		msg_buf.string = rbuf[p];
 		msg_buf.string.resize(l);
-	}else if(type == "sensor_msgs/Image"){
-	*/
+	}else if(type == "sensor_msgs/Image"){ */
 		unsigned int l,p;
 		p=0;
 		msg_buf.header.seq = buf[p];
@@ -448,10 +446,14 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 				size += ((unsigned int)sdq[3])*65536;
 				//ROS_INFO("SUB_TASK: data size[%d]",size);
 				memcpy(rbuf,&mem[PUB_ADDR2],size);
-				tcpros_decoder((char*)rbuf,msg_buf);		//TCPROSからメッセージに戻す
-				void (*fp)(sensor_msgs::Image&);
-				fp = (void (*)(sensor_msgs::Image&))lst.func_vec[num];
-				fp(msg_buf);
+				//tcpros_decoder((char*)rbuf,msg_buf);		//TCPROSからメッセージに戻す
+				//void (*fp)(sensor_msgs::Image&);
+				//fp = (void (*)(sensor_msgs::Image&))lst.func_vec[num];
+				//fp(msg_buf);
+				void (*fp)(intptr_t);		//stringのみ対応
+				fp = (void (*)(intptr_t))lst.func_vec[num];
+				string msg((const char*)&rbuf[0]);
+				fp((intptr_t)&msg);
 			}
 	    }else{
 
@@ -484,7 +486,7 @@ syslog(LOG_NOTICE, "========Activate mROS SUBSCRIBE========");
 							if(len >= msg_size +4){
 				//data received
 								rbuf[msg_size + 4] = '\0';
-								syslog(LOG_NOTICE,"SUB_TASK:data length [%d]",len);
+								//syslog(LOG_NOTICE,"SUB_TASK:data length [%d]",len);
 								void (*fp)(intptr_t);		//stringのみ対応
 								fp = (void (*)(intptr_t))lst.func_vec[i];
 								string msg((const char*)&rbuf[8]);

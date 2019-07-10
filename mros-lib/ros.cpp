@@ -28,7 +28,7 @@ void ros::init(int argc,char *argv,std::string node_name){
 	ID id;
 	get_tid(&id);
 	IDv.push_back(id);
-	syslog(LOG_NOTICE,"usr task ID [%d]",id);
+	//syslog(LOG_NOTICE,"usr task ID [%d]",id);
 	node_nv.push_back(node_name);
 }
 
@@ -37,7 +37,7 @@ ros::Subscriber ros::NodeHandle::subscriber(std::string topic,int queue_size,voi
 	while(ros_sem != 0){
 	}
 	state = 1;
-	syslog(LOG_NOTICE,"Change state [%d]",state);
+	//syslog(LOG_NOTICE,"Change state [%d]",state);
 	ros_sem++;
 	ID id;
 	get_tid(&id);
@@ -100,7 +100,7 @@ ros::Publisher ros::NodeHandle::advertise(string topic,int queue_size){
 	}
 	ros_sem++;
 	state = 2;
-	syslog(LOG_NOTICE,"Change state [%d]",state);
+	//syslog(LOG_NOTICE,"Change state [%d]",state);
 	ID id;
 	get_tid(&id);
 	Publisher pub;
@@ -161,7 +161,7 @@ void ros::Publisher::publish(std_msgs::String& data){
 		sbuf[2] = size/256;
 		sbuf[3] = size/65536;
 		pdq = (intptr_t*) &sbuf;
-		syslog(LOG_NOTICE, "i=%d data=%s", i, data.data.c_str());
+		//syslog(LOG_NOTICE, "i=%d data=%s", i, data.data.c_str());
 		snd_dtq(SUB_DTQ,*pdq);
 	}
 
