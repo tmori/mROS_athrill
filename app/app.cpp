@@ -14,7 +14,9 @@ unsigned int athrill_device_func_call __attribute__ ((section(".athrill_device_s
 
 /*****mROS user task code*******/
 static char str_buf[1024];
-static unsigned char test_inner = 0;
+extern "C" {
+unsigned char test_inner = 0;
+}
 
 void usr_task1(void)
 {
@@ -24,11 +26,11 @@ void usr_task1(void)
 	int i = 0;
 	ros::init(argc,argv,"mros_node");
 	ros::NodeHandle n;
-	ros::Publisher chatter_pub = n.advertise("mros_msg", 1);
+	ros::Publisher chatter_pub;
 	ros::Rate loop_rate(5);
-
 	std_msgs::String str;
 
+	chatter_pub = n.advertise("mros_msging", 1);
 	syslog(LOG_NOTICE,"Data Publish Start");
 	while(1){
 		wait_ms(1000);
@@ -62,7 +64,7 @@ void usr_task2(void)
 		 sub = n.subscriber("test_string",1, Callback);
 	}
 	else {
-		 sub = n.subscriber("mros_msg",1, Callback);
+		 sub = n.subscriber("mros_msging",1, Callback);
 	}
 
 	ros::spin();

@@ -3,10 +3,14 @@
 . ./seinou_comm.bash
 
 START_BREAK_FILE="app.cpp"
-START_BREAK_LINE="36"
+START_BREAK_LINE="39"
 
 END_BREAK_FILE="app.cpp"
-END_BREAK_LINE="37"
+END_BREAK_LINE="40"
+
+#check test condition
+function_for_break_func main_task
+athrill_remote p test_inner
 
 #test point
 athrill_remote b ${START_BREAK_FILE} ${START_BREAK_LINE}

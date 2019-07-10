@@ -18,6 +18,13 @@ function wait_for_break()
     done
 }
 
+function_for_break_func()
+{
+    funcname=${1}
+    athrill_remote b ${funcname}
+    athrill_remote c
+}
+
 ELAPS_VALUE=
 function get_elaps()
 {
