@@ -83,16 +83,16 @@ mRosReturnType mros_topic_create(const char *topic_name, const char *topic_typen
 	mros_uint32 typelen = strlen(topic_typename);
 	mRosReturnType ret;
 
-	mros_name_formalize(topic_name, len, topic_name_buffer, &len);
-	ret = mros_topic_get(topic_name_buffer, id);
-	if (ret == MROS_E_OK) {
-		return MROS_E_OK;
-	}
 	if (len >= (MROS_TOPIC_NAME_MAXLEN + 1)) { /* for add slash on top */
 		return MROS_E_NOMEM;
 	}
 	if (typelen >= MROS_TOPIC_NAME_MAXLEN) {
 		return MROS_E_NOMEM;
+	}
+	mros_name_formalize(topic_name, len, topic_name_buffer, &len);
+	ret = mros_topic_get(topic_name_buffer, id);
+	if (ret == MROS_E_OK) {
+		return MROS_E_OK;
 	}
 
 	ListEntry_Alloc(&topic_manager.head, mRosTopicListEntryType, &p);

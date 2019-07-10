@@ -36,6 +36,7 @@ extern "C" {
  */
 #define MROS_SUB_TOPIC_CONNECTOR_MAX_NUM		10U
 
+#define MROS_OUTER_CONNECTOR_QUEUE_MAXLEN		1
 
 
 /**************************************

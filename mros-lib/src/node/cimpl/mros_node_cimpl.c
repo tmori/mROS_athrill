@@ -9,6 +9,7 @@ static mRosNodeManagerType node_manager[MROS_NODE_TYPE_NUM] MROS_MATTR_BSS_NOCLR
 #define NODE_TYPE(id)	( (id <= node_manager[MROS_NODE_TYPE_INNER].max_node) ? MROS_NODE_TYPE_INNER : MROS_NODE_TYPE_OUTER )
 
 static mRosNodeListEntryType node_entries[MROS_NODE_TYPE_NUM][MROS_NODE_MAX_NUM] MROS_MATTR_BSS_NOCLR;
+static char node_name_buffer[MROS_NODE_NAME_MAXLEN + 1] MROS_MATTR_BSS_NOCLR;
 
 #define NODE_MAX_ID(type)	( \
 	(type == MROS_NODE_TYPE_INNER) ? \
@@ -115,7 +116,9 @@ static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType tas
 			ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_NOMEM);
 			return MROS_E_NOMEM;
 		}
-		ret = mros_node_get_byname(node_name, id);
+		mros_name_formalize(node_name, len, node_name_buffer, &len);
+
+		ret = mros_node_get_byname(node_name_buffer, id);
 		if (ret == MROS_E_OK) {
 			return MROS_E_OK;
 		}
@@ -132,7 +135,8 @@ static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType tas
 	*id = p->data.node_id;
 	p->data.task_id = task_id;
 	if (node_name != MROS_NULL) {
-		mros_name_formalize(node_name, len, p->data.node_name, &p->data.namelen);
+		p->data.namelen = len;
+		memcpy(p->data.node_name, node_name_buffer, len);
 	}
 	else {
 		p->data.namelen = 0;
