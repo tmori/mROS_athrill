@@ -40,12 +40,12 @@ void mros_client_wait_for_request_done(mRosWaitQueueType *wait_queue, mRosWaitLi
 }
 static mRosWaitListEntryType *mros_server_queue_get(mRosWaitQueueType *wait_queue)
 {
-	mRosTaskPriorityType min_priority = 0;
+	mRosTaskPriorityType min_priority = MROS_TASK_MIN_PRIORITY;
 	mRosWaitListEntryType *entry;
 	mRosWaitListEntryType *target = MROS_NULL;
 
 	ListEntry_Foreach(&wait_queue->head, entry) {
-		if (entry->data.task_priority > min_priority) {
+		if (entry->data.task_priority < min_priority) {
 			min_priority = entry->data.task_priority;
 			target = entry;
 		}

@@ -6,6 +6,7 @@ static mRosTopicManagerType 	topic_manager;
 #define TOPIC_OBJ(id)		topic_manager.topic_entries[MROS_INDEX((id))]
 
 static mRosTopicListEntryType topic_entries[MROS_TOPIC_MAX_NUM] MROS_MATTR_BSS_NOCLR;
+static char topic_name_buffer[MROS_TOPIC_NAME_MAXLEN + 1] MROS_MATTR_BSS_NOCLR;
 
 mRosReturnType mros_topic_init(void)
 {
@@ -80,8 +81,10 @@ mRosReturnType mros_topic_create(const char *topic_name, const char *topic_typen
 	mRosTopicListEntryType *p;
 	mros_uint32 len = strlen(topic_name);
 	mros_uint32 typelen = strlen(topic_typename);
+	mRosReturnType ret;
 
-	mRosReturnType ret = mros_topic_get(topic_name, id);
+	mros_name_formalize(topic_name, len, topic_name_buffer, &len);
+	ret = mros_topic_get(topic_name_buffer, id);
 	if (ret == MROS_E_OK) {
 		return MROS_E_OK;
 	}
@@ -97,7 +100,8 @@ mRosReturnType mros_topic_create(const char *topic_name, const char *topic_typen
 		return MROS_E_NOMEM;
 	}
 	*id = p->data.topic_id;
-	mros_name_formalize(topic_name, len, p->data.topic_name, &p->data.namelen);
+	p->data.namelen = len;
+	memcpy(p->data.topic_name, topic_name_buffer, len);
 	p->data.typenamelen = typelen;
 	memcpy(p->data.topic_typename, topic_typename, typelen);
 	p->data.topic_typename[typelen] = '\0';

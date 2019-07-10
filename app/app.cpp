@@ -14,6 +14,7 @@ unsigned int athrill_device_func_call __attribute__ ((section(".athrill_device_s
 
 /*****mROS user task code*******/
 static char str_buf[1024];
+static unsigned char test_inner = 0;
 
 void usr_task1(void)
 {
@@ -55,6 +56,14 @@ void usr_task2(void)
 	char *argv = NULL;
 	ros::init(argc,argv,"mros_node2");
 	ros::NodeHandle n;
-	ros::Subscriber sub = n.subscriber("test_string",1, Callback);
+	ros::Subscriber sub;
+
+	if (test_inner == 0) {
+		 sub = n.subscriber("test_string",1, Callback);
+	}
+	else {
+		 sub = n.subscriber("mros_msg",1, Callback);
+	}
+
 	ros::spin();
 }

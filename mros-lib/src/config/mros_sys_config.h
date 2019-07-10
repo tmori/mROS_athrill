@@ -51,7 +51,11 @@ extern "C" {
  * EXCLUSIVE AREA
  *****************************************/
 
-#define MROS_GIANT_EXCLUSIVE_AREA_PRIORITY		MROS_USR_TASK_PRI
+#define MROS_GIANT_EXCLUSIVE_AREA_PRIORITY		( \
+		( MROS_USR_TASK_PRI < MROS_TASK_PRI) ? \
+				MROS_USR_TASK_PRI : \
+				MROS_TASK_PRI \
+	)
 
 
 extern void mros_sys_config_init(void);

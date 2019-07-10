@@ -157,9 +157,13 @@ mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uin
 	//                       |
 	//                       V
 	//"http://xxx.xxx.xx:8080/"
+	//"http://xxx.xxx.xx:8080</"
 	head = tail;
 	tail = strstr(head, "/");
 	len = (tail - head) + 1;
+	if (head[len - 2] == '<') {
+		len--;
+	}
 	if (len > PORT_MAX_STR_LEN) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;

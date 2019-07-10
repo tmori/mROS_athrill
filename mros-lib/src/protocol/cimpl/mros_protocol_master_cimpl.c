@@ -30,6 +30,7 @@ typedef struct {
 	mRosPacketType						reqtopic_packet;
 	mRosCommTcpClientType				master_comm;
 	mRosWaitListEntryType				*api_reqp;
+	mros_uint32							self_ipaddr;
 } mRosProtocolMasterType;
 
 static mRosProtocolMasterType mros_protocol_master MROS_MATTR_BSS_NOCLR;
@@ -49,6 +50,11 @@ mRosReturnType mros_protocol_master_init(void)
 	mros_protocol_master.reqtopic_packet.data = &mros_master_packet_buffer.buffer;
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
 	mros_protocol_master.api_reqp = NULL;
+	ret = mros_comm_inet_get_ipaddr((const char *)MROS_NODE_IPADDR, &mros_protocol_master.self_ipaddr);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		return ret;
+	}
 	return MROS_E_OK;
 }
 
@@ -211,6 +217,7 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 	mros_uint32 ipaddr;
 	mros_int32 port;
 	mRosPtrType ptr;
+	mros_boolean is_outer_node = MROS_FALSE;
 
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_REGISTER_SUBSCRIBER;
 
@@ -243,6 +250,10 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 	}
 	while (ptr != MROS_NULL) {
 		mRosCommTcpClientType client;
+		if (ipaddr == mros_protocol_master.self_ipaddr) {
+			ptr = mros_xmlpacket_subres_get_next_uri(ptr, rpc_regc_res.reply_packet, &ipaddr, &port);
+			continue;
+		}
 
 		ret = mros_comm_tcp_client_ip32_init(&client, ipaddr, port);
 		if (ret != MROS_E_OK) {
@@ -260,10 +271,14 @@ static mRosReturnType mros_protocol_master_register_subscriber(mRosProtocolMaste
 			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 			goto done;
 		}
+		is_outer_node = MROS_TRUE;
 		ptr = mros_xmlpacket_subres_get_next_uri(ptr, rpc_regc_res.reply_packet, &ipaddr, &port);
 	}
 
 done:
+	if (is_outer_node == MROS_FALSE) {
+		mros_client_wakeup(mros_protocol_master.api_reqp);
+	}
 	mros_comm_tcp_client_close(&mros_protocol_master.master_comm);
 	mros_protocol_master.state = MROS_PROTOCOL_MASTER_STATE_WAITING;
 
