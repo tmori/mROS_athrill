@@ -1,6 +1,10 @@
 #ifndef _MROS_ARRAY_CONTAINER_H_
 #define _MROS_ARRAY_CONTAINER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mros_types.h"
 
 typedef struct {
@@ -25,5 +29,8 @@ static inline void mros_array_container_add(mRosArrayContainerType *mgrp, mRosCo
 	mgrp->array[mgrp->count] = obj;
 	mgrp->count++;
 }
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MROS_ARRAY_CONTAINER_H_ */

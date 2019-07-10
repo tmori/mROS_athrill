@@ -23,6 +23,9 @@ extern "C" {
  */
 #define MROS_MASTER_IPADDR						"0.0.0.0"
 
+/*
+ * ipaddr of self node
+ */
 #define MROS_NODE_IPADDR						"127.0.0.1"
 
 /*
@@ -35,8 +38,14 @@ extern "C" {
  */
 #define MROS_PUBLISHER_PORT_NO					11511
 
+/*
+ * uri of mROS slave
+ */
 #define MROS_URI_SLAVE							"http://127.0.0.1:11411"
 
+/*
+ * do not change this parameter
+ */
 #define MROS_TOPIC_TCP_CLIENT_MAX_NUM			( MROS_PUB_TOPIC_CONNECTOR_MAX_NUM + MROS_SUB_TOPIC_CONNECTOR_MAX_NUM )
 
 
@@ -44,6 +53,9 @@ extern "C" {
  * EXCLUSIVE AREA
  *****************************************/
 
+/*
+ * do not change this parameter
+ */
 #define MROS_GIANT_EXCLUSIVE_AREA_PRIORITY		( \
 		( MROS_USR_TASK_PRI < MROS_TASK_PRI) ? \
 				MROS_USR_TASK_PRI : \

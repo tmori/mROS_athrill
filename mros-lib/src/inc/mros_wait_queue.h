@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 #include "mros_list.h"
-#include "mros_exclusive_ops.h"
 
 typedef struct {
 	mRosTaskIdType 			task_id;
