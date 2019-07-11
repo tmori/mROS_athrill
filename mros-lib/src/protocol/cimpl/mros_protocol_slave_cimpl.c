@@ -2,10 +2,9 @@
 #include "mros_protocol_server_proc_cimpl.h"
 #include "mros_comm_tcp_client_cimpl.h"
 #include "mros_comm_tcp_server_cimpl.h"
-#include "mros_types.h"
-#include "mros_sys_config.h"
 #include "mros_packet_encoder_cimpl.h"
 #include "mros_exclusive_area.h"
+#include "mros_sys_config.h"
 
 typedef union {
 	char buffer;

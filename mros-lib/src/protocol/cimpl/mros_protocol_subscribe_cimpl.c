@@ -1,19 +1,14 @@
 #include "mros_protocol_subscribe_cimpl.h"
-#include "mros_types.h"
-#include "mros_exclusive_area.h"
-#include "mros_wait_queue.h"
-#include "mros_comm_tcp_client_factory_cimpl.h"
-#include "mros_packet_decoder_cimpl.h"
-#include "mros_node_cimpl.h"
-#include "mros_memory.h"
-#include "mros_packet_encoder_cimpl.h"
 #include "mros_protocol_client_rpc_cimpl.h"
 #include "mros_topic_cimpl.h"
-#include "mros_node_cimpl.h"
-#include "mros_topic_runner_cimpl.h"
-#include "mros_sys_config.h"
-#include "mros_packet_config.h"
 #include "mros_topic_connector_factory_cimpl.h"
+#include "mros_topic_runner_cimpl.h"
+#include "mros_node_cimpl.h"
+#include "mros_comm_tcp_client_factory_cimpl.h"
+#include "mros_packet_config.h"
+#include "mros_exclusive_area.h"
+#include "mros_wait_queue.h"
+#include "mros_sys_config.h"
 
 typedef union {
 	char buffer;
@@ -24,7 +19,6 @@ typedef union {
 
 typedef struct {
 	mRosProtocolSubscribeStateEnumType 	state;
-	mRosEncodeArgType 					arg;
 	mRosPacketType						tcpros_packet;
 	mRosTopicConnectorManagerType 		*pub_mgrp;// for outer
 } mRosProtocolSubscribeType;

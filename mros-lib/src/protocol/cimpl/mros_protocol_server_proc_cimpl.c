@@ -1,13 +1,11 @@
 #include "mros_protocol_server_proc_cimpl.h"
+#include "mros_protocol_operation_cimpl.h"
 #include "mros_comm_tcp_client_cimpl.h"
 #include "mros_topic_cimpl.h"
 #include "mros_topic_connector_factory_cimpl.h"
-#include "mros_sys_config.h"
-#include "mros_packet_config.h"
 #include "mros_packet_encoder_cimpl.h"
 #include "mros_packet_decoder_cimpl.h"
-#include "mros_node_cimpl.h"
-#include "mros_protocol_operation_cimpl.h"
+#include "mros_sys_config.h"
 #include <string.h>
 
 static mRosPacketDecodedRequestType mros_proc_slave_decoded_requst MROS_MATTR_BSS_NOCLR;

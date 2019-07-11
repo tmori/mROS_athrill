@@ -1,5 +1,4 @@
 #include "mros_node_cimpl.h"
-#include "mros_os.h"
 #include "mros_usr_config.h"
 #include "mros_name.h"
 #include <string.h>

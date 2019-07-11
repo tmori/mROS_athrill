@@ -1,7 +1,7 @@
 #include "mros_topic_connector_cimpl.h"
-#include "mros_usr_config.h"
-#include "mros_node_cimpl.h"
 #include "mros_topic_callback.h"
+#include "mros_node_cimpl.h"
+#include "mros_usr_config.h"
 #include <string.h>
 
 #define MROS_TOPIC_CONNECTOR_ENTRY_INIT(entryp)	\

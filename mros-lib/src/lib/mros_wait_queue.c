@@ -1,6 +1,5 @@
 #include "mros_wait_queue.h"
 #include "mros_os.h"
-#include "mros_list.h"
 
 void mros_client_wait_entry_init(mRosWaitListEntryType *wait_entry, void *reqp)
 {
