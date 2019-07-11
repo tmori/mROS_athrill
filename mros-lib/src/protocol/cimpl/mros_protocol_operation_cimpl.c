@@ -85,7 +85,7 @@ mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType 
 
 void mros_protocol_client_obj_free(void* reqp)
 {
-	mros_comm_tcp_clientc_free((mRosCommTcpClientListReqEntryType *)reqp);
+	mros_comm_tcp_client_free((mRosCommTcpClientListReqEntryType *)reqp);
 	return;
 }
 

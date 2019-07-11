@@ -28,7 +28,7 @@ mRosReturnType mros_comm_tcp_client_factory_init(void)
 	return MROS_E_OK;
 }
 
-mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc(void)
+mRosCommTcpClientListReqEntryType *mros_comm_tcp_client_alloc(void)
 {
 	mRosCommTcpClientListReqEntryType *p;
 	ListEntry_Alloc(&mros_comm_tcp_client_factory, mRosCommTcpClientListReqEntryType, &p);
@@ -39,11 +39,11 @@ mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc(void)
 	ListEntry_AddEntry(&mros_comm_tcp_client_factory, p);
 	return p;
 }
-mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc_copy(mRosCommTcpClientType *client)
+mRosCommTcpClientListReqEntryType *mros_comm_tcp_client_alloc_copy(mRosCommTcpClientType *client)
 {
 	mRosCommTcpClientListReqEntryType *p;
 
-	p = mros_comm_tcp_clientc_alloc();
+	p = mros_comm_tcp_client_alloc();
 	if (p == MROS_NULL) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOMEM);
 		return MROS_NULL;
@@ -52,7 +52,7 @@ mRosCommTcpClientListReqEntryType *mros_comm_tcp_clientc_alloc_copy(mRosCommTcpC
 
 	return p;
 }
-void mros_comm_tcp_clientc_free(mRosCommTcpClientListReqEntryType *client)
+void mros_comm_tcp_client_free(mRosCommTcpClientListReqEntryType *client)
 {
 	ListEntry_Free(&mros_comm_tcp_client_factory, client);
 	return;

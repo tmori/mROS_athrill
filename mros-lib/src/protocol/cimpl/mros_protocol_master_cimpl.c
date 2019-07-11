@@ -153,7 +153,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *
 	//TODO まだ出版ノードが存在しない場合は，非同期でマスタから情報をもらう
 	ptr = mros_xmlpacket_reqtopicres_get_first_uri(rpc_response->reply_packet, &ipaddr, &port);
 	while (ptr != MROS_NULL) {
-		mRosCommTcpClientListReqEntryType *req = mros_comm_tcp_clientc_alloc();
+		mRosCommTcpClientListReqEntryType *req = mros_comm_tcp_client_alloc();
 		if (req == MROS_NULL) {
 			ret = MROS_E_NOMEM;
 			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);

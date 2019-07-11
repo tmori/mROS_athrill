@@ -177,7 +177,7 @@ static mRosReturnType mros_proc_add_outersub_connector(mRosCommTcpClientType *cl
 	}
 	cobj = mros_topic_connector_get_obj(sub_mgrp, &connector);
 
-	mRosCommTcpClientListReqEntryType *client_entry = mros_comm_tcp_clientc_alloc_copy(client);
+	mRosCommTcpClientListReqEntryType *client_entry = mros_comm_tcp_client_alloc_copy(client);
 	if (client_entry == MROS_NULL) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOENT);
 		return MROS_E_NOENT;
