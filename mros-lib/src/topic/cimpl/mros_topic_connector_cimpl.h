@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-#include "mros_types.h"
 #include "mros_node_cimpl.h"
 #include "mros_memory.h"
 #include "mros_comm_tcp_client_factory_cimpl.h"
@@ -16,6 +15,9 @@ typedef struct {
 	mRosFuncIdType				func_id;
 } mRosTopicConnectorType;
 
+/******************************************************
+ * START: do not use these data types
+ ******************************************************/
 typedef struct {
 	mRosTopicConnectorType				value;
 	mRosSizeType						queue_maxsize;
@@ -26,13 +28,6 @@ typedef struct {
 typedef ListEntryType(mRosTopicConnectorListEntryType, mRosTopicConnectorEntryType) mRosTopicConnectorListEntryType;
 typedef ListHeadType(mRosTopicConnectorListEntryType) mRosTopicConnectorListHeadType;
 
-#define MROS_TOPIC_CONNECTOR_ENTRY_INIT(entryp)	\
-do {	\
-	(entryp)->data.queue_maxsize = 1U;		\
-	(entryp)->data.value.topic_id = MROS_ID_NONE;		\
-	(entryp)->data.value.node_id = MROS_ID_NONE;		\
-	(entryp)->data.value.func_id = MROS_ID_NONE;	\
-} while (0)
 
 
 typedef struct {
@@ -57,6 +52,9 @@ typedef struct {
 	mRosTopicConnectorListEntryType				*conn_entries;
 	mRosTopicConnectorListEntryRootType			*topic_entries;
 } mRosTopicConnectorConfigType;
+/******************************************************
+ * END: do not use these data types
+ ******************************************************/
 
 extern mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, mRosTopicConnectorManagerType *mgrp);
 
@@ -83,18 +81,7 @@ extern mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, co
 extern mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const char *data, mRosSizeType len);
 extern mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerObjType obj);
 
-/*
- * topic connector Config APIs
- */
-#define MROS_TOPIC_CONNECTOR_CONFIG_DECLARE_MANAGER(manager_name, conn_entry_num)	\
-	static mRosTopicConnectorListEntryType manager_name##_conn_array [(conn_entry_num)] MROS_MATTR_BSS_NOCLR;	\
-	static mRosTopicConnectorListEntryRootType manager_name##_topic_array [MROS_TOPIC_MAX_NUM] MROS_MATTR_BSS_NOCLR;	\
-	static mRosTopicConnectorManagerType manager_name MROS_MATTR_BSS_NOCLR;	\
-	static mRosTopicConnectorConfigType manager_name##_config = {	\
-		(conn_entry_num),	\
-		manager_name##_conn_array,	\
-		manager_name##_topic_array,	\
-	};
+
 
 #ifdef __cplusplus
 }

@@ -16,7 +16,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 #include "mros_comm_tcp_client_factory_cimpl.h"
-
+#include "mros_sys_config.h"
 
 static mRosCommTcpClientEntryHeadType mros_comm_tcp_client_factory MROS_MATTR_BSS_NOCLR;
 static mRosCommTcpClientListReqEntryType mros_comm_tcp_client_entries[MROS_TOPIC_TCP_CLIENT_MAX_NUM] MROS_MATTR_BSS_NOCLR;

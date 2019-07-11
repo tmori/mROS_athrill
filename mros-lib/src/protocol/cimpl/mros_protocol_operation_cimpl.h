@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-#include "mros_list.h"
 #include "mros_memory.h"
 #include "mros_comm_tcp_client_cimpl.h"
 

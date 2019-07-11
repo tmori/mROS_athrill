@@ -4,6 +4,40 @@
 #include "mros_name.h"
 #include <string.h>
 
+typedef struct {
+	mRosNodeIdType				node_id;
+	mRosTaskIdType				task_id;
+	char						node_name[MROS_NODE_NAME_MAXLEN];
+	mros_uint32					namelen;
+} mRosNodeEntryType;
+
+#define MROS_TOPIC_NODE_ENTRY_INIT(entryp)	\
+do {	\
+	(entryp)->data.node_id = MROS_ID_NONE;	\
+	(entryp)->data.namelen = 0;	\
+} while (0)
+
+typedef ListEntryType(mRosNodeListEntryType, mRosNodeEntryType) mRosNodeListEntryType;
+typedef ListHeadType(mRosNodeListEntryType) mRosNodeEntryHeadType;
+
+typedef struct {
+	mRosNodeEntryHeadType	 	head;
+	mRosNodeListEntryType 		*node_entries;
+	mRosSizeType				max_node;
+} mRosNodeManagerType;
+
+/*
+ * Topic Node Config APIs
+ */
+#define MROS_TOPIC_NODE_CONFIG_DECLARE_MANAGER(tnode_instance_name, max_node)	\
+	static mRosNodeListEntryType tnode_instance_name##_array [(node_num)];	\
+	static mRosNodeManagerType tnode_instance_name##_mgr;	\
+	static mRosNodeConfigType  tnode_instance_name##_config = {	\
+		(max_node),	\
+		tnode_config_name##_array,	\
+	};
+
+
 static mRosNodeManagerType node_manager[MROS_NODE_TYPE_NUM] MROS_MATTR_BSS_NOCLR;
 #define NODE_OBJ(type, id)		node_manager[(type)].node_entries[MROS_INDEX((id))]
 #define NODE_TYPE(id)	( (id <= node_manager[MROS_NODE_TYPE_INNER].max_node) ? MROS_NODE_TYPE_INNER : MROS_NODE_TYPE_OUTER )

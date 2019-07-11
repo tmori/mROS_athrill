@@ -8,7 +8,6 @@ extern "C" {
 #include "mros_types.h"
 #include "mros_packet_cimpl.h"
 #include "mros_comm_tcp_client_cimpl.h"
-#include "mros_topic_connector_factory_cimpl.h"
 
 typedef struct {
 	const char*					node_name;

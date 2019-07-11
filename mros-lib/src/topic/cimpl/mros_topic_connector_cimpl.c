@@ -4,6 +4,14 @@
 #include "mros_topic_callback.h"
 #include <string.h>
 
+#define MROS_TOPIC_CONNECTOR_ENTRY_INIT(entryp)	\
+do {	\
+	(entryp)->data.queue_maxsize = 1U;		\
+	(entryp)->data.value.topic_id = MROS_ID_NONE;		\
+	(entryp)->data.value.node_id = MROS_ID_NONE;		\
+	(entryp)->data.value.func_id = MROS_ID_NONE;	\
+} while (0)
+
 mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, mRosTopicConnectorManagerType *mgrp)
 {
 	mros_uint32 i;

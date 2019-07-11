@@ -10,6 +10,8 @@
 #include "mros_comm_tcp_client_cimpl.h"
 #include "mros_packet_decoder_cimpl.h"
 #include "mros_protocol_operation_cimpl.h"
+#include "mros_sys_config.h"
+#include "mros_packet_config.h"
 
 typedef union {
 	char buffer;

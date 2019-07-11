@@ -1,6 +1,37 @@
 #include "mros_topic_cimpl.h"
+#include "mros_usr_config.h"
 #include "mros_name.h"
 #include <string.h>
+
+typedef struct {
+	mRosTopicIdType				topic_id;
+	mros_uint32					namelen;
+	char						topic_name[MROS_TOPIC_NAME_MAXLEN];
+	mros_uint32					typenamelen;
+	char						topic_typename[MROS_TOPIC_TYPENAME_MAXLEN];
+
+	/*
+	 * トピックデータ格納用キュー
+	 */
+	mRosSizeType				queue_maxsize;
+	mRosMemoryListHeadType 		queue_head;
+} mRosTopicEntryType;
+
+typedef ListEntryType(mRosTopicListEntryType, mRosTopicEntryType) mRosTopicListEntryType;
+typedef ListHeadType(mRosTopicListEntryType) mRosTopicEntryHeadType;
+
+#define MROS_TOPIC_ENTRY_INIT(entryp)	\
+do {	\
+	(entryp)->data.namelen = 0;	\
+	(entryp)->data.typenamelen = 0;	\
+	(entryp)->data.queue_maxsize = 1; \
+} while (0)
+
+typedef struct {
+	mRosTopicEntryHeadType	 	head;
+	mRosTopicListEntryType 		*topic_entries;
+	mRosTopicIdType				max_topic;
+} mRosTopicManagerType;
 
 static mRosTopicManagerType 	topic_manager;
 #define TOPIC_OBJ(id)		topic_manager.topic_entries[MROS_INDEX((id))]

@@ -7,7 +7,6 @@ extern "C" {
 
 #include "mros_types.h"
 #include "mros_os.h"
-#include "mros_list.h"
 
 
 typedef struct {

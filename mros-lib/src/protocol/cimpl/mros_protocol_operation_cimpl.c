@@ -2,6 +2,7 @@
 #include "mros_comm_tcp_client_factory_cimpl.h"
 #include "mros_packet_encoder_cimpl.h"
 #include "mros_packet_decoder_cimpl.h"
+#include "mros_sys_config.h"
 #include "mros_memory.h"
 
 mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, const char *data, mRosSizeType datalen)

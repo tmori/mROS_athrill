@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-#include "mros_types.h"
 #include "mros_packet_cimpl.h"
 #include "mros_comm_tcp_client_cimpl.h"
 

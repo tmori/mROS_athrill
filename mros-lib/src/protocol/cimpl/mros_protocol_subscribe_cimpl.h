@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 #include "mros_types.h"
-#include "mros_comm_tcp_client_factory_cimpl.h"
 
 typedef enum {
 	MROS_PROTOCOL_SUBSCRIBE_STATE_WAITING = 0,

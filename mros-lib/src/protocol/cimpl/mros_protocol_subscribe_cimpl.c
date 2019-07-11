@@ -13,6 +13,7 @@
 #include "mros_topic_runner_cimpl.h"
 #include "mros_sys_config.h"
 #include "mros_packet_config.h"
+#include "mros_topic_connector_factory_cimpl.h"
 
 typedef union {
 	char buffer;
