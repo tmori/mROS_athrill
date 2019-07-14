@@ -45,6 +45,7 @@ void mros_topic_data_subscriber_run(void)
 	if (mgrp == MROS_NULL) {
 		return;
 	}
+	mros_topic_sub_mgr.count = 0;
 
 	topic_obj = mros_topic_connector_get_topic_first(mgrp);
 	while (topic_obj != MROS_COBJ_NULL) {
