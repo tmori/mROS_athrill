@@ -38,6 +38,7 @@ typedef ListEntryType(mRosTopicConnectorListEntryRootType, mRosTopicConnectorEnt
 typedef ListHeadType(mRosTopicConnectorListEntryRootType) mRosTopicConnectorListEntryRootHeadType;
 
 typedef struct {
+	mros_boolean								is_error;
 	mRosSizeType								max_connector;
 
 	mRosTopicConnectorListHeadType			 	conn_head;
@@ -78,9 +79,10 @@ extern mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType 
 
 
 extern mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const char *data, mRosSizeType len);
-extern mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const char *data, mRosSizeType len);
-extern mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerObjType obj);
+extern mRosReturnType mros_topic_connector_send_data(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType obj, const char *data, mRosSizeType len);
+extern mRosReturnType mros_topic_connector_receive_data(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType obj, mRosMemoryListEntryType **memp);
 
+extern void mros_topic_connector_purge(mRosTopicConnectorManagerType *mgrp);
 
 
 #ifdef __cplusplus

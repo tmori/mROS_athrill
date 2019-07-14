@@ -36,7 +36,7 @@ typedef struct {
 
 typedef struct {
 	mRosReturnType (*topic_data_send) (mRosCommTcpClientType *client, const char *data, mRosSizeType datalen);
-	mRosMemoryListEntryType* (*topic_data_receive) (mRosCommTcpClientType *client, mRosMemoryManagerType *mempool);
+	mRosReturnType (*topic_data_receive) (mRosCommTcpClientType *client, mRosMemoryManagerType *mempool, mRosMemoryListEntryType **retp);
 	void (*free) (void* reqp);
 } mRosCommOperationType;
 

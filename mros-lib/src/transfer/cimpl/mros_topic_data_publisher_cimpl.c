@@ -23,8 +23,8 @@ static void mros_topic_publish(mRosTopicConnectorManagerType *mgrp, mRosNodeEnum
 		return;
 	}
 	while (obj != MROS_COBJ_NULL) {
-		topic_data = mros_topic_connector_receive_data(obj);
-		if (topic_data == MROS_NULL) {
+		ret = mros_topic_connector_receive_data(mgrp, obj, &topic_data);
+		if (ret != MROS_E_OK) {
 			obj = mros_topic_connector_get_next(mgrp, topic_obj, obj);
 			continue;
 		}
@@ -73,5 +73,7 @@ void mros_topic_data_publisher_run(void)
 	for (i = 0; i < mros_topic_pub_mgr.count; i++) {
 		mros_topic_publish(mgrp, MROS_NODE_TYPE_OUTER, mros_topic_pub_mgr.array[i]);
 	}
+
+	mros_topic_connector_purge(mgrp);
 	return;
 }

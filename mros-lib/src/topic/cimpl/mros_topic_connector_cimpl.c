@@ -15,6 +15,7 @@ do {	\
 mRosReturnType mros_topic_connector_init(mRosTopicConnectorConfigType *config, mRosTopicConnectorManagerType *mgrp)
 {
 	mros_uint32 i;
+	mgrp->is_error = MROS_FALSE;
 	mgrp->conn_entries = config->conn_entries;
 	mgrp->topic_entries = config->topic_entries;
 	mgrp->max_connector = config->max_connector;
@@ -202,6 +203,7 @@ mRosReturnType mros_topic_connector_remove(mRosTopicConnectorManagerType *mgrp, 
 		entryp->data.commp->data.op.free(entryp->data.commp);
 		entryp->data.commp = MROS_NULL;
 	}
+	ListEntry_Free(&mgrp->conn_head, entryp);
 	return MROS_E_OK;
 }
 
@@ -296,8 +298,9 @@ mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const cha
 }
 
 
-mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const char* data, mRosSizeType len)
+mRosReturnType mros_topic_connector_send_data(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType obj, const char* data, mRosSizeType len)
 {
+	mRosReturnType ret;
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
@@ -310,27 +313,88 @@ mRosReturnType mros_topic_connector_send_data(mRosContainerObjType obj, const ch
 	if (entry->data.commp == MROS_NULL) {
 		return MROS_E_NOTCONN;
 	}
-	return entry->data.commp->data.op.topic_data_send(&entry->data.commp->data.client, data, len);
+	ret = entry->data.commp->data.op.topic_data_send(&entry->data.commp->data.client, data, len);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		mgrp->is_error = MROS_TRUE;
+		mros_comm_tcp_client_close(&entry->data.commp->data.client);
+	}
+	return ret;
 }
 
-mRosMemoryListEntryType *mros_topic_connector_receive_data(mRosContainerObjType obj)
+mRosReturnType mros_topic_connector_receive_data(mRosTopicConnectorManagerType *mgrp, mRosContainerObjType obj, mRosMemoryListEntryType **memp)
 {
+	mRosReturnType ret;
 	mRosMemoryListEntryType *data;
 	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
 
+	*memp = MROS_NULL;
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
 	if (type == MROS_NODE_TYPE_INNER) {
 		if (entry->data.queue_head.entry_num == 0) {
-			return MROS_NULL;
+			return MROS_E_NOENT;
 		}
 		ListEntry_GetFirst(&entry->data.queue_head, &data);
 		ListEntry_RemoveEntry(&entry->data.queue_head, data);
-		return data;
+		*memp = data;
+		return MROS_E_OK;
 	}
 	//outer node
 	if (entry->data.commp == MROS_NULL) {
 		return MROS_NULL;
 	}
-	return entry->data.commp->data.op.topic_data_receive(&entry->data.commp->data.client, entry->data.mempool);
+	ret = entry->data.commp->data.op.topic_data_receive(&entry->data.commp->data.client, entry->data.mempool, memp);
+	if ((ret != MROS_E_OK) && (ret != MROS_E_NOENT)) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		mgrp->is_error = MROS_TRUE;
+		mros_comm_tcp_client_close(&entry->data.commp->data.client);
+	}
+
+	return ret;
 }
 
+static mros_boolean mros_topic_connector_purge_one(mRosTopicConnectorManagerType *mgrp, mRosTopicConnectorListEntryRootType *topic_root)
+{
+	mRosTopicConnectorListEntryType *entryp;
+
+	ListEntry_Foreach(&topic_root->data.head[MROS_NODE_TYPE_OUTER], entryp) {
+		if (entryp->data.commp != MROS_NULL) {
+			if (mros_comm_tcp_client_is_connected(&entryp->data.commp->data.client) == MROS_FALSE) {
+				entryp->data.commp->data.op.free(entryp->data.commp);
+				entryp->data.commp = MROS_NULL;
+				mros_node_remove(entryp->data.value.node_id);
+				ListEntry_RemoveEntry(&topic_root->data.head[MROS_NODE_TYPE_OUTER], entryp);
+				ListEntry_Free(&mgrp->conn_head, entryp);
+				ROS_ERROR("removed connector topic_id=%d node_id=%d", entryp->data.value.topic_id, entryp->data.value.node_id);
+				return MROS_TRUE;
+			}
+		}
+	}
+	return MROS_FALSE;
+}
+
+void mros_topic_connector_purge(mRosTopicConnectorManagerType *mgrp)
+{
+	mros_boolean is_removed = MROS_FALSE;
+	mRosTopicConnectorListEntryRootType *topic_first = MROS_NULL;
+	mRosTopicConnectorListEntryRootType *topic_root = MROS_NULL;
+
+	if (mgrp->is_error == MROS_FALSE) {
+		return;
+	}
+	if (mgrp->topic_head.entry_num == 0) {
+		return;
+	}
+
+	ListEntry_GetFirst(&mgrp->topic_head, &topic_first);
+	topic_root = topic_first;
+	do {
+		do {
+			is_removed = mros_topic_connector_purge_one(mgrp, topic_root);
+		} while (is_removed == MROS_TRUE);
+		topic_root = topic_root->next;
+	} while (topic_root != topic_first);
+
+	mgrp->is_error = MROS_FALSE;
+	return;
+}

@@ -9,7 +9,7 @@ extern "C" {
 #include "mros_comm_tcp_client_cimpl.h"
 
 extern mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, const char *data, mRosSizeType datalen);
-extern mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType *client, mRosMemoryManagerType *mempool);
+extern mRosReturnType mros_protocol_topic_data_receive(mRosCommTcpClientType *client, mRosMemoryManagerType *mempool, mRosMemoryListEntryType **retp);
 
 /*
  * reqp: mRosCommTcpClientListReqEntryType

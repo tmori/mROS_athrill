@@ -20,6 +20,7 @@ static encode_table_type encode_table[MROS_PACKET_DATA_NUM] = {
 		encode_register_subscriber_req,			//MROS_PACKET_DATA_REGISTER_SUBSCRIBER_REQ
 		encode_request_topic_req,				//MROS_PACKET_DATA_REQUEST_TOPIC_REQ
 		encode_request_topic_res,				//MROS_PACKET_DATA_REQUEST_TOPIC_RES
+		MROS_NULL,								//MROS_PACKET_DATA_PUBLISHER_UPDATE_REQ
 		encode_tcpros_topic_req,				//MROS_PACKET_DATA_TCPROS_TOPIC_REQ
 		encode_tcpros_topic_res,				//MROS_PACKET_DATA_TCPROS_TOPIC_RES
 		encode_topic_data,						//MROS_PACKET_DATA_TOPIC

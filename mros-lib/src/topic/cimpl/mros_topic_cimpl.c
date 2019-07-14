@@ -183,6 +183,7 @@ mRosReturnType mros_topic_remove_byname(const char *topic_name)
 	if (ret != MROS_E_OK) {
 		return ret;
 	}
+	ListEntry_RemoveEntry(&topic_manager.head, &TOPIC_OBJ(id));
 	ListEntry_Free(&topic_manager.head, &TOPIC_OBJ(id));
 	return MROS_E_OK;
 }
@@ -191,6 +192,7 @@ mRosReturnType mros_topic_remove_byid(mRosTopicIdType id)
 	if (id > topic_manager.max_topic) {
 		return MROS_E_RANGE;
 	}
+	ListEntry_RemoveEntry(&topic_manager.head, &TOPIC_OBJ(id));
 	ListEntry_Free(&topic_manager.head, &TOPIC_OBJ(id));
 	return MROS_E_OK;
 }

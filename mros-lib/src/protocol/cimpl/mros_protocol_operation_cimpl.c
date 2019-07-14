@@ -36,7 +36,7 @@ mRosReturnType mros_protocol_topic_data_send(mRosCommTcpClientType *client, cons
 	return mros_comm_tcp_client_send_all(client, data, datalen, &res);
 }
 
-mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType *client, mRosMemoryManagerType *mempool)
+mRosReturnType mros_protocol_topic_data_receive(mRosCommTcpClientType *client, mRosMemoryManagerType *mempool, mRosMemoryListEntryType **retp)
 {
 	mRosPacketType packet;
 	mRosSizeType len;
@@ -44,17 +44,18 @@ mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType 
 	mRosReturnType ret;
 	mRosMemoryListEntryType *mem_entryp;
 	mros_int8 rawdata[MROS_TOPIC_RAWDATA_HEADER_SIZE];
+	*retp = MROS_NULL;
 
 	ret = mros_comm_socket_wait_readable(&client->socket, 0);
 	if (ret != MROS_E_OK) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return MROS_NULL;
+		return ret;
 	}
 	//receive header
 	ret = mros_comm_tcp_client_receive_all(client, rawdata, MROS_TOPIC_RAWDATA_HEADER_SIZE, &res);
 	if (ret != MROS_E_OK) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return MROS_NULL;
+		return ret;
 	}
 	//decode header
 	packet.total_size = MROS_TOPIC_RAWDATA_HEADER_SIZE;
@@ -63,13 +64,13 @@ mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType 
 	ret = mros_topicpacket_get_body_size(&packet, &len);
 	if (ret != MROS_E_OK) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return MROS_NULL;
+		return ret;
 	}
 	//receive body
 	ret = mros_mem_alloc(mempool, len, &mem_entryp);
 	if (ret != MROS_E_OK) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return MROS_NULL;
+		return ret;
 	}
 	packet.total_size = len;
 	packet.data_size = len;
@@ -78,9 +79,10 @@ mRosMemoryListEntryType* mros_protocol_topic_data_receive(mRosCommTcpClientType 
 	ret = mros_comm_tcp_client_receive_all(client, packet.data, len, &res);
 	if (ret != MROS_E_OK) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return MROS_NULL;
+		return ret;
 	}
-	return mem_entryp;
+	*retp = mem_entryp;
+	return MROS_E_OK;
 }
 
 void mros_protocol_client_obj_free(void* reqp)

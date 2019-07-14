@@ -38,7 +38,12 @@ typedef struct {
 
 
 static mRosNodeManagerType node_manager[MROS_NODE_TYPE_NUM] MROS_MATTR_BSS_NOCLR;
-#define NODE_OBJ(type, id)		node_manager[(type)].node_entries[MROS_INDEX((id))]
+#define NODE_OBJ(type, id)		( \
+									( type == MROS_NODE_TYPE_INNER) ? \
+											&node_manager[(type)].node_entries[MROS_INDEX((id))] :	\
+											&node_manager[(type)].node_entries[MROS_INDEX((id - node_manager[MROS_NODE_TYPE_INNER].max_node))] \
+								)
+
 #define NODE_TYPE(id)	( (id <= node_manager[MROS_NODE_TYPE_INNER].max_node) ? MROS_NODE_TYPE_INNER : MROS_NODE_TYPE_OUTER )
 
 static mRosNodeListEntryType node_entries[MROS_NODE_TYPE_NUM][MROS_NODE_MAX_NUM] MROS_MATTR_BSS_NOCLR;
@@ -131,7 +136,7 @@ const char* mros_node_name(mRosNodeIdType id)
 	if (type != MROS_NODE_TYPE_INNER) {
 		return MROS_NULL;
 	}
-	return NODE_OBJ(type, id).data.node_name;
+	return NODE_OBJ(type, id)->data.node_name;
 }
 static mRosReturnType mros_node_create(const char *node_name, mRosTaskIdType task_id, mRosNodeEnumType type, mRosNodeIdType *id)
 {
@@ -192,12 +197,14 @@ mRosReturnType mros_node_create_outer(mRosNodeIdType *id)
 
 mRosReturnType mros_node_remove(mRosNodeIdType id)
 {
+	mRosNodeListEntryType *nodep;
 	mRosNodeEnumType type = NODE_TYPE(id);
 	if (id > NODE_MAX_ID(type)) {
 		ROS_ERROR("%s %u ret=%d", __FUNCTION__, __LINE__, MROS_E_RANGE);
 		return MROS_E_RANGE;
 	}
-
-	ListEntry_Free(&node_manager[type].head, &NODE_OBJ(type, id));
+	nodep = NODE_OBJ(type, id);
+	ListEntry_RemoveEntry(&node_manager[type].head, nodep);
+	ListEntry_Free(&node_manager[type].head, nodep);
 	return MROS_E_OK;
 }

@@ -17,7 +17,7 @@ static void mros_topic_subscribe(mRosTopicConnectorManagerType *mgrp, mRosNodeEn
 	}
 
 	while (obj != MROS_COBJ_NULL) {
-		ret = mros_topic_connector_send_data(obj, topic_data->data.memp, topic_data->data.size);
+		ret = mros_topic_connector_send_data(mgrp, obj, topic_data->data.memp, topic_data->data.size);
 		if (ret != MROS_E_OK) {
 			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		}
@@ -63,5 +63,7 @@ void mros_topic_data_subscriber_run(void)
 			(void)mros_mem_free(topic_data->data.mgrp, topic_data);
 		}
 	}
+
+	mros_topic_connector_purge(mgrp);
 	return;
 }

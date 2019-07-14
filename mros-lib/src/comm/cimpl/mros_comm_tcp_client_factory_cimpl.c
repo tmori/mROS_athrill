@@ -54,6 +54,7 @@ mRosCommTcpClientListReqEntryType *mros_comm_tcp_client_alloc_copy(mRosCommTcpCl
 }
 void mros_comm_tcp_client_free(mRosCommTcpClientListReqEntryType *client)
 {
+	ListEntry_RemoveEntry(&mros_comm_tcp_client_factory, client);
 	ListEntry_Free(&mros_comm_tcp_client_factory, client);
 	return;
 }
