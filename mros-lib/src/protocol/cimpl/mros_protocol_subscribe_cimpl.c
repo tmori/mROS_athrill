@@ -20,7 +20,7 @@ typedef union {
 typedef struct {
 	mRosProtocolSubscribeStateEnumType 	state;
 	mRosPacketType						tcpros_packet;
-	mRosTopicConnectorManagerType 		*pub_mgrp;// for outer
+	mRosTopicConnectorManagerType 		*pub_mgrp;// for outer pub
 } mRosProtocolSubscribeType;
 
 static mRosProtocolSubscribeType mros_protocol_subscribe MROS_MATTR_BSS_NOCLR;
@@ -40,10 +40,11 @@ void mros_protocol_subscribe_run(void)
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;
 	mRosCommTcpClientListReqEntryType *client_req;
-	mRosContainerObjType cobj;
 	mRosRcpRosReqType req;
 	mRosTcpRosResType res;
+	mRosContainerObjType cobj;
 	mROsExclusiveUnlockObjType unlck_obj;
+	mRosTopicConnectorType sub_connector;
 
 	req.req_packet = &mros_protocol_subscribe.tcpros_packet;
 	res.reply_packet = &mros_protocol_subscribe.tcpros_packet;
@@ -90,7 +91,15 @@ void mros_protocol_subscribe_run(void)
 		}
 
 		mros_protocol_subscribe.state = MROS_PROTOCOL_SUBSCRIBE_STATE_PUB_REQUESTING;
-		req.node_name = mros_node_name(connector.node_id);
+		sub_connector.node_id = mros_proc_connector_get_first(connector.topic_id, MROS_TOPIC_CONNECTOR_SUB, MROS_NODE_TYPE_INNER, MROS_NULL);
+		if (sub_connector.node_id == MROS_ID_NONE) {
+			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+			(void)mros_node_remove(connector.node_id);
+			mros_comm_tcp_client_free(client_req);
+			continue;
+		}
+
+		req.node_name = mros_node_name(sub_connector.node_id);
 		req.topic_name = mros_topic_get_topic_name(connector.topic_id);
 		req.topic_typename = mros_topic_get_topic_typename(connector.topic_id);
 		ret = mros_rpc_tcpros(&client_req->data.client, &req, &res);
@@ -105,8 +114,10 @@ void mros_protocol_subscribe_run(void)
 		cobj = mros_topic_connector_get_obj(mros_protocol_subscribe.pub_mgrp, &connector);
 		(void)mros_topic_connector_set_connection(cobj, client_req);
 		//wakeup api requester
-		mros_client_wakeup((mRosWaitListEntryType*)client_req->data.reqobj.api_reqp);
-		client_req->data.reqobj.api_reqp = NULL;
+		if (client_req->data.reqobj.api_reqp != MROS_NULL) {
+			mros_client_wakeup((mRosWaitListEntryType*)client_req->data.reqobj.api_reqp);
+			client_req->data.reqobj.api_reqp = NULL;
+		}
 	}
 	mros_exclusive_unlock(&unlck_obj);
 	return;

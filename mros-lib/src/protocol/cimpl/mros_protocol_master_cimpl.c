@@ -1,5 +1,6 @@
 #include "mros_protocol_master_cimpl.h"
 #include "mros_protocol_client_rpc_cimpl.h"
+#include "mros_protocol_server_proc_cimpl.h"
 #include "mros_topic_cimpl.h"
 #include "mros_topic_connector_factory_cimpl.h"
 #include "mros_protocol_operation_cimpl.h"
@@ -121,9 +122,6 @@ static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;
 	mRosRequestTopicReqType rpc_request;
-	mros_uint32 ipaddr;
-	mros_int32 port;
-	mRosPtrType ptr;
 
 	ret = mros_topic_connector_get(req->connector_obj,  &connector);
 	if (ret != MROS_E_OK) {
@@ -147,31 +145,7 @@ static mRosReturnType mros_protocol_master_request_topic(mRosCommTcpClientType *
 		return ret;
 	}
 
-	//TODO まだ出版ノードが存在しない場合は，非同期でマスタから情報をもらう
-	ptr = mros_xmlpacket_reqtopicres_get_first_uri(rpc_response->reply_packet, &ipaddr, &port);
-	while (ptr != MROS_NULL) {
-		mRosCommTcpClientListReqEntryType *req = mros_comm_tcp_client_alloc();
-		if (req == MROS_NULL) {
-			ret = MROS_E_NOMEM;
-			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-			goto done;
-		}
-		req->data.reqobj.ipaddr = ipaddr;
-		req->data.reqobj.port = port;
-		req->data.reqobj.topic_id = connector.topic_id;
-		req->data.op.free = mros_protocol_client_obj_free;
-		req->data.op.topic_data_receive = mros_protocol_topic_data_receive;
-		req->data.op.topic_data_send = mros_protocol_topic_data_send;
-		mros_client_wait_entry_init(&req->data.reqobj.waitobj, req);
-		req->data.reqobj.api_reqp = (void*)mros_protocol_master.api_reqp;
-
-		mros_client_put_request(&mros_subscribe_wait_queue, &req->data.reqobj.waitobj);
-
-		ptr = mros_xmlpacket_reqtopicres_get_next_uri(ptr, rpc_response->reply_packet, &ipaddr, &port);
-	}
-
-done:
-	return ret;
+	return mros_proc_request_outer_node_addition(connector.topic_id, rpc_response, mros_protocol_master.api_reqp);
 }
 
 static mRosReturnType mros_protocol_master_register_publisher(mRosProtocolMasterRequestType *pub_req)

@@ -5,6 +5,8 @@
 #include "mros_topic_connector_factory_cimpl.h"
 #include "mros_packet_encoder_cimpl.h"
 #include "mros_packet_decoder_cimpl.h"
+#include "mros_exclusive_area.h"
+#include "mros_wait_queue.h"
 #include "mros_sys_config.h"
 #include <string.h>
 
@@ -71,14 +73,15 @@ mRosReturnType mros_proc_tcpros_receive(mRosCommTcpClientType *client, mRosPacke
 	return ret;
 }
 
-static mRosNodeIdType mros_publisher_is_exist(mRosTopicIdType topic_id)
+mRosNodeIdType mros_proc_connector_get_first(mRosTopicIdType topic_id, mRosTopicConnectorEnumType type, mRosNodeEnumType nodeType, mRosTopicOuterTcpConnectionType *tcp_conn)
 {
 	mRosContainerObjType obj;
 	mRosContainerObjType topic_obj;
-	mRosTopicConnectorType connector;
 	mRosTopicConnectorManagerType *mgrp;
+	mRosCommTcpClientListReqEntryType *connection;
+	mRosTopicConnectorType connector;
 
-	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_PUB);
+	mgrp = mros_topic_connector_factory_get(type);
 	if (mgrp == MROS_NULL) {
 		return MROS_ID_NONE;
 	}
@@ -86,18 +89,30 @@ static mRosNodeIdType mros_publisher_is_exist(mRosTopicIdType topic_id)
 	if (topic_obj == MROS_COBJ_NULL) {
 		return MROS_ID_NONE;
 	}
-	obj = mros_topic_connector_get_first(mgrp, MROS_NODE_TYPE_INNER, topic_obj);
-	if (obj != MROS_COBJ_NULL) {
-		(void)mros_topic_connector_get(obj, &connector);
-		return connector.node_id;
+	obj = mros_topic_connector_get_first(mgrp, nodeType, topic_obj);
+	while (obj != MROS_COBJ_NULL) {
+		(void)mros_topic_connector_get(obj,  &connector);
+		if (tcp_conn != MROS_NULL) {
+			 (void)mros_topic_connector_get_connection(obj, &connection);
+			 if (connection != MROS_NULL) {
+				 if ( (connection->data.client.remote.sin_port == tcp_conn->port) &&
+						 (connection->data.client.remote.sin_addr.s_addr == tcp_conn->ipaddr) ) {
+					return connector.node_id;
+				 }
+			 }
+		}
+		else {
+			return connector.node_id;
+		}
+		obj = mros_topic_connector_get_next(mgrp, topic_obj, obj);
 	}
 	return MROS_ID_NONE;
 }
 
-
 static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *client, mRosPacketType *packet)
 {
 	mRosReturnType ret;
+	mRosNodeIdType node_id;
 	mRosTopicIdType topic_id;
 	mRosSizeType res;
 
@@ -110,7 +125,7 @@ static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *clien
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
-	mRosNodeIdType node_id = mros_publisher_is_exist(topic_id);
+	node_id = mros_proc_connector_get_first(topic_id, MROS_TOPIC_CONNECTOR_PUB, MROS_NODE_TYPE_INNER, NULL);
 	if (node_id == MROS_ID_NONE) {
 		//TODO error reply...
 		// original code does not support this case...
@@ -134,6 +149,123 @@ static mRosReturnType mros_proc_slave_request_topic(mRosCommTcpClientType *clien
 	return ret;
 }
 
+mRosReturnType mros_proc_request_outer_node_addition(mRosTopicIdType topic_id, mRosRequestTopicResType *rpc_response, void *api_reqp)
+{
+	mRosReturnType ret = MROS_E_OK;
+	mRosPtrType ptr;
+	mRosTopicOuterTcpConnectionType tcp_conn;
+
+	ptr = mros_xmlpacket_reqtopicres_get_first_uri(rpc_response->reply_packet, &tcp_conn.ipaddr, &tcp_conn.port);
+	while (ptr != MROS_NULL) {
+		mRosCommTcpClientListReqEntryType *req = mros_comm_tcp_client_alloc();
+		if (req == MROS_NULL) {
+			ret = MROS_E_NOMEM;
+			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+			goto done;
+		}
+		if (mros_proc_connector_get_first(topic_id, MROS_TOPIC_CONNECTOR_PUB, MROS_NODE_TYPE_OUTER, &tcp_conn) != MROS_ID_NONE) {
+			mros_comm_tcp_client_free(req);
+			ptr = mros_xmlpacket_reqtopicres_get_next_uri(ptr, rpc_response->reply_packet, &tcp_conn.ipaddr, &tcp_conn.port);
+			continue;
+		}
+		req->data.reqobj.ipaddr = tcp_conn.ipaddr;
+		req->data.reqobj.port = tcp_conn.port;
+		req->data.reqobj.topic_id = topic_id;
+		req->data.op.free = mros_protocol_client_obj_free;
+		req->data.op.topic_data_receive = mros_protocol_topic_data_receive;
+		req->data.op.topic_data_send = mros_protocol_topic_data_send;
+		mros_client_wait_entry_init(&req->data.reqobj.waitobj, req);
+		req->data.reqobj.api_reqp = api_reqp;
+
+		mros_client_put_request(&mros_subscribe_wait_queue, &req->data.reqobj.waitobj);
+
+		ptr = mros_xmlpacket_reqtopicres_get_next_uri(ptr, rpc_response->reply_packet, &tcp_conn.ipaddr, &tcp_conn.port);
+	}
+
+done:
+	return ret;
+}
+
+static mRosReturnType mros_proc_slave_publisher_update_do_request_topic(mRosTopicIdType topic_id, mRosTopicOuterTcpConnectionType *tcp_conn, mRosPacketType *packet)
+{
+	mRosReturnType ret;
+	mRosRequestTopicReqType rpc_request;
+	mRosRequestTopicResType rpc_response;
+	mRosCommTcpClientType slave_client;
+	mRosTopicConnectorType sub_connector;
+
+	sub_connector.topic_id = topic_id;
+	sub_connector.node_id = mros_proc_connector_get_first(topic_id, MROS_TOPIC_CONNECTOR_SUB, MROS_NODE_TYPE_INNER, MROS_NULL);
+	if (sub_connector.node_id == MROS_ID_NONE) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_NOENT);
+		return MROS_E_NOENT;
+	}
+
+	rpc_request.req_packet = packet;
+	rpc_response.reply_packet =  packet;
+
+	rpc_request.node_name = mros_node_name(sub_connector.node_id);
+	rpc_request.topic_name = mros_topic_get_topic_name(topic_id);
+
+	ret = mros_comm_tcp_client_ip32_init(&slave_client, tcp_conn->ipaddr, tcp_conn->port);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		return ret;
+	}
+	ret = mros_comm_tcp_client_connect(&slave_client);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		return ret;
+	}
+	ret = mros_rpc_request_topic(&slave_client, &rpc_request, &rpc_response);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		return ret;
+	}
+	ret = mros_xmlpacket_reqtopicres_result(rpc_response.reply_packet);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		return ret;
+	}
+	mros_comm_tcp_client_close(&slave_client);
+	ret = mros_proc_request_outer_node_addition(topic_id, &rpc_response, MROS_NULL);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		return ret;
+	}
+	return MROS_E_OK;
+}
+
+static mRosReturnType mros_proc_slave_publisher_update(mRosCommTcpClientType *client, mRosPacketType *packet)
+{
+	mRosReturnType ret;
+	mRosTopicIdType topic_id;
+	mRosPtrType ptr;
+	mRosTopicOuterTcpConnectionType tcp_conn;
+
+	if (mros_proc_slave_decoded_requst.request.topic.topic_name.res.len >= MROS_TOPIC_NAME_MAXLEN) {
+		return MROS_E_INVAL;
+	}
+	mros_proc_slave_decoded_requst.request.topic.topic_name.res.head[mros_proc_slave_decoded_requst.request.topic.topic_name.res.len] = '\0';
+	ret = mros_topic_get((const char*)&mros_proc_slave_decoded_requst.request.topic.topic_name.res.head[0], &topic_id);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+		return ret;
+	}
+
+	ptr = mros_xmlpacket_pubupreq_get_first_uri(&mros_proc_slave_decoded_requst.request.publisher_update.topic_name.res.tail[1], &tcp_conn.ipaddr, &tcp_conn.port);
+	while (ptr != MROS_NULL) {
+		ret = mros_proc_slave_publisher_update_do_request_topic(topic_id, &tcp_conn, packet);
+		if (ret != MROS_E_OK) {
+			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
+			return ret;
+		}
+		ptr = mros_xmlpacket_pubupreq_get_next_uri(ptr, packet, &tcp_conn.ipaddr, &tcp_conn.port);
+	}
+
+	return ret;
+}
+
 mRosReturnType mros_proc_slave(mRosCommTcpClientType *client, mRosPacketType *packet)
 {
 	mRosReturnType ret = MROS_E_INVAL;
@@ -142,6 +274,9 @@ mRosReturnType mros_proc_slave(mRosCommTcpClientType *client, mRosPacketType *pa
 	switch (type) {
 	case MROS_PACKET_DATA_REQUEST_TOPIC_REQ:
 		ret = mros_proc_slave_request_topic(client, packet);
+		break;
+	case MROS_PACKET_DATA_PUBLISHER_UPDATE_REQ:
+		ret = mros_proc_slave_publisher_update(client, packet);
 		break;
 	default:
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
@@ -195,6 +330,7 @@ static mRosReturnType mros_proc_add_outersub_connector(mRosCommTcpClientType *cl
 mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketType *packet)
 {
 	mRosReturnType ret;
+	mRosNodeIdType node_id;
 	mRosTopicIdType topic_id;
 	mRosSizeType res;
 	mRosTcpRosPacketType tcpros_packet;
@@ -209,7 +345,7 @@ mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketTyp
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return ret;
 	}
-	mRosNodeIdType node_id = mros_publisher_is_exist(topic_id);
+	node_id = mros_proc_connector_get_first(topic_id, MROS_TOPIC_CONNECTOR_PUB, MROS_NODE_TYPE_INNER, NULL);
 	if (node_id == MROS_ID_NONE) {
 		//TODO error reply...
 		// original code does not support this case...

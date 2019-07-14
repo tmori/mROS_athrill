@@ -10,6 +10,7 @@ typedef union {
 	char buffer;
 	char buffer1[MROS_PACKET_MAXSIZE_REQ_REQUEST_TOPIC];
 	char buffer2[MROS_PACKET_MAXSIZE_RES_REQUEST_TOPIC];
+	char buffer3[MROS_PACKET_MAXSIZE_REQ_PUBLISHER_UPDATE];
 } mRosSlavePacketBufferType;
 static mRosSlavePacketBufferType mros_slave_packet_buffer MROS_MATTR_BSS_NOCLR;
 

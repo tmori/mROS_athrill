@@ -124,13 +124,13 @@ mRosReturnType mros_xmlpacket_subres_result(mRosPacketType *packet)
 {
 	return mros_xmlpacket_result(packet);
 }
-mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
+static mRosPtrType mros_xmlpacket_get_first_uri(char *packet_data, mros_uint32 *ipaddr, mros_int32 *port)
 {
 	//search HERE
 	//        |
 	//        V
 	//"http://xxx.xxx.xx:8080/"
-	char* head = find_string_after((const char *)&packet->data[0], "http://");
+	char* head = find_string_after((const char *)packet_data, "http://");
 	if (head == MROS_NULL) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_NULL;
@@ -174,6 +174,11 @@ mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uin
 	return (mRosPtrType)tail;
 }
 
+mRosPtrType mros_xmlpacket_subres_get_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
+{
+	return mros_xmlpacket_get_first_uri(&packet->data[0], ipaddr, port);
+}
+
 mRosPtrType mros_xmlpacket_subres_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
 {
 	//TODO
@@ -205,7 +210,8 @@ static mRosReturnType mros_xmlpacket_get_member_info(const char*p, mRosPacketMem
 static mRosPacketDataEnumType mros_xmlpacket_slave_request_get_method(mRosPacketType *packet, mRosPacketMemberInfoType *minfop)
 {
 	mRosReturnType ret;
-	mRosSizeType len = strlen("requestTopic");
+	mRosSizeType reqtopic_len = strlen("requestTopic");
+	mRosSizeType pubup_len = strlen("publisherUpdate");
 
 	//"<methodName>requestTopic</methodName>"
 	minfop->req.start_key = "<methodName>";
@@ -216,14 +222,16 @@ static mRosPacketDataEnumType mros_xmlpacket_slave_request_get_method(mRosPacket
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
 		return MROS_PACKET_DATA_INVALID;
 	}
-	if (len != minfop->res.len) {
-		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
-		return MROS_PACKET_DATA_INVALID;
+	if (reqtopic_len == minfop->res.len) {
+		if (strncmp(minfop->res.head, "requestTopic", reqtopic_len) == 0) {
+			return MROS_PACKET_DATA_REQUEST_TOPIC_REQ;
+		}
 	}
-	if (strncmp(minfop->res.head, "requestTopic", len) == 0) {
-		return MROS_PACKET_DATA_REQUEST_TOPIC_REQ;
+	if (pubup_len == minfop->res.len) {
+		if (strncmp(minfop->res.head, "publisherUpdate", pubup_len) == 0) {
+			return MROS_PACKET_DATA_PUBLISHER_UPDATE_REQ;
+		}
 	}
-
 	ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
 	return MROS_PACKET_DATA_INVALID;
 }
@@ -259,6 +267,30 @@ static mRosReturnType mros_xmlpacket_request_topic_req_decode(mRosPacketType *pa
 	return MROS_E_OK;
 }
 
+static mRosReturnType mros_xmlpacket_publisher_update_req_decode(mRosPacketType *packet, mRosPacketDecodedRequestType *decoded_infop)
+{
+	mRosReturnType ret;
+	char *node_name_tail;
+
+	decoded_infop->request.publisher_update.name.req.start_key = REQTOPIC_VALUE_TAG_START;
+	decoded_infop->request.publisher_update.name.req.end_key = "<";
+	ret = mros_xmlpacket_get_member_info(decoded_infop->method.res.tail, &decoded_infop->request.publisher_update.name);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
+		return MROS_E_INVAL;
+	}
+	node_name_tail = decoded_infop->request.publisher_update.name.res.tail;
+	decoded_infop->request.publisher_update.topic_name.req.start_key = REQTOPIC_VALUE_TAG_START;
+	decoded_infop->request.publisher_update.topic_name.req.end_key = "<";
+	ret = mros_xmlpacket_get_member_info(node_name_tail, &decoded_infop->request.publisher_update.topic_name);
+	if (ret != MROS_E_OK) {
+		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, MROS_E_INVAL);
+		return MROS_E_INVAL;
+	}
+
+	return MROS_E_OK;
+}
+
 mRosPacketDataEnumType mros_xmlpacket_slave_request_decode(mRosPacketType *packet, mRosPacketDecodedRequestType *decoded_infop)
 {
 	mRosReturnType ret = MROS_E_INVAL;
@@ -266,6 +298,9 @@ mRosPacketDataEnumType mros_xmlpacket_slave_request_decode(mRosPacketType *packe
 	switch (decoded_infop->packet_type) {
 	case MROS_PACKET_DATA_REQUEST_TOPIC_REQ:
 		ret = mros_xmlpacket_request_topic_req_decode(packet, decoded_infop);
+		break;
+	case MROS_PACKET_DATA_PUBLISHER_UPDATE_REQ:
+		ret = mros_xmlpacket_publisher_update_req_decode(packet, decoded_infop);
 		break;
 	default:
 		break;
@@ -389,6 +424,17 @@ mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mro
 }
 
 mRosPtrType mros_xmlpacket_reqtopicres_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
+{
+	//TODO
+	return MROS_NULL;
+}
+
+mRosPtrType mros_xmlpacket_pubupreq_get_first_uri(char *packet_data, mros_uint32 *ipaddr, mros_int32 *port)
+{
+	return mros_xmlpacket_get_first_uri(packet_data, ipaddr, port);
+}
+
+mRosPtrType mros_xmlpacket_pubupreq_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port)
 {
 	//TODO
 	return MROS_NULL;

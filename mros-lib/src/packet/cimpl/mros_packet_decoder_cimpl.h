@@ -57,6 +57,10 @@ typedef struct {
 			mRosPacketMemberInfoType node_name;
 			mRosPacketMemberInfoType topic_name;
 		} topic;
+		struct {
+			mRosPacketMemberInfoType name;
+			mRosPacketMemberInfoType topic_name;
+		} publisher_update;
 	} request;
 } mRosPacketDecodedRequestType;
 extern mRosPacketDataEnumType mros_xmlpacket_slave_request_decode(mRosPacketType *packet, mRosPacketDecodedRequestType *decoded_infop);
@@ -73,6 +77,12 @@ extern mRosReturnType mros_xmlpacket_slave_reqtopic_get_topic_name(mRosPacketTyp
 extern mRosReturnType mros_xmlpacket_reqtopicres_result(mRosPacketType *packet);
 extern mRosPtrType mros_xmlpacket_reqtopicres_get_first_uri(mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port);
 extern mRosPtrType mros_xmlpacket_reqtopicres_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port);
+
+/*
+ * publisherUpdate request
+ */
+extern mRosPtrType mros_xmlpacket_pubupreq_get_first_uri(char *packet_data, mros_uint32 *ipaddr, mros_int32 *port);
+extern mRosPtrType mros_xmlpacket_pubupreq_get_next_uri(mRosPtrType ptr, mRosPacketType *packet, mros_uint32 *ipaddr, mros_int32 *port);
 
 /****************************************************
  * TCPROS
