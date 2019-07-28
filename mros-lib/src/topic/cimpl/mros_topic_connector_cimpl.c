@@ -306,7 +306,7 @@ mRosReturnType mros_topic_connector_send_data(mRosTopicConnectorManagerType *mgr
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
 	if (type == MROS_NODE_TYPE_INNER) {
 		//TOPIC ==> inner node callback
-		mros_topic_callback(entry->data.value.func_id, data);
+		mros_topic_callback(entry->data.value.func_id, data, len);
 		return MROS_E_OK;
 	}
 	//TOPIC ==> outer node
