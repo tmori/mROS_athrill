@@ -139,7 +139,7 @@ void usr_task1(void)
 	int argc = 0;
 	char *argv = NULL;
 	int i = 0;
-	ros::init(argc,argv,"mros_node");
+	ros::init(argc,argv,"vehicle_controller");
 	ros::NodeHandle n;
 	ros::Rate loop_rate(10);
 
@@ -147,11 +147,23 @@ void usr_task1(void)
 	car_actuator.stearing = n.advertise("control_stearing", 1);
 	car_actuator.brake = n.advertise("control_brake", 1);
 
-	topic_publish(car_actuator.motor, 10);
-	while(1){
+	topic_publish(car_actuator.motor, 30);
+	int brake_counter = 0;
+	while (1) {
 		if (car_sensor.obstacle.found != 0) {
+			brake_counter = 1;
+			topic_publish(car_actuator.motor, 0);
 			topic_publish(car_actuator.brake, 1);
 		}
+		if (brake_counter > 0) {
+			brake_counter++;
+			if ((brake_counter > 10) && (car_sensor.obstacle.found == 0)) {
+				topic_publish(car_actuator.brake, 0);
+				topic_publish(car_actuator.motor, 30);
+				brake_counter = 0;
+			}
+		}
+
 		i++;
 		loop_rate.sleep();
 	}
@@ -196,7 +208,7 @@ void obstacle_callback(string *msg)
 	car_sensor.obstacle.found = arg.argv[0];
 	car_sensor.obstacle.distance = arg.argv[1];
 	car_sensor.obstacle.angle = arg.argv[2];
-	syslog(LOG_NOTICE, "/obstacle found=%d distance=%d angle=%d", arg.argv[0], arg.argv[1], arg.argv[2]);
+	//syslog(LOG_NOTICE, "/obstacle found=%d distance=%d angle=%d", arg.argv[0], arg.argv[1], arg.argv[2]);
 }
 void line_sensor_callback(string *msg)
 {
@@ -212,15 +224,15 @@ void usr_task2(void)
 	syslog(LOG_NOTICE,"========Activate user task2========");
 	int argc = 0;
 	char *argv = NULL;
-	ros::init(argc,argv,"led1_node");
+	ros::init(argc,argv,"vehicle_sensor");
 	ros::NodeHandle n;
 	ros::Subscriber sub;
 
-	 //sub = n.subscriber("pose",1, pose_callback);
-	 //sub = n.subscriber("stearing",1, stearing_callback);
-	 //sub = n.subscriber("speed",1, speed_callback);
+	 sub = n.subscriber("pose",1, pose_callback);
+	 sub = n.subscriber("stearing",1, stearing_callback);
+	 sub = n.subscriber("speed",1, speed_callback);
 	 sub = n.subscriber("obstacle",1, obstacle_callback);
-	 //sub = n.subscriber("line_sensor",1, line_sensor_callback);
+	 sub = n.subscriber("line_sensor",1, line_sensor_callback);
 
 	ros::spin();
 }
