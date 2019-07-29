@@ -1,6 +1,7 @@
 #include "mros_topic_connector_cimpl.h"
 #include "mros_topic_callback.h"
 #include "mros_node_cimpl.h"
+#include "mros_topic_cimpl.h"
 #include "mros_usr_config.h"
 #include <string.h>
 
@@ -285,7 +286,6 @@ mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const cha
 		ListEntry_GetFirst(&entry->data.queue_head, &mem_entryp);
 		ListEntry_RemoveEntry(&entry->data.queue_head, mem_entryp);
 		(void)mros_mem_free(entry->data.mempool, mem_entryp);
-
 	}
 	ret = mros_mem_alloc(entry->data.mempool, len, &mem_entryp);
 	if (ret != MROS_E_OK) {
@@ -293,6 +293,30 @@ mRosReturnType mros_topic_connector_put_data(mRosContainerObjType obj, const cha
 	}
 	mem_entryp->data.size = len;
 	memcpy(mem_entryp->data.memp, data, mem_entryp->data.size);
+	ListEntry_AddEntry(&entry->data.queue_head, mem_entryp);
+	return MROS_E_OK;
+}
+mRosReturnType mros_topic_connector_alloc_data(mRosContainerObjType obj, char **data, mRosSizeType len)
+{
+	mRosReturnType ret;
+	mRosMemoryListEntryType *mem_entryp;
+	mRosTopicConnectorListEntryType *entry = (mRosTopicConnectorListEntryType*)obj;
+	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
+	if (type != MROS_NODE_TYPE_INNER) {
+		return MROS_E_INVAL;
+	}
+	if (entry->data.queue_head.entry_num >= entry->data.queue_maxsize) {
+		ROS_WARN("%s %s() %u :WARNING: Removed topic data for queufull(%u).", __FILE__, __FUNCTION__, __LINE__, entry->data.queue_maxsize);
+		ListEntry_GetFirst(&entry->data.queue_head, &mem_entryp);
+		ListEntry_RemoveEntry(&entry->data.queue_head, mem_entryp);
+		(void)mros_mem_free(entry->data.mempool, mem_entryp);
+	}
+	ret = mros_mem_alloc(entry->data.mempool, len, &mem_entryp);
+	if (ret != MROS_E_OK) {
+		return ret;
+	}
+	mem_entryp->data.size = len;
+	*data = mem_entryp->data.memp;
 	ListEntry_AddEntry(&entry->data.queue_head, mem_entryp);
 	return MROS_E_OK;
 }
@@ -306,7 +330,9 @@ mRosReturnType mros_topic_connector_send_data(mRosTopicConnectorManagerType *mgr
 	mRosNodeEnumType type = mros_node_type(entry->data.value.node_id);
 	if (type == MROS_NODE_TYPE_INNER) {
 		//TOPIC ==> inner node callback
-		mros_topic_callback(entry->data.value.func_id, data, len);
+		mros_uint32 type_id;
+		(void)mros_topic_get_typeid(entry->data.value.topic_id, &type_id);
+		mros_topic_callback(type_id, entry->data.value.func_id, data, len);
 		return MROS_E_OK;
 	}
 	//TOPIC ==> outer node

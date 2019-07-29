@@ -26,7 +26,6 @@ typedef mros_uint32 mRosIdType;
 typedef mros_uint32* mRosFuncIdType;
 typedef mros_int8* mRosPtrType;
 
-//typedef void (*mros_topic_callback)(void *);
 
 typedef mros_uint32* mRosContainerObjType;
 #define MROS_NULL (0)

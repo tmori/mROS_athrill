@@ -9,6 +9,9 @@ typedef struct {
 	char						topic_name[MROS_TOPIC_NAME_MAXLEN];
 	mros_uint32					typenamelen;
 	char						topic_typename[MROS_TOPIC_TYPENAME_MAXLEN];
+	const char*					md5sum;
+	const char*					definition;
+	mros_uint32					typeid;
 
 	/*
 	 * トピックデータ格納用キュー
@@ -157,6 +160,59 @@ mRosReturnType mros_topic_set_quesize_byid(mRosTopicIdType id, mRosSizeType size
 		return MROS_E_RANGE;
 	}
 	TOPIC_OBJ(id).data.queue_maxsize = size;
+	return MROS_E_OK;
+}
+mRosReturnType mros_topic_set_typeid(mRosTopicIdType topic_id, mros_uint32 type_id)
+{
+	if (topic_id > topic_manager.max_topic) {
+		return MROS_E_RANGE;
+	}
+	TOPIC_OBJ(topic_id).data.typeid = type_id;
+	return MROS_E_OK;
+}
+mRosReturnType mros_topic_get_typeid(mRosTopicIdType topic_id, mros_uint32 *type_id)
+{
+	if (topic_id > topic_manager.max_topic) {
+		return MROS_E_RANGE;
+	}
+	*type_id = TOPIC_OBJ(topic_id).data.typeid;
+	return MROS_E_OK;
+}
+
+mRosReturnType mros_topic_set_definition(mRosTopicIdType topic_id, const char* definition)
+{
+	if (topic_id > topic_manager.max_topic) {
+		return MROS_E_RANGE;
+	}
+	TOPIC_OBJ(topic_id).data.definition = definition;
+	return MROS_E_OK;
+}
+
+mRosReturnType mros_topic_get_definition(mRosTopicIdType topic_id, const char **definition)
+{
+	if (topic_id > topic_manager.max_topic) {
+		return MROS_E_RANGE;
+	}
+	*definition = TOPIC_OBJ(topic_id).data.definition;
+	return MROS_E_OK;
+}
+
+
+mRosReturnType mros_topic_set_md5sum(mRosTopicIdType topic_id, const char* md5sum)
+{
+	if (topic_id > topic_manager.max_topic) {
+		return MROS_E_RANGE;
+	}
+	TOPIC_OBJ(topic_id).data.md5sum = md5sum;
+	return MROS_E_OK;
+}
+
+mRosReturnType mros_topic_get_md5sum(mRosTopicIdType topic_id, const char **md5sum)
+{
+	if (topic_id > topic_manager.max_topic) {
+		return MROS_E_RANGE;
+	}
+	*md5sum = TOPIC_OBJ(topic_id).data.md5sum;
 	return MROS_E_OK;
 }
 

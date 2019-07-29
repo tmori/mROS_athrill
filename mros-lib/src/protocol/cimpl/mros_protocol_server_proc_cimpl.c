@@ -353,7 +353,8 @@ mRosReturnType mros_proc_pub_tcpros(mRosCommTcpClientType *client, mRosPacketTyp
 	}
 	else {
 		mRosEncodeArgType arg;
-		char *md5sum = "060021388200f6f0f447d0fcd9c64743";//TODO
+		const char* md5sum;
+		(void)mros_topic_get_md5sum(topic_id, &md5sum);
 		arg.type = MROS_PACKET_DATA_TCPROS_TOPIC_RES;
 		arg.args_int = 0;
 		arg.args_char = 4;

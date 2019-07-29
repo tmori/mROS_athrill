@@ -3,14 +3,6 @@
 
 #include <string>
 
-namespace std_msgs{
-class String{
-public:
-	std::string data;
-};
-}
-
-
 namespace ros {
 
 void init(int argc, char *argv, std::string node_name);
@@ -18,7 +10,8 @@ void init(int argc, char *argv, std::string node_name);
 
 class Publisher {
 public:
-	void publish(std_msgs::String& data);
+	template <class T>
+	void publish(T& data);
 	void set(void *cobj)
 	{
 		this->cobj = cobj;
@@ -48,7 +41,9 @@ private:
 
 class NodeHandle {
 public:
-	Subscriber subscriber(std::string topic, int queue_size, void(*fp)(std::string*));
+	template<class T>
+	Subscriber subscribe(std::string topic, int queue_size, void (*fp) (T));
+	template<class T>
 	Publisher advertise(std::string topic, int queue_size);
 };
 
@@ -66,6 +61,27 @@ private:
 
 void spin(void);
 
+}
+
+namespace message_traits
+{
+	template <int V>
+	struct MD5Sum{static const char* value();};
+
+	template <class T>
+	struct DataType{static const char* value();};
+
+	template <class T>
+	struct DataTypeId{static const int value();};
+
+	template <class T>
+	struct Definition{static const char* value();};
+}
+
+namespace subtask_methods
+{
+	template <int T>
+	struct CallCallbackFuncs{static void call(void (*fp)(), char *rbuf, int len);};
 }
 
 

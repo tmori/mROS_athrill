@@ -1,4 +1,5 @@
 #include "ros.h"
+#include "message_headers.h"
 #include "mros_node_cimpl.h"
 #include "mros_topic_cimpl.h"
 #include "mros_topic_connector_factory_cimpl.h"
@@ -6,6 +7,7 @@
 #include "mros_wait_queue.h"
 #include "mros_protocol_master_cimpl.h"
 #include "mros_usr_config.h"
+#include "mros_topic_callback.h"
 #include <string.h>
 
 
@@ -24,7 +26,8 @@ void ros::init(int argc, char *argv, std::string node_name)
 	return;
 }
 
-ros::Subscriber ros::NodeHandle::subscriber(std::string topic, int queue_size, void(*fp)(std::string*))
+template <class T>
+ros::Subscriber ros::NodeHandle::subscribe(std::string topic, int queue_size, void (*fp) (T))
 {
 	Subscriber sub;
 	mRosReturnType ret;
@@ -33,6 +36,7 @@ ros::Subscriber ros::NodeHandle::subscriber(std::string topic, int queue_size, v
 	mRosProtocolMasterRequestType req;
 	mRosWaitListEntryType client_wait;
 	mROsExclusiveUnlockObjType unlck_obj;
+	mros_uint32 type_id;
 
 	mros_client_wait_entry_init(&client_wait, &req);
 
@@ -47,12 +51,16 @@ ros::Subscriber ros::NodeHandle::subscriber(std::string topic, int queue_size, v
 		return sub;
 	}
 
-	ret = mros_topic_create(topic.c_str(), "std_msgs/String", &connector.topic_id);//TODO typename
+	ret = mros_topic_create(topic.c_str(), message_traits::DataType<T>().value(), &connector.topic_id);
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return sub;
 	}
+	(void)mros_topic_set_typeid(connector.topic_id, message_traits::DataTypeId<T>().value());
+	(void)mros_topic_set_definition(connector.topic_id, message_traits::Definition<T>().value());
+	(void)mros_topic_get_typeid(connector.topic_id, &type_id);
+	(void)mros_topic_set_md5sum(connector.topic_id, getMD5Sum((int)type_id));
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_SUB);
 	if (mgrp == MROS_NULL) {
@@ -85,6 +93,7 @@ ros::Subscriber ros::NodeHandle::subscriber(std::string topic, int queue_size, v
 	return sub;
 }
 
+template <class T>
 ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 {
 	Publisher pub;
@@ -94,6 +103,7 @@ ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 	mRosProtocolMasterRequestType req;
 	mRosWaitListEntryType client_wait;
 	mROsExclusiveUnlockObjType unlck_obj;
+	mros_uint32 type_id;
 
 	mros_client_wait_entry_init(&client_wait, &req);
 
@@ -107,12 +117,16 @@ ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 		return pub;
 	}
 
-	ret = mros_topic_create(topic.c_str(), "std_msgs/String", &connector.topic_id);//TODO typename
+	ret = mros_topic_create(topic.c_str(), message_traits::DataType<T*>().value(), &connector.topic_id);//TODO typename
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 		return pub;
 	}
+	(void)mros_topic_set_typeid(connector.topic_id, message_traits::DataTypeId<T*>().value());
+	(void)mros_topic_set_definition(connector.topic_id, message_traits::Definition<T*>().value());
+	(void)mros_topic_get_typeid(connector.topic_id, &type_id);
+	(void)mros_topic_set_md5sum(connector.topic_id, getMD5Sum((int)type_id));
 
 	mgrp = mros_topic_connector_factory_get(MROS_TOPIC_CONNECTOR_PUB);
 	if (mgrp == MROS_NULL) {
@@ -147,18 +161,19 @@ ros::Publisher ros::NodeHandle::advertise(std::string topic, int queue_size)
 }
 
 
-void ros::Publisher::publish(std_msgs::String& data)
+template <class T>
+void ros::Publisher::publish(T& data)
 {
 	mRosReturnType ret;
-	const char *snd_data = data.data.c_str();
-	mRosSizeType len = strlen(snd_data);
+	char *snd_data;
 	mROsExclusiveUnlockObjType unlck_obj;
 
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
-	ret = mros_topic_connector_put_data((mRosContainerObjType)this->get(), snd_data, len);
+	ret = mros_topic_connector_alloc_data((mRosContainerObjType)this->get(), &snd_data, data.dataSize());
 	if (ret != MROS_E_OK) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 	}
+	data.memCopy(snd_data);
 	mros_exclusive_unlock(&unlck_obj);
 	return;
 }
@@ -174,3 +189,15 @@ void ros::spin(void){
 	slp_tsk();
 	return;
 }
+
+
+void mros_topic_callback(mros_uint32 type_id, mRosFuncIdType func_id, const char *data, int len)
+{
+	void (*fp)(void *ptr);
+	fp = (void (*)(void *))func_id;
+
+	callCallback((int)type_id, fp, (char*)data, len);
+	return;
+}
+
+#include "message_class_specialization.h"

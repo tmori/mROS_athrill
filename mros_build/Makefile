@@ -6,6 +6,8 @@ PRJROOT_ETHERIF=$(MBED_LIB_DIR)/EthernetInterface
 PRJROOT_MROS=$(MROS_LIB_DIR)/mros-lib
 PRJROOT_ASP=../../../../mros/asp-athrill-mbed/asp-athrill
 SRC_ROOT=$(MROS_LIB_DIR)/mros-lib/src
+MROS_MSG_DIR=$(MROS_LIB_DIR)/mros-lib/mros-msgs
+APL_DIR=../app
 
 ROS_VERSION	:= kinetic
 
@@ -54,6 +56,8 @@ IFLAGS	+= -I$(SRC_ROOT)/packet/template/version/$(ROS_VERSION)
 IFLAGS	+= -I$(SRC_ROOT)/packet/cimpl/version/$(ROS_VERSION)
 IFLAGS	+= -I$(SRC_ROOT)/protocol/cimpl
 IFLAGS	+= -I$(SRC_ROOT)/transfer/cimpl
+IFLAGS	+= -I$(MROS_MSG_DIR)
+IFLAGS	+= -I$(APL_DIR)/include
 
 CXX_OBJ += ros.o
 CXX_OBJ += mros_comm_cimpl.o
@@ -82,7 +86,6 @@ CXX_OBJ += mros_topic_cimpl.o
 CXX_OBJ += mros_topic_connector_cimpl.o
 CXX_OBJ += mros_topic_connector_factory_cimpl.o
 CXX_OBJ += mros_name.o
-CXX_OBJ += mros_topic_callback.o
 CXX_OBJ += mros_os_config.o
 CXX_OBJ += mros_usr_config.o
 CXX_OBJ += mros_sys_config.o

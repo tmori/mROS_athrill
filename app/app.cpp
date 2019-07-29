@@ -1,5 +1,6 @@
 #include "app.h"
 #include "../mros-lib/src/api/ros.h"
+#include "../mros-lib/mros-msgs/std_msgs/String.h"
 //mbed library
 #include "mbed.h"
 #include "EthernetInterface.h"
@@ -30,7 +31,7 @@ void usr_task1(void)
 	ros::Rate loop_rate(5);
 	std_msgs::String str;
 
-	chatter_pub = n.advertise("mros_msging", 1);
+	chatter_pub = n.advertise<std_msgs::String>("mros_msging", 1);
 	syslog(LOG_NOTICE,"Data Publish Start");
 	while(1){
 		wait_ms(1000);
@@ -45,8 +46,8 @@ void usr_task1(void)
 /*******  callback **********/
 #include <string.h>
 static char callback_buffer[1024];
-void Callback(string *msg){
-	sprintf(callback_buffer, "I heard [%s]",msg->c_str());
+void Callback(std_msgs::String *msg){
+	sprintf(callback_buffer, "I heard [%s]",msg->data.c_str());
 	syslog(LOG_NOTICE, "%s", callback_buffer);
 }
 
@@ -61,10 +62,10 @@ void usr_task2(void)
 	ros::Subscriber sub;
 
 	if (test_inner == 0) {
-		 sub = n.subscriber("test_string",1, Callback);
+		 sub = n.subscribe("test_string",1, Callback);
 	}
 	else {
-		 sub = n.subscriber("mros_msging",1, Callback);
+		 sub = n.subscribe("mros_msging",1, Callback);
 	}
 
 	ros::spin();

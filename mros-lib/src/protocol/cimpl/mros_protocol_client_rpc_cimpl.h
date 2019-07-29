@@ -39,6 +39,7 @@ typedef struct {
 	const char*			node_name;
 	const char*			topic_name;
 	const char*			topic_typename;
+	const char*			md5sum;
 	mRosPacketType 		*req_packet;
 } mRosRcpRosReqType;
 

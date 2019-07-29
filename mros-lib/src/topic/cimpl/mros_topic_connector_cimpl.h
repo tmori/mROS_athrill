@@ -84,6 +84,8 @@ extern mRosReturnType mros_topic_connector_receive_data(mRosTopicConnectorManage
 
 extern void mros_topic_connector_purge(mRosTopicConnectorManagerType *mgrp);
 
+extern mRosReturnType mros_topic_connector_alloc_data(mRosContainerObjType obj, char **data, mRosSizeType len);
+
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,6 @@
 #include "mros_protocol_subscribe_cimpl.h"
 #include "mros_protocol_client_rpc_cimpl.h"
+#include "mros_protocol_server_proc_cimpl.h"
 #include "mros_topic_cimpl.h"
 #include "mros_topic_connector_factory_cimpl.h"
 #include "mros_topic_runner_cimpl.h"
@@ -102,6 +103,7 @@ void mros_protocol_subscribe_run(void)
 		req.node_name = mros_node_name(sub_connector.node_id);
 		req.topic_name = mros_topic_get_topic_name(connector.topic_id);
 		req.topic_typename = mros_topic_get_topic_typename(connector.topic_id);
+		(void)mros_topic_get_md5sum(connector.topic_id, &req.md5sum);
 		ret = mros_rpc_tcpros(&client_req->data.client, &req, &res);
 		if (ret != MROS_E_OK) {
 			ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);

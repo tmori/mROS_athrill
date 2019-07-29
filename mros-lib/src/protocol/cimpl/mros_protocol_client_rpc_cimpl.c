@@ -128,14 +128,13 @@ mRosReturnType mros_rpc_tcpros(mRosCommTcpClientType *client, mRosRcpRosReqType 
 {
 	mRosEncodeArgType arg;
 
-	char *md5sum = "992ce8a1687cec8c8bd883ec73ca41d1";//TODO
 	arg.type = MROS_PACKET_DATA_TCPROS_TOPIC_REQ;
 	arg.args_int = 0;
 	arg.args_char = 4;
 	arg.argv[0] = req->node_name;
 	arg.argv[1] = req->topic_name;
 	arg.argv[2] = req->topic_typename;
-	arg.argv[3] = md5sum;
+	arg.argv[3] = req->md5sum;
 
 	return mros_rpc_sendreply_tcpros(&arg, client, req, res);
 }
