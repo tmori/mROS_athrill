@@ -11,7 +11,7 @@ typedef struct {
 	char						topic_typename[MROS_TOPIC_TYPENAME_MAXLEN];
 	const char*					md5sum;
 	const char*					definition;
-	mros_uint32					typeid;
+	mros_uint32					type_id;
 
 	/*
 	 * トピックデータ格納用キュー
@@ -167,7 +167,7 @@ mRosReturnType mros_topic_set_typeid(mRosTopicIdType topic_id, mros_uint32 type_
 	if (topic_id > topic_manager.max_topic) {
 		return MROS_E_RANGE;
 	}
-	TOPIC_OBJ(topic_id).data.typeid = type_id;
+	TOPIC_OBJ(topic_id).data.type_id = type_id;
 	return MROS_E_OK;
 }
 mRosReturnType mros_topic_get_typeid(mRosTopicIdType topic_id, mros_uint32 *type_id)
@@ -175,7 +175,7 @@ mRosReturnType mros_topic_get_typeid(mRosTopicIdType topic_id, mros_uint32 *type
 	if (topic_id > topic_manager.max_topic) {
 		return MROS_E_RANGE;
 	}
-	*type_id = TOPIC_OBJ(topic_id).data.typeid;
+	*type_id = TOPIC_OBJ(topic_id).data.type_id;
 	return MROS_E_OK;
 }
 

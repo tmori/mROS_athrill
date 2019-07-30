@@ -1,10 +1,10 @@
 #include "std_msgs/String.h"
 
 
-static void callCallback(int id, void (*fp)(void *), char *rbuf, int len){
+static void callCallback(int id, void (*fp)(void *), char *rbuf){
 	switch(id){
 		case 9:
-			subtask_methods::CallCallbackFuncs<9>().call(fp,rbuf, len);
+			subtask_methods::CallCallbackFuncs<9>().call(fp,rbuf);
 			break;
 	
 	

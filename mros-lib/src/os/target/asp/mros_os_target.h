@@ -7,6 +7,7 @@ extern "C" {
 
 #include <kernel.h>
 #include <t_syslog.h>
+
 #include "mros_types.h"
 
 typedef ID	mRosTaskIdType;
@@ -25,12 +26,7 @@ typedef mros_uint32 mRosTaskSleepIntervalType;
 #define MROS_LOG_INFO		LOG_INFO
 #define MROS_LOG_DEBUG		LOG_DEBUG
 
-#define ROS_DEBUG(...) 		syslog(LOG_DEBUG, __VA_ARGS__)
-#define ROS_INFO(...) 		syslog(LOG_NOTICE, __VA_ARGS__)
-#define ROS_WARN(...) 		syslog(LOG_WARNING, __VA_ARGS__)
-#define ROS_ERROR(...) 		syslog(LOG_ERROR, __VA_ARGS__)
-#define ROS_FATAL(...) 		syslog(LOG_EMERG, __VA_ARGS__)
-
+#include "mros_log.h"
 
 
 #ifdef __cplusplus

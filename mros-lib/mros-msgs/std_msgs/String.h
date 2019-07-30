@@ -9,15 +9,14 @@ namespace std_msgs{
 class String{
 public:
 	std::string data;
-  int dataSize(){return data.size();}
+  int dataSize(){return data.size() + 4;}
 
   void memCopy(char *addrPtr){
-	//TODO
-    //int size;
-    //size = data.size();
-    //memcpy(addrPtr, &size, 4);
-    //addrPtr += 4;
-    memcpy(addrPtr, data.c_str(), data.size());
+	  int size;
+	  size = data.size();
+	  memcpy(addrPtr, &size, 4);
+	  addrPtr += 4;
+	  memcpy(addrPtr, data.c_str(), data.size());
   }
 };
 }
@@ -47,7 +46,7 @@ struct DataType<std_msgs::String*>
 template<>
 struct DataTypeId<std_msgs::String*>
 {
-  static const int value()
+  static int value()
   {
     return STRING_MSG_ID;
   }
@@ -70,10 +69,12 @@ namespace subtask_methods
 {
   template<>
   struct CallCallbackFuncs<STRING_MSG_ID>{
-    static void call(void (*fp)(void *), char *rbuf, int len)
+    static void call(void (*fp)(void *), char *rbuf)
     {
       std_msgs::String msg;
-      std::string str_msg((const char*)rbuf, len);
+	  int size;
+	  memcpy((char*)&size, &rbuf[4], 4);
+      std::string str_msg((const char*)&rbuf[8], size);
 
       msg.data = str_msg;
       fp(&msg);

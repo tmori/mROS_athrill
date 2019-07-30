@@ -106,7 +106,7 @@ void mros_comm_init(void)
 }
 mros_int32 mros_comm_accept(mros_int32 s, mRosSockAddrType *addr, mRosSizeType *addrlen)
 {
-	return lwip_accept(s, addr, addrlen);
+	return lwip_accept(s, addr, (socklen_t*)addrlen);
 }
 mros_int32 mros_comm_bind(mros_int32 s, const mRosSockAddrType *name, mRosSizeType namelen)
 {
@@ -118,15 +118,15 @@ mros_int32 mros_comm_shutdown(mros_int32 s, mros_int32 how)
 }
 mros_int32 mros_comm_getpeername (mros_int32 s, mRosSockAddrType *name, mRosSizeType *namelen)
 {
-	return lwip_getpeername(s, name, namelen);
+	return lwip_getpeername(s, name, (socklen_t*)namelen);
 }
 mros_int32 mros_comm_getsockname (mros_int32 s, mRosSockAddrType *name, mRosSizeType *namelen)
 {
-	return lwip_getsockname(s, name, namelen);
+	return lwip_getsockname(s, name, (socklen_t*)namelen);
 }
 mros_int32 mros_comm_getsockopt (mros_int32 s, mros_int32 level, mros_int32 optname, void *optval, mRosSizeType *optlen)
 {
-	return lwip_getsockopt(s, level, optname, optval, optlen);
+	return lwip_getsockopt(s, level, optname, optval, (socklen_t*)optlen);
 }
 mros_int32 mros_comm_setsockopt (mros_int32 s, mros_int32 level, mros_int32 optname, const void *optval, mRosSizeType optlen)
 {
@@ -154,7 +154,7 @@ mros_int32 mros_comm_read(mros_int32 s, void *mem, mRosSizeType len)
 }
 mros_int32 mros_comm_recvfrom(mros_int32 s, void *mem, mRosSizeType len, mros_int32 flags, mRosSockAddrType *from, mRosSizeType *fromlen)
 {
-	return lwip_recvfrom(s, mem, len, flags, from, fromlen);
+	return lwip_recvfrom(s, mem, len, flags, from, (socklen_t*)fromlen);
 }
 mros_int32 mros_comm_send(mros_int32 s, const void *dataptr, mRosSizeType size, mros_int32 flags)
 {

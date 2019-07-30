@@ -72,7 +72,7 @@ namespace message_traits
 	struct DataType{static const char* value();};
 
 	template <class T>
-	struct DataTypeId{static const int value();};
+	struct DataTypeId{static int value(void);};
 
 	template <class T>
 	struct Definition{static const char* value();};
@@ -84,5 +84,6 @@ namespace subtask_methods
 	struct CallCallbackFuncs{static void call(void (*fp)(), char *rbuf, int len);};
 }
 
+#include "mros_log.h"
 
 #endif /* _ROS_H_ */
