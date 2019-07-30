@@ -1,9 +1,9 @@
 #ENV FOLDERS
 ATHRILL_ROOT=../../../athrill
 MROS_LIB_DIR=..
-MBED_LIB_DIR=../../asp-athrill-mbed/mbed-lib
+MBED_LIB_DIR=../../../mros/asp-athrill-mbed/mbed-lib
 PRJROOT_ETHERIF=$(MBED_LIB_DIR)/EthernetInterface
-PRJROOT_ASP=../../asp-athrill-mbed//asp-athrill
+PRJROOT_ASP=../../../mros/asp-athrill-mbed//asp-athrill
 
 include $(PRJROOT_ETHERIF)/Makefile.eif
 
