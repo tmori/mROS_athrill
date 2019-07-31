@@ -1,0 +1,2 @@
+-l 24 ./kernel_cfg_asm.S
+
