@@ -11,6 +11,7 @@
 #include "digital.h"
 #include "device_io.h"
 #include <string.h>
+#include <kernel_cfg.h>
 
 using namespace std;
 
@@ -134,6 +135,7 @@ typedef struct {
 
 static ActuatorType car_actuator;
 
+static int car_mode = 1;
 void usr_task1(void)
 {
 	syslog(LOG_NOTICE,"========Activate user task1========");
@@ -142,26 +144,28 @@ void usr_task1(void)
 	int i = 0;
 	ros::init(argc,argv,"vehicle_controller");
 	ros::NodeHandle n;
-	ros::Rate loop_rate(10);
+	ros::Rate loop_rate(1000);
 
 	car_actuator.motor = n.advertise<std_msgs::String>("control_motor_torque", 1);
 	car_actuator.stearing = n.advertise<std_msgs::String>("control_stearing", 1);
 	car_actuator.brake = n.advertise<std_msgs::String>("control_brake", 1);
 
 	topic_publish(car_actuator.motor, 30);
-	int brake_counter = 0;
 	while (1) {
-		if (car_sensor.obstacle.found != 0) {
-			brake_counter = 1;
-			topic_publish(car_actuator.motor, 0);
-			topic_publish(car_actuator.brake, 1);
+		if (car_mode == 1) {
+			if (car_sensor.obstacle.found != 0) {
+				syslog(LOG_NOTICE, "FOUND!!");
+				topic_publish(car_actuator.brake, 1);
+				topic_publish(car_actuator.motor, 0);
+				car_mode = 0;
+			}
 		}
-		if (brake_counter > 0) {
-			brake_counter++;
-			if ((brake_counter > 10) && (car_sensor.obstacle.found == 0)) {
-				topic_publish(car_actuator.brake, 0);
+		else {
+			if (car_sensor.obstacle.found == 0) {
+				syslog(LOG_NOTICE, "NOT FOUND!!");
 				topic_publish(car_actuator.motor, 30);
-				brake_counter = 0;
+				topic_publish(car_actuator.brake, 0);
+				car_mode = 1;
 			}
 		}
 
@@ -209,7 +213,8 @@ void obstacle_callback(std_msgs::String *msg)
 	car_sensor.obstacle.found = arg.argv[0];
 	car_sensor.obstacle.distance = arg.argv[1];
 	car_sensor.obstacle.angle = arg.argv[2];
-	//syslog(LOG_NOTICE, "/obstacle found=%d distance=%d angle=%d", arg.argv[0], arg.argv[1], arg.argv[2]);
+	syslog(LOG_NOTICE, "/obstacle found=%d distance=%d angle=%d car_mode=%d", arg.argv[0], arg.argv[1], arg.argv[2], car_mode);
+	wup_tsk(USR_TASK1);
 }
 void line_sensor_callback(std_msgs::String *msg)
 {
