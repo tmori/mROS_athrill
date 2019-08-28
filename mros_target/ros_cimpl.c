@@ -12,7 +12,7 @@
 
 static int mros_id = 0;
 
-void ros_nit(mRosObjType *cobj, int argc, char *argv, const char* node_name)
+void ros_init(mRosObjType *cobj, int argc, char *argv, const char* node_name)
 {
 	mRosNodeIdType id;
 	mRosReturnType ret;

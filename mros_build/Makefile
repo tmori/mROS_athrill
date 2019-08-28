@@ -80,6 +80,7 @@ CXX_OBJ += mros_name.o
 CXX_OBJ += mros_os_config.o
 CXX_OBJ += mros_usr_config.o
 CXX_OBJ += mros_sys_config.o
+CXX_OBJ += lwip_linux.o
 
 OBJS	:= $(C_OBJ) $(CXX_OBJ)
 
@@ -99,6 +100,10 @@ VPATH	+= $(SRC_ROOT)/config
 VPATH	+= $(SRC_ROOT)/config/os/target/os_asp
 VPATH	+= $(PRJROOT_MROS)
 VPATH	+= $(MROX_TARGET_DIR)
+VPATH	+= $(MROX_TARGET_DIR)/x86/lwip
+
+main: libmros.a
+	gcc $(IFLAGS)  $(CDEFS) $(CFLAGS) -o mros_test main.c -L. -lmros -lm -lpthread
 
 %.o: %.S
 	$(CC) -c $(IFLAGS)  $(CDEFS) $(CFLAGS) $<
@@ -109,7 +114,7 @@ VPATH	+= $(MROX_TARGET_DIR)
 %.o: %.cpp
 	$(CXX) -c $(IFLAGS) $(CFLAGS) $(CDEFS) $(CXXFLAGS) $<
 
-all: $(CXX_OBJ) $(C_OBJ)
+libmros.a: $(CXX_OBJ) $(C_OBJ)
 	$(AR) -rcv  $(TARGET) $(CXX_OBJ) $(C_OBJ)
 
 clean:
