@@ -1,8 +1,36 @@
+typedef int* intptr_t;
 #include "kernel.h"
+#include "kernel_cfg.h"
 #include <time.h>
+#include "mros_os_config.h"
 
 pthread_mutex_t mutex_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cond_wait = PTHREAD_COND_INITIALIZER;
+
+extern void usr1_task(void);
+extern void usr2_task(void);
+
+
+typedef struct {
+	void (*task_func) (void);
+} OsTaskFuncType;
+
+static void *os_asp_task_body(void *arg)
+{
+	void (*fp)(void);
+	fp = (void (*)(void))arg;
+	fp();
+	return NULL;
+}
+static OsTaskFuncType os_task_table[NUM_TASK] = {
+		{ main_task },
+		{ sub_task },
+		{ pub_task },
+		{ xml_slv_task },
+		{ xml_mas_task },
+		{ usr1_task },
+		{ usr2_task },
+};
 
 int slp_tsk(void)
 {
@@ -13,7 +41,9 @@ int slp_tsk(void)
 }
 int act_tsk(ID id)
 {
-	return 0;
+	pthread_t ptr;
+
+	return pthread_create(&ptr, NULL, os_asp_task_body, (void*)os_task_table[id].task_func);
 }
 int get_tid(ID *p_tskid)
 {
