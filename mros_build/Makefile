@@ -1,5 +1,5 @@
 ATHRILL_ROOT=../../../athrill
-MROX_TARGET_DIR=../mros_target/x86
+MROX_TARGET_DIR=../mros_target
 MROS_LIB_DIR=../../../fork/mROS
 MBED_LIB_DIR=../../../mros/asp-athrill-mbed/mbed-lib
 PRJROOT_ETHERIF=$(MBED_LIB_DIR)/EthernetInterface
@@ -11,11 +11,6 @@ APL_DIR=../mros_ws/app
 
 ROS_VERSION	:= kinetic
 
-INCLUDE_PATHS += \
-  		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip \
-  		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip-sys \
- 		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip/include \
- 		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip/include/ipv4 
 CDEFS += -DTARGET_ATHRILL 
 CDEFS += -DLWIP_TRANSPORT_ETHERNET
 
@@ -32,14 +27,9 @@ CFLAGS	+= -gdwarf-2 -Wall -Wno-unused-label -Wpointer-arith
 
 IFLAGS	:= -I.
 IFLAGS	+= -I$(MROX_TARGET_DIR)
-IFLAGS	+= -I$(MROX_TARGET_DIR)/os
+IFLAGS	+= -I$(MROX_TARGET_DIR)/x86
+IFLAGS	+= -I$(MROX_TARGET_DIR)/x86/os
 IFLAGS	+= -I$(PRJROOT_ETHERIF)/lwip-athrill/include
-#IFLAGS	+= -I$(MBED_LIB_DIR)/mbed-src/api
-#IFLAGS	+= -I$(PRJROOT_ASP)
-#IFLAGS	+= -I$(PRJROOT_ASP)/include
-#IFLAGS	+= -I$(PRJROOT_ASP)/target/v850_gcc
-#IFLAGS	+= -I$(PRJROOT_ASP)/arch
-#IFLAGS	+= -I$(PRJROOT_ASP)/arch/v850_gcc
 IFLAGS	+= -I$(ATHRILL_ROOT)/trunk/apl/include
 
 IFLAGS	+= -I$(SRC_ROOT)/inc
@@ -60,7 +50,7 @@ IFLAGS	+= -I$(SRC_ROOT)/transfer/cimpl
 IFLAGS	+= -I$(MROS_MSG_DIR)
 IFLAGS	+= -I$(APL_DIR)/include
 
-CXX_OBJ += ros.o
+CXX_OBJ += ros_cimpl.o
 CXX_OBJ += mros_comm_cimpl.o
 CXX_OBJ += mros_comm_socket_cimpl.o
 CXX_OBJ += mros_comm_tcp_client_cimpl.o
@@ -108,6 +98,7 @@ VPATH	+= $(SRC_ROOT)/transfer/cimpl
 VPATH	+= $(SRC_ROOT)/config
 VPATH	+= $(SRC_ROOT)/config/os/target/os_asp
 VPATH	+= $(PRJROOT_MROS)
+VPATH	+= $(MROX_TARGET_DIR)
 
 %.o: %.S
 	$(CC) -c $(IFLAGS)  $(CDEFS) $(CFLAGS) $<
