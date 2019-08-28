@@ -1,51 +1,112 @@
-#ENV FOLDERS
 ATHRILL_ROOT=../../../athrill
-MROS_LIB_DIR=..
-MBED_LIB_DIR=../../asp-athrill-mbed/mbed-lib
+MROX_TARGET_DIR=../mros_target/x86
+MROS_LIB_DIR=../../../fork/mROS
+MBED_LIB_DIR=../../../mros/asp-athrill-mbed/mbed-lib
 PRJROOT_ETHERIF=$(MBED_LIB_DIR)/EthernetInterface
 PRJROOT_MROS=$(MROS_LIB_DIR)/mros-lib
-PRJROOT_ASP=../../asp-athrill-mbed//asp-athrill
+PRJROOT_ASP=../../../mros/asp-athrill-mbed/asp-athrill
+SRC_ROOT=$(MROS_LIB_DIR)/mros-lib/mros-src
+MROS_MSG_DIR=$(MROS_LIB_DIR)/mros-lib/mros-msgs
+APL_DIR=../mros_ws/app
 
-INCLUDE_PATHS += -I$(MBED_LIB_DIR)/EthernetInterface \
-		 -I$(MBED_LIB_DIR)/EthernetInterface/Socket \
+ROS_VERSION	:= kinetic
+
+INCLUDE_PATHS += \
   		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip \
   		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip-sys \
  		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip/include \
  		 -I$(MBED_LIB_DIR)/EthernetInterface/lwip/include/ipv4 
-CDEFS += -DTARGET_ATHRILL
+CDEFS += -DTARGET_ATHRILL 
 CDEFS += -DLWIP_TRANSPORT_ETHERNET
 
 TARGET	:= libmros.a
 
-CC		:= v850-elf-gcc
-CXX		:= v850-elf-g++
-LINK	:= v850-elf-gcc
-AR		:= v850-elf-ar
+CC		:= gcc
+CXX		:= g++
+LINK	:= gcc
+AR		:= ar
 
 CXXFLAGS := -fno-use-cxa-atexit -fno-exceptions -fno-rtti 
-CFLAGS	:= -O0 -mdisable-callt -mno-app-regs -mtda=0
-CFLAGS	+= -gdwarf-2 -Wall -Wno-unused-label -Wpointer-arith  -mv850e2v3 -Wa,-mno-bcond17 -msoft-float -Wa,-mwarn-signed-overflow -Wa,-mwarn-unsigned-overflow
+CFLAGS	:= -O0 
+CFLAGS	+= -gdwarf-2 -Wall -Wno-unused-label -Wpointer-arith   
 
 IFLAGS	:= -I.
-IFLAGS	+= $(INCLUDE_PATHS)
+IFLAGS	+= -I$(MROX_TARGET_DIR)
+IFLAGS	+= -I$(MROX_TARGET_DIR)/os
 IFLAGS	+= -I$(PRJROOT_ETHERIF)/lwip-athrill/include
-IFLAGS	+= -I$(MBED_LIB_DIR)/mbed-src/api
-IFLAGS	+= -I$(PRJROOT_ASP)
-IFLAGS	+= -I$(PRJROOT_ASP)/include
-IFLAGS	+= -I$(PRJROOT_ASP)/target/v850_gcc
-IFLAGS	+= -I$(PRJROOT_ASP)/arch
-IFLAGS	+= -I$(PRJROOT_ASP)/arch/v850_gcc
+#IFLAGS	+= -I$(MBED_LIB_DIR)/mbed-src/api
+#IFLAGS	+= -I$(PRJROOT_ASP)
+#IFLAGS	+= -I$(PRJROOT_ASP)/include
+#IFLAGS	+= -I$(PRJROOT_ASP)/target/v850_gcc
+#IFLAGS	+= -I$(PRJROOT_ASP)/arch
+#IFLAGS	+= -I$(PRJROOT_ASP)/arch/v850_gcc
 IFLAGS	+= -I$(ATHRILL_ROOT)/trunk/apl/include
 
-CXX_OBJ += xmlparser.o
-CXX_OBJ += tcp_ros.o
-CXX_OBJ += xmlcall.o
+IFLAGS	+= -I$(SRC_ROOT)/inc
+IFLAGS	+= -I$(SRC_ROOT)/config
+IFLAGS	+= -I$(SRC_ROOT)/config/os/target/os_asp
+IFLAGS	+= -I$(SRC_ROOT)/api
+IFLAGS	+= -I$(SRC_ROOT)/protocol/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/node/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/topic/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/os/target/os_asp
+IFLAGS	+= -I$(SRC_ROOT)/comm/cimpl/target/lwip
+IFLAGS	+= -I$(SRC_ROOT)/comm/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/packet/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/packet/template/version/$(ROS_VERSION)
+IFLAGS	+= -I$(SRC_ROOT)/packet/cimpl/version/$(ROS_VERSION)
+IFLAGS	+= -I$(SRC_ROOT)/protocol/cimpl
+IFLAGS	+= -I$(SRC_ROOT)/transfer/cimpl
+IFLAGS	+= -I$(MROS_MSG_DIR)
+IFLAGS	+= -I$(APL_DIR)/include
+
 CXX_OBJ += ros.o
-CXX_OBJ += mros.o
+CXX_OBJ += mros_comm_cimpl.o
+CXX_OBJ += mros_comm_socket_cimpl.o
+CXX_OBJ += mros_comm_tcp_client_cimpl.o
+CXX_OBJ += mros_comm_tcp_client_factory_cimpl.o
+CXX_OBJ += mros_comm_tcp_server_cimpl.o
+CXX_OBJ += mros_memory.o
+CXX_OBJ += mros_wait_queue.o
+CXX_OBJ += mros_node_cimpl.o
+CXX_OBJ += mros_exclusive_area.o
+CXX_OBJ += mros_exclusive_ops.o
+CXX_OBJ += mros_os.o
+CXX_OBJ += mros_packet_decoder_cimpl.o
+CXX_OBJ += mros_packet_encoder_cimpl.o
+CXX_OBJ += mros_protocol_client_rpc_cimpl.o
+CXX_OBJ += mros_protocol_master_cimpl.o
+CXX_OBJ += mros_protocol_operation_cimpl.o
+CXX_OBJ += mros_protocol_publish_cimpl.o
+CXX_OBJ += mros_protocol_server_proc_cimpl.o
+CXX_OBJ += mros_protocol_slave_cimpl.o
+CXX_OBJ += mros_protocol_subscribe_cimpl.o
+CXX_OBJ += mros_topic_data_publisher_cimpl.o
+CXX_OBJ += mros_topic_data_subscriber_cimpl.o
+CXX_OBJ += mros_topic_cimpl.o
+CXX_OBJ += mros_topic_connector_cimpl.o
+CXX_OBJ += mros_topic_connector_factory_cimpl.o
+CXX_OBJ += mros_name.o
+CXX_OBJ += mros_os_config.o
+CXX_OBJ += mros_usr_config.o
+CXX_OBJ += mros_sys_config.o
 
 OBJS	:= $(C_OBJ) $(CXX_OBJ)
 
-VPATH	:= .
+VPATH	:= $(SRC_ROOT)/api
+VPATH	+= $(SRC_ROOT)/comm/cimpl/target/lwip
+VPATH	+= $(SRC_ROOT)/comm/cimpl/target/lwip
+VPATH	+= $(SRC_ROOT)/comm/cimpl
+VPATH	+= $(SRC_ROOT)/node/cimpl
+VPATH	+= $(SRC_ROOT)/lib
+VPATH	+= $(SRC_ROOT)/os
+VPATH	+= $(SRC_ROOT)/os/target/os_asp
+VPATH	+= $(SRC_ROOT)/packet/cimpl/version/$(ROS_VERSION)
+VPATH	+= $(SRC_ROOT)/protocol/cimpl
+VPATH	+= $(SRC_ROOT)/topic/cimpl
+VPATH	+= $(SRC_ROOT)/transfer/cimpl
+VPATH	+= $(SRC_ROOT)/config
+VPATH	+= $(SRC_ROOT)/config/os/target/os_asp
 VPATH	+= $(PRJROOT_MROS)
 
 %.o: %.S

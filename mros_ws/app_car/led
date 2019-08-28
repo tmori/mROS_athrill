@@ -1,0 +1,3 @@
+#!/bin/bash
+
+../../../../athrill/sample/edu/dio_tools/led digital.config
