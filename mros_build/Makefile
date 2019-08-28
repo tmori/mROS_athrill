@@ -22,7 +22,7 @@ LINK	:= gcc
 AR		:= ar
 
 CXXFLAGS := -fno-use-cxa-atexit -fno-exceptions -fno-rtti 
-CFLAGS	:= -O0 
+CFLAGS	:= -O0 -g
 CFLAGS	+= -gdwarf-2 -Wall -Wno-unused-label -Wpointer-arith   
 
 IFLAGS	:= -I.

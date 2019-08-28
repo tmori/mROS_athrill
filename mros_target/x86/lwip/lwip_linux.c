@@ -1,14 +1,19 @@
 #include <lwip/sockets.h>
 #include <unistd.h>
+#include "kernel.h"
+#include <pthread.h>
 
 void lwip_init(void)
 {
 	return;
 }
+extern int get_tskid(void);
 
 int lwip_accept(int s, struct sockaddr *addr, socklen_t *addrlen)
 {
-	return accept(s, (struct sockaddr *)addr, addrlen);
+	int ret;
+	ret = accept(s, (struct sockaddr *)addr, addrlen);
+	return ret;
 }
 
 int lwip_bind(int s, const struct sockaddr *name, socklen_t namelen)
@@ -52,7 +57,19 @@ int lwip_close(int s)
 
 int lwip_connect(int s, const struct sockaddr *name, socklen_t namelen)
 {
-	return connect(s, name, namelen);
+	int tskid = get_tskid();
+	int isLocked = 0;
+	if (os_task_table[tskid].lock_count > 0) {
+		isLocked = 1;
+		os_task_table[tskid].lock_count--;
+		pthread_mutex_unlock(&mutex_lock);
+	}
+	int ret = connect(s, name, namelen);
+	if (isLocked != 0) {
+		pthread_mutex_lock(&mutex_lock);
+		os_task_table[tskid].lock_count++;
+	}
+	return ret;
 }
 
 
@@ -64,7 +81,20 @@ int lwip_listen(int s, int backlog)
 
 int lwip_recv(int s, void *mem, size_t len, int flags)
 {
-	return recv(s, mem, len, flags);
+	int ret;
+	int tskid = get_tskid();
+	int isLocked = 0;
+	if (os_task_table[tskid].lock_count > 0) {
+		isLocked = 1;
+		os_task_table[tskid].lock_count--;
+		pthread_mutex_unlock(&mutex_lock);
+	}
+	ret = recv(s, mem, len, flags);
+	if (isLocked != 0) {
+		pthread_mutex_lock(&mutex_lock);
+		os_task_table[tskid].lock_count++;
+	}
+	return ret;
 }
 
 int lwip_read(int s, void *mem, size_t len)
@@ -103,7 +133,20 @@ int lwip_write(int s, const void *dataptr, size_t size)
 int lwip_select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset,
                 struct timeval *timeout)
 {
-	return select(maxfdp1, readset, writeset, exceptset, timeout);
+	int ret;
+	int tskid = get_tskid();
+	int isLocked = 0;
+	if (os_task_table[tskid].lock_count > 0) {
+		isLocked = 1;
+		os_task_table[tskid].lock_count--;
+		pthread_mutex_unlock(&mutex_lock);
+	}
+	ret = select(maxfdp1, readset, writeset, exceptset, timeout);
+	if (isLocked != 0) {
+		pthread_mutex_lock(&mutex_lock);
+		os_task_table[tskid].lock_count++;
+	}
+	return ret;
 }
 
 int lwip_ioctl(int s, long cmd, void *argp)
