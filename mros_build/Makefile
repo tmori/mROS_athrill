@@ -60,7 +60,7 @@ CXX_OBJ += mros_memory.o
 CXX_OBJ += mros_wait_queue.o
 CXX_OBJ += mros_node_cimpl.o
 CXX_OBJ += mros_exclusive_area.o
-CXX_OBJ += mros_exclusive_ops.o
+CXX_OBJ += mros_exclusive_ops_linux.o
 CXX_OBJ += mros_os.o
 CXX_OBJ += mros_packet_decoder_cimpl.o
 CXX_OBJ += mros_packet_encoder_cimpl.o
@@ -81,6 +81,7 @@ CXX_OBJ += mros_os_config.o
 CXX_OBJ += mros_usr_config.o
 CXX_OBJ += mros_sys_config.o
 CXX_OBJ += lwip_linux.o
+CXX_OBJ += os_asp.o
 
 OBJS	:= $(C_OBJ) $(CXX_OBJ)
 
@@ -101,6 +102,7 @@ VPATH	+= $(SRC_ROOT)/config/os/target/os_asp
 VPATH	+= $(PRJROOT_MROS)
 VPATH	+= $(MROX_TARGET_DIR)
 VPATH	+= $(MROX_TARGET_DIR)/x86/lwip
+VPATH	+= $(MROX_TARGET_DIR)/x86/os
 
 main: libmros.a
 	gcc $(IFLAGS)  $(CDEFS) $(CFLAGS) -o mros_test main.c -L. -lmros -lm -lpthread

@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <pthread.h>
 typedef int ID;
 typedef int PRI;
 
@@ -14,6 +15,10 @@ extern int iwup_tsk(ID tskid);
 extern int get_pri(ID tskid, PRI *p_tskpri);
 extern int dly_tsk(int dlytim);
 extern int wup_tsk(ID tskid);
+
+extern pthread_mutex_t mutex_lock;
+extern pthread_cond_t cond_wait;
+
 
 #define TMAX_TPRI 1
 
