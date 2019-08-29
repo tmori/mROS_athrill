@@ -10,6 +10,22 @@ pthread_cond_t cond_wait = PTHREAD_COND_INITIALIZER;
 extern void usr1_task(void);
 extern void usr2_task(void);
 
+typedef enum {
+	OsState_STOPPED = 0,
+	OsState_RUNNABLE,
+	OsState_RUNNING,
+	OsState_WAITING,
+} OsStateType;
+
+typedef struct {
+	int				lock_count;
+	pthread_t		thread;
+	OsStateType		state;
+	void (*task_func) (void);
+} OsTaskType;
+extern OsTaskType os_task_table[NUM_TASK];
+extern int get_tskid(void);
+
 
 
 OsTaskType os_task_table[NUM_TASK] = {
@@ -59,36 +75,80 @@ static void *os_asp_task_body(void *arg)
 	return NULL;
 }
 
+void os_lock_recursive(void)
+{
+	int tskid = get_tskid();
+	if (tskid < 0) {
+		return;
+	}
+	if (os_task_table[tskid].lock_count <= 0) {
+		pthread_mutex_lock(&mutex_lock);
+	}
+	os_task_table[tskid].lock_count++;
+	return;
+}
+
+void os_unlock_recursive(void)
+{
+	int tskid = get_tskid();
+	if (tskid < 0) {
+		return;
+	}
+	if (os_task_table[tskid].lock_count > 0) {
+		os_task_table[tskid].lock_count--;
+	}
+	if (os_task_table[tskid].lock_count <= 0) {
+		pthread_mutex_unlock(&mutex_lock);
+	}
+	return;
+}
+
+void os_save_unlock(OsSaveLockType *save)
+{
+	save->tskid = get_tskid();
+	save->lockCount = os_task_table[save->tskid].lock_count;
+	if (os_task_table[save->tskid].lock_count > 0) {
+		os_task_table[save->tskid].lock_count = 0;
+		pthread_mutex_unlock(&mutex_lock);
+	}
+	return;
+}
+
+void os_restore_lock(OsSaveLockType *save)
+{
+	if (save->lockCount > 0) {
+		pthread_mutex_lock(&mutex_lock);
+	}
+	os_task_table[save->tskid].lock_count = save->lockCount;
+	return;
+}
+
+
 int slp_tsk(void)
 {
+	OsSaveLockType save;
 	/*
 	 * already locked!
 	 */
-	int tskid = get_tskid();
-	if (tskid < 0) {
+	save.tskid = get_tskid();
+	if (save.tskid < 0) {
 		return -1;
 	}
-	os_task_table[tskid].state = OsState_WAITING;
-	while (os_task_table[tskid].state == OsState_WAITING) {
-		os_task_table[tskid].lock_count--;
+	save.lockCount = os_task_table[save.tskid].lock_count;
+	os_task_table[save.tskid].state = OsState_WAITING;
+	while (os_task_table[save.tskid].state == OsState_WAITING) {
+		os_task_table[save.tskid].lock_count = 0;
 		pthread_cond_wait(&cond_wait, &mutex_lock);
-		os_task_table[tskid].lock_count++;
+		os_task_table[save.tskid].lock_count = save.lockCount;
 	}
 	return 0;
 }
 int act_tsk(ID id)
 {
-	pthread_mutex_lock(&mutex_lock);
-	int tskid = get_tskid();
-	if (tskid < 0) {
-		pthread_mutex_unlock(&mutex_lock);
-		return -1;
-	}
-	os_task_table[tskid].lock_count++;
+	os_lock_recursive();
 	os_task_table[id].state = OsState_RUNNABLE;
 	(void)pthread_create(&os_task_table[id].thread, NULL, os_asp_task_body, (void*)os_task_table[id].task_func);
-	os_task_table[tskid].lock_count--;
-	pthread_mutex_unlock(&mutex_lock);
+	os_unlock_recursive();
 	return 0;
 }
 int get_tid(ID *p_tskid)
@@ -103,10 +163,10 @@ int chg_pri(ID tskid, PRI tskpri)
 }
 int iwup_tsk(ID tskid)
 {
-	pthread_mutex_lock(&mutex_lock);
+	os_lock_recursive();
 	os_task_table[tskid].state = OsState_RUNNABLE;
 	pthread_cond_signal(&cond_wait);
-	pthread_mutex_unlock(&mutex_lock);
+	os_unlock_recursive();
 	return 0;
 }
 int get_pri(ID tskid, PRI *p_tskpri)
@@ -119,34 +179,23 @@ int dly_tsk(int dlytim)
 {
 	struct timespec tv;
 	clock_gettime(CLOCK_REALTIME, &tv);
-	tv.tv_nsec += dlytim * 1000;
-	pthread_mutex_lock(&mutex_lock);
 	int tskid = get_tskid();
 	if (tskid < 0) {
-		pthread_mutex_unlock(&mutex_lock);
 		return -1;
 	}
-	os_task_table[tskid].lock_count++;
+	tv.tv_nsec += dlytim * 1000;
+	os_lock_recursive();
 	os_task_table[tskid].state = OsState_WAITING;
 	pthread_cond_timedwait(&cond_wait, &mutex_lock, &tv);
 	os_task_table[tskid].state = OsState_RUNNING;
-	os_task_table[tskid].lock_count--;
-	pthread_mutex_unlock(&mutex_lock);
+	os_unlock_recursive();
 	return 0;
 }
 int wup_tsk(ID tskid)
 {
-	int myid = get_tskid();
-	if (myid < 0) {
-		return -1;
-	}
-	if (os_task_table[myid].lock_count <= 0) {
-		pthread_mutex_lock(&mutex_lock);
-	}
+	os_lock_recursive();
 	os_task_table[tskid].state = OsState_RUNNABLE;
 	pthread_cond_signal(&cond_wait);
-	if (os_task_table[myid].lock_count <= 0) {
-		pthread_mutex_unlock(&mutex_lock);
-	}
+	os_unlock_recursive();
 	return 0;
 }

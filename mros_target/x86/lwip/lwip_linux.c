@@ -57,18 +57,10 @@ int lwip_close(int s)
 
 int lwip_connect(int s, const struct sockaddr *name, socklen_t namelen)
 {
-	int tskid = get_tskid();
-	int isLocked = 0;
-	if (os_task_table[tskid].lock_count > 0) {
-		isLocked = 1;
-		os_task_table[tskid].lock_count--;
-		pthread_mutex_unlock(&mutex_lock);
-	}
+	OsSaveLockType save;
+	os_save_unlock(&save);
 	int ret = connect(s, name, namelen);
-	if (isLocked != 0) {
-		pthread_mutex_lock(&mutex_lock);
-		os_task_table[tskid].lock_count++;
-	}
+	os_restore_lock(&save);
 	return ret;
 }
 
@@ -82,18 +74,10 @@ int lwip_listen(int s, int backlog)
 int lwip_recv(int s, void *mem, size_t len, int flags)
 {
 	int ret;
-	int tskid = get_tskid();
-	int isLocked = 0;
-	if (os_task_table[tskid].lock_count > 0) {
-		isLocked = 1;
-		os_task_table[tskid].lock_count--;
-		pthread_mutex_unlock(&mutex_lock);
-	}
+	OsSaveLockType save;
+	os_save_unlock(&save);
 	ret = recv(s, mem, len, flags);
-	if (isLocked != 0) {
-		pthread_mutex_lock(&mutex_lock);
-		os_task_table[tskid].lock_count++;
-	}
+	os_restore_lock(&save);
 	return ret;
 }
 
@@ -134,18 +118,10 @@ int lwip_select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptse
                 struct timeval *timeout)
 {
 	int ret;
-	int tskid = get_tskid();
-	int isLocked = 0;
-	if (os_task_table[tskid].lock_count > 0) {
-		isLocked = 1;
-		os_task_table[tskid].lock_count--;
-		pthread_mutex_unlock(&mutex_lock);
-	}
+	OsSaveLockType save;
+	os_save_unlock(&save);
 	ret = select(maxfdp1, readset, writeset, exceptset, timeout);
-	if (isLocked != 0) {
-		pthread_mutex_lock(&mutex_lock);
-		os_task_table[tskid].lock_count++;
-	}
+	os_restore_lock(&save);
 	return ret;
 }
 

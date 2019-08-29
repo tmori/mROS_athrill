@@ -21,21 +21,15 @@ extern pthread_cond_t cond_wait;
 
 #include "kernel_cfg.h"
 
-typedef enum {
-	OsState_STOPPED = 0,
-	OsState_RUNNABLE,
-	OsState_RUNNING,
-	OsState_WAITING,
-} OsStateType;
 
 typedef struct {
-	int				lock_count;
-	pthread_t		thread;
-	OsStateType		state;
-	void (*task_func) (void);
-} OsTaskType;
-extern OsTaskType os_task_table[NUM_TASK];
-extern int get_tskid(void);
+	int tskid;
+	int lockCount;
+} OsSaveLockType;
+extern void os_save_unlock(OsSaveLockType *save);
+extern void os_restore_lock(OsSaveLockType *save);
+extern void os_lock_recursive(void);
+extern void os_unlock_recursive(void);
 
 #define TMAX_TPRI 1
 
