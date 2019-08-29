@@ -29,7 +29,7 @@ void ros_init(mRosObjType *cobj, int argc, char *argv, const char* node_name)
 	return;
 }
 
-int ros_subscribe(mRosObjType *cobj, const char* topic, int queue_size, void (*fp) (char *))
+int ros_topic_subscribe(mRosObjType *cobj, const char* topic, int queue_size, void (*fp) (const char *))
 {
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;
@@ -157,7 +157,7 @@ int ros_advertise(mRosObjType *cobj, const char* topic, int queue_size)
 }
 
 
-int ros_publish(mRosObjType* cobj, void *data, int datalen)
+int ros_topic_publish(mRosObjType* cobj, void *data, int datalen)
 {
 	mRosReturnType ret;
 	char *snd_data;
@@ -165,7 +165,7 @@ int ros_publish(mRosObjType* cobj, void *data, int datalen)
 	mRosSizeType size;
 	mROsExclusiveUnlockObjType unlck_obj;
 
-	size = mros_protocol_get_buffersize(datalen);
+	size = mros_protocol_get_buffersize(datalen + 4);
 
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
 	ret = mros_topic_connector_alloc_data((mRosContainerObjType)cobj->objp, &snd_data, size);
@@ -173,8 +173,7 @@ int ros_publish(mRosObjType* cobj, void *data, int datalen)
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 	}
 	bodyp = mros_protocol_get_body(snd_data);
-    size = datalen + 4;
-    memcpy(bodyp, &size, 4);
+    memcpy(bodyp, &datalen, 4);
     bodyp += 4;
 	memcpy(bodyp, data, datalen);
 	mros_exclusive_unlock(&unlck_obj);
@@ -187,7 +186,7 @@ void mros_topic_callback(mros_uint32 type_id, mRosFuncIdType func_id, const char
 	void (*fp)(void *ptr);
 	fp = (void (*)(void *))func_id;
 
-	fp((char*)data);
+	fp((char*)&data[8]);
 	return;
 }
 

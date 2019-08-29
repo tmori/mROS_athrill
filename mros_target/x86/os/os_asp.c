@@ -93,6 +93,7 @@ int act_tsk(ID id)
 }
 int get_tid(ID *p_tskid)
 {
+	*p_tskid = get_tskid();
 	return 0;
 }
 int chg_pri(ID tskid, PRI tskpri)
@@ -135,9 +136,17 @@ int dly_tsk(int dlytim)
 }
 int wup_tsk(ID tskid)
 {
-	pthread_mutex_lock(&mutex_lock);
+	int myid = get_tskid();
+	if (myid < 0) {
+		return -1;
+	}
+	if (os_task_table[myid].lock_count <= 0) {
+		pthread_mutex_lock(&mutex_lock);
+	}
 	os_task_table[tskid].state = OsState_RUNNABLE;
 	pthread_cond_signal(&cond_wait);
-	pthread_mutex_unlock(&mutex_lock);
+	if (os_task_table[myid].lock_count <= 0) {
+		pthread_mutex_unlock(&mutex_lock);
+	}
 	return 0;
 }
