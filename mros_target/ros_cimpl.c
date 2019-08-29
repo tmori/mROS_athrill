@@ -10,21 +10,17 @@
 #include "mros_topic_callback.h"
 #include <string.h>
 
-static int mros_id = 0;
-
-void ros_init(mRosObjType *cobj, int argc, char *argv, const char* node_name)
+void ros_init(int argc, char *argv, const char* node_name)
 {
 	mRosNodeIdType id;
 	mRosReturnType ret;
 	mROsExclusiveUnlockObjType unlck_obj;
 
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
-	mros_id++;
 	ret = mros_node_create_inner(node_name, &id);
 	if (ret != MROS_E_OK) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 	}
-	cobj->id = mros_id;
 	mros_exclusive_unlock(&unlck_obj);
 	return;
 }

@@ -33,13 +33,12 @@ IFLAGS	+= -I$(PRJROOT_ETHERIF)/lwip-athrill/include
 IFLAGS	+= -I$(ATHRILL_ROOT)/trunk/apl/include
 
 IFLAGS	+= -I$(SRC_ROOT)/inc
-IFLAGS	+= -I$(SRC_ROOT)/config
-IFLAGS	+= -I$(SRC_ROOT)/config/os/target/os_asp
+IFLAGS	+= -I$(MROX_TARGET_DIR)/x86/config
+IFLAGS	+= -I$(SRC_ROOT)/os/target/os_asp
 IFLAGS	+= -I$(SRC_ROOT)/api
 IFLAGS	+= -I$(SRC_ROOT)/protocol/cimpl
 IFLAGS	+= -I$(SRC_ROOT)/node/cimpl
 IFLAGS	+= -I$(SRC_ROOT)/topic/cimpl
-IFLAGS	+= -I$(SRC_ROOT)/os/target/os_asp
 IFLAGS	+= -I$(SRC_ROOT)/comm/cimpl/target/lwip
 IFLAGS	+= -I$(SRC_ROOT)/comm/cimpl
 IFLAGS	+= -I$(SRC_ROOT)/packet/cimpl
@@ -97,12 +96,11 @@ VPATH	+= $(SRC_ROOT)/packet/cimpl/version/$(ROS_VERSION)
 VPATH	+= $(SRC_ROOT)/protocol/cimpl
 VPATH	+= $(SRC_ROOT)/topic/cimpl
 VPATH	+= $(SRC_ROOT)/transfer/cimpl
-VPATH	+= $(SRC_ROOT)/config
-VPATH	+= $(SRC_ROOT)/config/os/target/os_asp
 VPATH	+= $(PRJROOT_MROS)
 VPATH	+= $(MROX_TARGET_DIR)
 VPATH	+= $(MROX_TARGET_DIR)/x86/lwip
 VPATH	+= $(MROX_TARGET_DIR)/x86/os
+VPATH	+= $(MROX_TARGET_DIR)/x86/config
 
 main: libmros.a
 	gcc $(IFLAGS)  $(CDEFS) $(CFLAGS) -o mros_test main.c -L. -lmros -lm -lpthread

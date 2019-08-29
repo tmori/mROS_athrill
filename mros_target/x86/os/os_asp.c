@@ -7,9 +7,6 @@ typedef int* intptr_t;
 pthread_mutex_t mutex_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cond_wait = PTHREAD_COND_INITIALIZER;
 
-extern void usr1_task(void);
-extern void usr2_task(void);
-
 typedef enum {
 	OsState_STOPPED = 0,
 	OsState_RUNNABLE,
@@ -23,19 +20,13 @@ typedef struct {
 	OsStateType		state;
 	void (*task_func) (void);
 } OsTaskType;
-extern OsTaskType os_task_table[NUM_TASK];
-extern int get_tskid(void);
 
-
-
-OsTaskType os_task_table[NUM_TASK] = {
+static OsTaskType os_task_table[NUM_TASK] = {
 		{ .task_func = main_task },
 		{ .task_func = sub_task },
 		{ .task_func = pub_task },
 		{ .task_func = xml_slv_task },
 		{ .task_func = xml_mas_task },
-		{ .task_func = usr1_task },
-		{ .task_func = usr2_task },
 };
 
 void set_main_task(void)
@@ -47,7 +38,7 @@ void set_main_task(void)
 	pthread_mutex_unlock(&mutex_lock);
 }
 
-int get_tskid(void)
+static int get_tskid(void)
 {
 	int i;
 	pthread_t self = pthread_self();
@@ -141,6 +132,7 @@ int slp_tsk(void)
 		pthread_cond_wait(&cond_wait, &mutex_lock);
 		os_task_table[save.tskid].lock_count = save.lockCount;
 	}
+	os_task_table[save.tskid].state = OsState_RUNNING;
 	return 0;
 }
 int act_tsk(ID id)
@@ -165,7 +157,7 @@ int iwup_tsk(ID tskid)
 {
 	os_lock_recursive();
 	os_task_table[tskid].state = OsState_RUNNABLE;
-	pthread_cond_signal(&cond_wait);
+	pthread_cond_broadcast(&cond_wait);
 	os_unlock_recursive();
 	return 0;
 }
@@ -195,7 +187,7 @@ int wup_tsk(ID tskid)
 {
 	os_lock_recursive();
 	os_task_table[tskid].state = OsState_RUNNABLE;
-	pthread_cond_signal(&cond_wait);
+	pthread_cond_broadcast(&cond_wait);
 	os_unlock_recursive();
 	return 0;
 }
