@@ -88,7 +88,7 @@ int ros_topic_subscribe(mRosObjType *cobj, const char* topic, int queue_size, vo
 	return 0;
 }
 
-int ros_advertise(mRosObjType *cobj, const char* topic, int queue_size)
+int ros_topic_advertise(mRosObjType *cobj, const char* topic, int queue_size)
 {
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;

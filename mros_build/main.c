@@ -25,7 +25,7 @@ int main(int argc, const char* argv[])
 	set_main_task();
 	main_task();
 	ros_init(0, NULL, "mros_pub_node");
-	err = ros_advertise(&pub_cobj, "test_string", 1);
+	err = ros_topic_advertise(&pub_cobj, "test_string", 1);
 	if (err != 0) {
 		printf("ros_advertise():err=%d\n", err);
 	}
