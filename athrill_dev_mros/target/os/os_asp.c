@@ -27,6 +27,7 @@ static OsTaskType os_task_table[NUM_TASK] = {
 		{ .task_func = pub_task },
 		{ .task_func = xml_slv_task },
 		{ .task_func = xml_mas_task },
+		{ .task_func = NULL },
 };
 
 void set_main_task(void)
@@ -35,6 +36,14 @@ void set_main_task(void)
 	os_task_table[MAIN_TASK].thread = pthread_self();
 	os_task_table[MAIN_TASK].state = OsState_RUNNING;
 	os_task_table[MAIN_TASK].lock_count = 0;
+	pthread_mutex_unlock(&mutex_lock);
+}
+void set_athrill_task(void)
+{
+	pthread_mutex_lock(&mutex_lock);
+	os_task_table[ATHRILL_TASK].thread = pthread_self();
+	os_task_table[ATHRILL_TASK].state = OsState_RUNNING;
+	os_task_table[ATHRILL_TASK].lock_count = 0;
 	pthread_mutex_unlock(&mutex_lock);
 }
 

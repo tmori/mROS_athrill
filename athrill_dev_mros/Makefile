@@ -32,6 +32,7 @@ IFLAGS	+= -I$(ATHRLL_MROS_DIR)/config
 IFLAGS	+= -I$(ATHRLL_MROS_DIR)/config/os/target/os_asp
 IFLAGS	+= -I$(ATHRLL_MROS_DIR)/target
 IFLAGS	+= -I$(ATHRLL_MROS_DIR)/target/os
+IFLAGS	+= -I$(ATHRLL_MROS_DIR)/device
 
 IFLAGS	+= -I$(SRC_ROOT)/inc
 IFLAGS	+= -I$(SRC_ROOT)/os/target/os_asp
@@ -78,6 +79,7 @@ CXX_OBJ += mros_usr_config.o
 CXX_OBJ += mros_sys_config.o
 CXX_OBJ += lwip_linux.o
 CXX_OBJ += os_asp.o
+CXX_OBJ += athrill_mros_device.o
 
 OBJS	:= $(C_OBJ) $(CXX_OBJ)
 
@@ -97,6 +99,7 @@ VPATH	+= $(ATHRLL_MROS_DIR)/api
 VPATH	+= $(ATHRLL_MROS_DIR)
 VPATH	+= $(ATHRLL_MROS_DIR)/target/lwip
 VPATH	+= $(ATHRLL_MROS_DIR)/target/os
+VPATH	+= $(ATHRLL_MROS_DIR)/device
 VPATH	+= $(ATHRLL_MROS_DIR)/config
 VPATH	+= $(ATHRLL_MROS_DIR)/config/os/target/os_asp
 

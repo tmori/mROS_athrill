@@ -7,7 +7,8 @@
 #define PUB_TASK	2
 #define XML_SLV_TASK	3
 #define XML_MAS_TASK	4
-#define NUM_TASK	5
+#define ATHRILL_TASK	5
+#define NUM_TASK	6
 
 #endif /* TOPPERS_KERNEL_CFG_H */
 

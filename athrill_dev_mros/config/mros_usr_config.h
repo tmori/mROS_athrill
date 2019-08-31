@@ -157,7 +157,7 @@ extern mRosMemoryManagerType ros_outer_topic_publisher_mempool;
  * please change corresponding variable definitions
  * of mros_usr_config.c for changing these parameters.
  */
-#define MROS_USR_TASK_NUM			2
+#define MROS_USR_TASK_NUM			1		// for athrill-thread
 /*
  * do not change for mROS inner data
  */

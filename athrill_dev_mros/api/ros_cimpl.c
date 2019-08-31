@@ -25,7 +25,7 @@ void ros_init(int argc, char *argv, const char* node_name)
 	return;
 }
 
-int ros_topic_subscribe(mRosObjType *cobj, const char* topic, int queue_size, void (*fp) (const char *))
+mRosSubscriberType *ros_topic_subscribe(const char* topic, int queue_size, void (*fp) (const char *))
 {
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;
@@ -34,7 +34,12 @@ int ros_topic_subscribe(mRosObjType *cobj, const char* topic, int queue_size, vo
 	mRosWaitListEntryType client_wait;
 	mROsExclusiveUnlockObjType unlck_obj;
 	mros_uint32 type_id;
+	mRosSubscriberType *sub;
 
+	sub = malloc(sizeof(mRosSubscriberType));
+	if (sub == NULL) {
+		return NULL;
+	}
 	mros_client_wait_entry_init(&client_wait, &req);
 
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
@@ -43,14 +48,14 @@ int ros_topic_subscribe(mRosObjType *cobj, const char* topic, int queue_size, vo
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return -1;
+		return NULL;
 	}
 
 	ret = mros_topic_create(topic, "std_msgs/String", &connector.topic_id);
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return -1;
+		return NULL;
 	}
 	(void)mros_topic_set_typeid(connector.topic_id, 0);
 	(void)mros_topic_set_definition(connector.topic_id, NULL);
@@ -61,7 +66,7 @@ int ros_topic_subscribe(mRosObjType *cobj, const char* topic, int queue_size, vo
 	if (mgrp == MROS_NULL) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return -1;
+		return NULL;
 	}
 	connector.func_id = (mRosFuncIdType)fp;
 
@@ -69,15 +74,16 @@ int ros_topic_subscribe(mRosObjType *cobj, const char* topic, int queue_size, vo
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return -1;
+		return NULL;
 	}
 	mRosContainerObjType obj = mros_topic_connector_get_obj(mgrp, &connector);
 	if (obj == MROS_COBJ_NULL) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return -1;
+		return NULL;
 	}
-	cobj->objp = (void*)obj;
+	sub->objp = (void*)obj;
+	sub->topic_id = connector.topic_id;
 
 	//ROSマスタへ登録する
 	req.req_type = MROS_PROTOCOL_MASTER_REQ_REGISTER_SUBSCRIBER;
@@ -85,10 +91,10 @@ int ros_topic_subscribe(mRosObjType *cobj, const char* topic, int queue_size, vo
 
 	mros_client_wait_for_request_done(&mros_master_wait_queue, &client_wait);
 	mros_exclusive_unlock(&unlck_obj);
-	return 0;
+	return sub;
 }
 
-int ros_topic_advertise(mRosObjType *cobj, const char* topic, int queue_size)
+mRosPublisherType *ros_topic_advertise(const char* topic, int queue_size)
 {
 	mRosReturnType ret;
 	mRosTopicConnectorType connector;
@@ -97,6 +103,12 @@ int ros_topic_advertise(mRosObjType *cobj, const char* topic, int queue_size)
 	mRosWaitListEntryType client_wait;
 	mROsExclusiveUnlockObjType unlck_obj;
 	mros_uint32 type_id;
+	mRosPublisherType *pub;
+
+	pub = malloc(sizeof(mRosPublisherType));
+	if (pub == NULL) {
+		return NULL;
+	}
 
 	mros_client_wait_entry_init(&client_wait, &req);
 
@@ -106,14 +118,14 @@ int ros_topic_advertise(mRosObjType *cobj, const char* topic, int queue_size)
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return -1;
+		return NULL;
 	}
 
 	ret = mros_topic_create(topic, "std_msgs/String", &connector.topic_id);
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return -1;
+		return NULL;
 	}
 	(void)mros_topic_set_typeid(connector.topic_id, 0);
 	(void)mros_topic_set_definition(connector.topic_id, NULL);
@@ -124,7 +136,7 @@ int ros_topic_advertise(mRosObjType *cobj, const char* topic, int queue_size)
 	if (mgrp == MROS_NULL) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return -1;
+		return NULL;
 	}
 	connector.func_id = (mRosFuncIdType)MROS_ID_NONE;
 
@@ -132,16 +144,17 @@ int ros_topic_advertise(mRosObjType *cobj, const char* topic, int queue_size)
 	if (ret != MROS_E_OK) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return -1;
+		return NULL;
 	}
 	mRosContainerObjType obj = mros_topic_connector_get_obj(mgrp, &connector);
 	if (obj == MROS_COBJ_NULL) {
 		mros_exclusive_unlock(&unlck_obj);
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
-		return -1;
+		return NULL;
 	}
 
-	cobj->objp = (void*)obj;
+	pub->objp = (void*)obj;
+	pub->topic_id = connector.topic_id;
 
 	//ROSマスタへ登録する
 	req.req_type = MROS_PROTOCOL_MASTER_REQ_REGISTER_PUBLISHER;
@@ -149,11 +162,11 @@ int ros_topic_advertise(mRosObjType *cobj, const char* topic, int queue_size)
 
 	mros_client_wait_for_request_done(&mros_master_wait_queue, &client_wait);
 	mros_exclusive_unlock(&unlck_obj);
-	return 0;
+	return pub;
 }
 
 
-int ros_topic_publish(mRosObjType* cobj, void *data, int datalen)
+int ros_topic_publish(mRosPublisherType* pub, void *data, int datalen)
 {
 	mRosReturnType ret;
 	char *snd_data;
@@ -164,7 +177,7 @@ int ros_topic_publish(mRosObjType* cobj, void *data, int datalen)
 	size = mros_protocol_get_buffersize(datalen + 4);
 
 	mros_exclusive_lock(&mros_exclusive_area, &unlck_obj);
-	ret = mros_topic_connector_alloc_data((mRosContainerObjType)cobj->objp, &snd_data, size);
+	ret = mros_topic_connector_alloc_data((mRosContainerObjType)pub->objp, &snd_data, size);
 	if (ret != MROS_E_OK) {
 		ROS_ERROR("%s %s() %u ret=%d", __FILE__, __FUNCTION__, __LINE__, ret);
 	}
@@ -195,6 +208,18 @@ mRosCallbackTopicIdType ros_topic_callback_topic_id(void)
 mRosCallbackDataLenType ros_topic_callback_datalen(void)
 {
 	return mros_callback_topic_datalen;
+}
+
+void ros_topic_callback_lock(void)
+{
+	mros_exclusive_lock(&mros_exclusive_area, NULL);
+	return;
+}
+
+void ros_topic_callback_unlock(void)
+{
+	mros_exclusive_unlock(NULL);
+	return;
 }
 
 
