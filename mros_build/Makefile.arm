@@ -1,0 +1,19 @@
+MROS_ARCH=arm
+
+CC		:= arm-none-eabi-gcc
+CXX		:= arm-none-eabi-g++
+LINK	:= arm-none-eabi-gcc
+AR		:= arm-none-eabi-ar
+
+PRJROOT_ASP=../../../athrill-sample/os/asp_arm
+
+
+CXXFLAGS := -fno-use-cxa-atexit -fno-exceptions -fno-rtti 
+CFLAGS	:= -g  -Wall -O0 -gdwarf-2 
+CFLAGS	+= -mlittle-endian  -mcpu=cortex-a9 -marm -mno-thumb-interwork  -mfloat-abi=hard -mfpu=neon 
+ 
+IFLAGS	+= -I$(PRJROOT_ASP)/target/gr_peach_gcc
+IFLAGS	+= -I$(PRJROOT_ASP)/arch/$(MROS_ARCH)_gcc
+IFLAGS	+= -I$(PRJROOT_ASP)/arch/$(MROS_ARCH)_gcc/common
+ 
+ CDEFS += -DTOPPERS_RZA1H
